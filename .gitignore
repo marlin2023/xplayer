@@ -1,0 +1,9 @@
+*.[oa]
+bin/
+obj/
+jni/
+.classpath
+.project
+.settings/
+*~
+

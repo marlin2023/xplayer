@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World, player01Activity!</string>
+    <string name="app_name">player01</string>
+    <string name="lable_text">please choose a movie</string>
+    <string name="button_text">play</string>
+
+</resources>

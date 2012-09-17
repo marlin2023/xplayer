@@ -1,0 +1,66 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <Button
+        android:id="@+id/btn_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dip"
+        android:paddingBottom="5dip"
+        android:paddingLeft="5dip"
+        android:layout_alignParentBottom="true"
+        android:text="seek-" >
+    </Button>
+
+    
+	<SeekBar  
+	   android:id="@+id/l014_seekBar2"  
+	   android:layout_width="match_parent"  
+	   android:layout_height="wrap_content"  
+	   android:max="100"  
+	   android:progress="20" />  
+        
+    <Button
+        android:id="@+id/btn_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/l014_seekBar2"
+        android:layout_marginTop="10dip"
+        android:paddingLeft="5dip"
+        android:text="pause" >
+    </Button>
+    
+     <Button
+        android:id="@+id/btn_stop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/btn_2"
+        android:layout_alignTop="@id/btn_2"
+        android:paddingLeft="5dip"
+        android:text="stop" >
+        
+    </Button>
+    
+          <Button
+        android:id="@+id/btn_back_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dip"
+        android:layout_toRightOf="@id/btn_stop"
+        android:layout_alignTop="@id/btn_stop"
+        android:text="back_start" >
+          </Button>
+
+        <Button
+            android:id="@+id/btn_back_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/btn_back_start"
+            android:layout_alignBottom="@+id/btn_back_start"
+            android:layout_toRightOf="@+id/btn_back_start"
+            android:paddingLeft="5dip"
+            android:text="back_stop" />
+
+</RelativeLayout>
