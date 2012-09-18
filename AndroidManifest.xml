@@ -28,7 +28,7 @@
         
         
         <activity
-            android:name=".selectActivity"
+            android:name=".StartActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
             
