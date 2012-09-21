@@ -8,6 +8,7 @@
         android:id="@+id/img"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:contentDescription="@string/video_thumbnail"
         android:layout_margin="5sp" />
 
     <LinearLayout

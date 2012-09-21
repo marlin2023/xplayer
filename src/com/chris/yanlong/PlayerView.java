@@ -176,7 +176,7 @@ public class PlayerView extends SurfaceView implements SurfaceHolder.Callback {
 		
 		
 		Log.e(TAG ,"==========================");
-		//½áÊøÄ³¸öÏß³Ì¡£
+		//ï¿½ï¿½ï¿½ï¿½Ä³ï¿½ï¿½ï¿½ß³Ì¡ï¿½
 		player_release(media_handle);
 		
 	}
@@ -279,7 +279,7 @@ public class PlayerView extends SurfaceView implements SurfaceHolder.Callback {
 			ByteBuffer buf = ByteBuffer.allocateDirect(src_width * src_height
 					* 2);
 			buf.order(ByteOrder.nativeOrder());
-			// Bitmap Ðý×ª
+			// Bitmap ï¿½ï¿½×ª
 
 			DisplayMetrics dm = getResources().getDisplayMetrics();
 			int mScreenWidth = dm.widthPixels;
