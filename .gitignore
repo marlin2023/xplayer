@@ -1,7 +1,6 @@
 *.[oa]
 bin/
 obj/
-jni/
 gen/
 .settings/
 *~
