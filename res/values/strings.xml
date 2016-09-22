@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">xplayer</string>
-    <string name="lable_text">please choose a movie</string>
-    <string name="button_text">play</string>
-
-    <!-- image contentDescription -->
-    <string name="video_thumbnail">video thumbnail</string>
-</resources>
