@@ -10,13 +10,29 @@ android {
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
+
+        // ndk config
+        // ndk must in defaultConfig .
+        ndk {
+            // so name.
+            moduleName "cmxplayer"
+            // cFlags
+
+            // need link library . ldLibs += ["android", "OpenSLES", "log"]
+            ldLibs = ["log"]
+
+            // Architecture
+            abiFilters = ["armeabi-v7a"]
+        }
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets { main { jni.srcDirs = ['src/main/jni', 'src/main/jni/'] } }
 }
 
 dependencies {
