@@ -21,6 +21,9 @@ android {
             // need link library . ldLibs += ["android", "OpenSLES", "log"]
             ldLibs = ["log"]
 
+            // add stl support.
+            stl "stlport_static"
+
             // Architecture
             abiFilters = ["armeabi-v7a"]
         }

@@ -14,39 +14,130 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <list>
+#include "XMutexLock.h"
+
+using namespace std;
 
 
-// 线程间通讯的几个队列
-// 这种设计很巧妙，用enum的最大数目，来作为下面数组的长度
-typedef enum _el_ipc_msg_q_name_e_
+// queue block mode
+typedef enum _q_node_mode_e_
 {
-    el_msg_q_demux_file = 0,
-    el_msg_q_decode_video,
-    el_msg_q_decode_audio,
-    el_msg_q_video_sync,
+    el_q_mode_unblock = 0x0,
+    el_q_mode_block_empty = 0x1,
+    el_q_mode_block_full = 0x2,
+    el_q_mode_max
+} q_node_mode_e;
 
-    el_msg_q_max
 
-} el_ipc_msg_q_name_e;
-
-// TODO: ??
-typedef struct _el_ipc_msg_node_t_
+/**
+ * Message Queue Node ADT
+ */
+typedef struct _ipc_msg_node_t_
 {
-    unsigned long       msg;    // 消息内容
-    int64_t             tm;     // 时间戳
-    struct list_node    list;   // 消息队列
-} el_ipc_msg_node_t;
+    /**
+     * message content
+     */
+    unsigned long       msg;
+
+    /**
+     * message timestamp
+     */
+    int64_t             tm;
+
+    //struct list_node    list;   // 消息队列
+}ipc_msg_node_t;
 
 
 
 
+/**
+ * Message Queue ADT
+ */
+class XMessageQueue{
 
-#ifdef __cplusplus
+public:
 
-}
-#endif
+    XMessageQueue(char *name);
+    ~XMessageQueue();
+
+    /**
+     * init function
+     */
+    int init();
+
+    /**
+     * add Elements at the front of queue.
+     * push_front
+     */
+    int push_front(ipc_msg_node_t *msg_node);
+
+    /**
+     * add Elements at the end of queue.
+     * push_back
+     */
+    int push(ipc_msg_node_t *msg_node);
+
+    /**
+     * pop Elements at the front of queue.
+     * pop_front
+     */
+    ipc_msg_node_t * pop();
+
+    /**
+     * if the queue has no element return true.
+     */
+    bool empty();
+
+    /**
+     * return the element number in the queue.
+     */
+    int size();
+
+
+private:
+
+    /**
+     * message queue
+     * empty queue.
+     */
+    list<ipc_msg_node_t *> msg_queue;
+
+    /**
+     * message queue name
+     */
+    char *msg_queue_name;
+
+
+    /**
+     * current node count
+     */
+    int node_count_current;
+
+    /**
+     * upper limit node count
+     */
+    int node_count_max;
+
+    /**
+     * queue block mode.
+     */
+    q_node_mode_e   mode;   // once this mode value is set, you should never change it during the q's life
+
+
+    /**
+     * mutex for current MessageQueue Object
+     */
+    pthread_mutex_t *mutexLock;
+
+    // if empty, blocked
+    pthread_cond_t  has_node;
+
+    // if full, blocked
+    pthread_cond_t  has_space;
+
+};
+
+
 
 #endif //XPLAYER_XMESSAGEQUEUE_H
