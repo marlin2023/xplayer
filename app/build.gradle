@@ -11,21 +11,28 @@ android {
         versionCode 1
         versionName "1.0"
 
-        // ndk config
-        // ndk must in defaultConfig .
-        ndk {
-            // so name.
-            moduleName "cmxplayer"
-            // cFlags
+//        // ndk config
+//        // ndk must in defaultConfig .
+//        ndk {
+//            // so name.
+//            moduleName "cmxplayer"
+//            // cFlags
+//
+//            // need link library . ldLibs += ["android", "OpenSLES", "log"]
+//            ldLibs = ["log"]
+//
+//            // add stl support.
+//            stl "stlport_static"
+//
+//            // Architecture
+//            abiFilters = ["armeabi-v7a"]
+//        }
+        externalNativeBuild {
+            ndkBuild {
+                arguments "NDK_APPLICATION_MK:=src/main/jni/Application.mk"
 
-            // need link library . ldLibs += ["android", "OpenSLES", "log"]
-            ldLibs = ["log"]
-
-            // add stl support.
-            stl "stlport_static"
-
-            // Architecture
-            abiFilters = ["armeabi-v7a"]
+                abiFilters "armeabi-v7a"
+            }
         }
     }
 
@@ -35,7 +42,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets { main { jni.srcDirs = ['src/main/jni', 'src/main/jni/'] } }
+//    sourceSets { main { jni.srcDirs = ['src/main/jni', 'src/main/jni/'] } }
+
+    // path used to specify the Android.mk file.
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/jni/libxplayer/Android.mk'
+        }
+    }
 }
 
 dependencies {
