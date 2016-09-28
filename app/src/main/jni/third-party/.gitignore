@@ -1,0 +1,6 @@
+/build
+*.[d]
+*.pc
+.config
+*.version
+*config.*
