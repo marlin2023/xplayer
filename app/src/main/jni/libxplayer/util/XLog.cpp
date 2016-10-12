@@ -24,5 +24,7 @@ void XLog::e(const char *tag,  const char *fmt, ...)
     va_end(ap);
 }
 
+// if set mLogEnable to false ,
+// then debug log will not be printed.
 bool XLog::mLogEnable = true ;
 
