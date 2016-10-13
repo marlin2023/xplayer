@@ -4,7 +4,8 @@
 //
 #include <stdlib.h>
 #include <jni.h>
-#include "../util/XLog.h"
+#include "util/XLog.h"
+#include "central/PlayerInner.h"
 
 static const char *TAG = "JNI_ONLOAD";
 
@@ -14,6 +15,12 @@ static const char *className = "com/cmcm/v/cmplayersdk/XPlayer";
 
 static void sayHello(JNIEnv *env, jobject thiz){
     XLog::e(TAG ,"======>say hello .");
+
+    // new PlayerInner
+    PlayerInner * playerInner = new PlayerInner();
+
+
+
 }
 
 // define the native method mapping .
@@ -39,14 +46,14 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
     // get the class name .
     clazz = env->FindClass(className);
     if (clazz == NULL) {
-        XLog::e("Native registration unable to find class '%s'", className);
+        XLog::e(TAG ,"Native registration unable to find class '%s'", className);
         return JNI_ERR;
     }
 
     // get methods length ,and then register native methods
     methodsLenght = sizeof(methods) / sizeof(methods[0]);
     if (env->RegisterNatives(clazz, methods, methodsLenght) < 0) {
-        XLog::e("RegisterNatives failed for '%s'", className);
+        XLog::e(TAG ,"RegisterNatives failed for '%s'", className);
         return JNI_ERR;
     }
 

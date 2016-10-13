@@ -10,6 +10,21 @@ extern "C" {
 #include "libavformat/avformat.h"
 
 } // end of extern C
+#include "util/cm_std.h"
+
+
+/**
+ * streams type in file media.
+ *
+ */
+typedef enum av_support_type_e_
+{
+    HAS_NONE = 0,
+    HAS_AUDIO,      // has audio
+    HAS_VIDEO,    // has video
+    HAS_BOTH,     // has all
+    HAS_END
+} av_support_type_e;
 
 
 class PlayerInner{
@@ -52,18 +67,22 @@ private:
     /**
      * Thread 4 the corresponding video Render StateMachine
      */
-     void *video_render_thread(void *arg);
+    void *video_render_thread(void *arg);
 
 
 
     /**
-     * open input file
-     *
-     * if open file success ,and get media info then return true.
-     */
-     bool open_file();
+    * OPEN input file
+    *
+    * if open file success ,and get media info then return CM_TRUE.
+    */
+    CM_BOOL open_file();
 
-
+    /**
+    * OPEN given stream by stream_index
+    *
+    */
+    CM_BOOL stream_component_open(int stream_index);
 
     //-----------*******************-------------
     //          private member variable
@@ -107,7 +126,10 @@ public:
      */
     int audio_channels_cnt;
 
-    //el_player_engine_AV_support_e av_support;   // 本文件类型: 音频、视频、音视频
+    /**
+     * media file contain streams type
+     */
+    av_support_type_e av_support;
 
 
 };

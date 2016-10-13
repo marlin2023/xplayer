@@ -7,6 +7,7 @@ public class XPlayer {
 
     static {
         try {
+            System.loadLibrary("ffmpeg");
             System.loadLibrary("cmxplayer");
 
         } catch(Exception e) {
