@@ -17,9 +17,10 @@ static void sayHello(JNIEnv *env, jobject thiz){
     XLog::e(TAG ,"======>say hello .");
 
     // new PlayerInner
-    PlayerInner * playerInner = new PlayerInner();
+    PlayerInner * playerInner = new PlayerInner();  // create player object
 
-
+    playerInner->player_engine_init();  // engine init
+    playerInner->open_file();           // open file ,get stream info
 
 }
 

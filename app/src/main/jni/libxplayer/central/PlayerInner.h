@@ -70,6 +70,9 @@ private:
     void *video_render_thread(void *arg);
 
 
+public:
+
+    void player_engine_init();
 
     /**
     * OPEN input file

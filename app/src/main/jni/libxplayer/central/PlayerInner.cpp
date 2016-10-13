@@ -71,7 +71,7 @@ EL_STATIC void *el_demux_file_thread(void *arg)
 /**
  * player central engine init.
  */
-void player_engine_init()
+void PlayerInner::player_engine_init()
 {
     // Register all formats and codecs
     av_register_all();
@@ -86,6 +86,7 @@ CM_BOOL PlayerInner::open_file()
     char *source_url = getSourceUrl();
     XLog::d(ANDROID_LOG_INFO ,TAG ,"==>in open file ,source url=%s" ,source_url);
 
+    format_context = NULL;
     // 1. Open input stream and read the header
     ret = avformat_open_input (&format_context, (const char *)source_url, NULL, NULL);
     if(ret != 0){
@@ -117,6 +118,7 @@ CM_BOOL PlayerInner::open_file()
     stream_index[AVMEDIA_TYPE_SUBTITLE] = -1;
     stream_index[AVMEDIA_TYPE_VIDEO] = -1;
     stream_index[AVMEDIA_TYPE_AUDIO] = -1;
+    av_support = HAS_NONE;
 
     XLog::d(ANDROID_LOG_INFO ,TAG ,"==> Traversing streams information in file ,nb_streams=%d\n" ,format_context->nb_streams);
     // Traversing streams information in file.
@@ -148,6 +150,10 @@ CM_BOOL PlayerInner::open_file()
         }
     }
 
+    XLog::d(ANDROID_LOG_INFO ,TAG ," ==> stream_index[video] = %d,stream_index[audio] =%d ,av_support =%d\n",
+        stream_index[AVMEDIA_TYPE_VIDEO],
+        stream_index[AVMEDIA_TYPE_AUDIO],
+        av_support);
 
     // Open the codec
     // process audio decoder
@@ -177,8 +183,7 @@ CM_BOOL PlayerInner::open_file()
         }
     }
 
-
-    XLog::d(ANDROID_LOG_INFO ,TAG ,"stream index video,audio,av_support is %d,%d,%d\n",
+    XLog::d(ANDROID_LOG_INFO ,TAG ," ==> after open_decoder, stream_index[video] = %d,stream_index[audio] =%d ,av_support =%d\n",
         stream_index[AVMEDIA_TYPE_VIDEO],
         stream_index[AVMEDIA_TYPE_AUDIO],
         av_support);
@@ -209,6 +214,7 @@ CM_BOOL PlayerInner::stream_component_open(int stream_index)
 
     if (stream_index < 0 || stream_index >= ic->nb_streams)
     {
+        XLog::e(TAG ,"===> invalid stream_index %d \n" ,stream_index);
         return CM_FALSE;
     }
 
@@ -221,6 +227,7 @@ CM_BOOL PlayerInner::stream_component_open(int stream_index)
     ret = avcodec_parameters_to_context(codec_context, ic->streams[stream_index]->codecpar);
     if (ret < 0){
         XLog::e(TAG ,"===> avcodec_parameters_to_context failed\n");
+        ret = CM_FALSE;
         goto fail;
     }
 
@@ -237,7 +244,7 @@ CM_BOOL PlayerInner::stream_component_open(int stream_index)
     }
 
     ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;
-
+    ret = CM_TRUE;
 fail:
     avcodec_free_context(&codec_context);
 
