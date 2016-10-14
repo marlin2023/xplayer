@@ -83,9 +83,29 @@ public:
 
     /**
     * OPEN given stream by stream_index
-    *
+    * refer to function from ffplay.c
     */
     CM_BOOL stream_component_open(int stream_index);
+
+    /**
+    * Close given stream by stream_index
+    * refer to function from ffplay.c
+    */
+    void stream_component_close(int stream_index);
+
+    /**
+    * Demux inputfile streams to packet queue
+    * audio packet put into audio packet queue
+    * video packet put into video packet queue
+    */
+    int demux_2_packet_queue(void);
+
+    /**
+    * put packet into queue.
+    * audio packet put into audio packet queue
+    * video packet put into video packet queue
+    */
+    int add_packet_to_q(AVPacket *pkt);
 
     //-----------*******************-------------
     //          private member variable
@@ -101,6 +121,10 @@ public:
      */
     unsigned long *duration;
 
+    /**
+     * av_read_frame- retry count
+     */
+    int read_retry_count;
 
 public:
     //*************   input file information  *****************
