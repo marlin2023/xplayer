@@ -18,6 +18,7 @@ LOCAL_SRC_FILES := jni/onLoad.cpp   \
                 util/XMutexlock.cpp \
                 \
                 central/PacketQueue.cpp \
+                central/FrameQueue.cpp \
                 central/PlayerEngineStateMachine.cpp    \
                 central/PlayerInner.cpp
 
