@@ -19,14 +19,16 @@ public :
     * audio packet put into audio packet queue
     * video packet put into video packet queue
     */
-    int demux_2_packet_queue(AVFormatContext *format_ctx);
+    int demux_2_packet_queue(MediaFile *mediaFile);
+
+private:
 
     /**
     * put packet into queue.
     * audio packet put into audio packet queue
     * video packet put into video packet queue
     */
-    int add_packet_to_q(AVPacket *pkt);
+    int add_packet_to_q(AVPacket *pkt ,MediaFile *mediaFile);
 
 private:
 

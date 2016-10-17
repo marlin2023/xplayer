@@ -14,6 +14,7 @@ extern "C" {
 #include "util/cm_std.h"
 
 #include "MediaFile.h"
+#include "MediaDemuxStateMachine.h"
 
 class PlayerInner{
 
@@ -25,6 +26,11 @@ public:
      * Media File Handler contain file all information.
      */
     MediaFile *mediaFileHandle;
+
+    /**
+     * Media Demux State Machine Handle.
+     */
+    MediaDemuxStateMachine *mediaDemuxStateMachineHandle;
 
 private:
 

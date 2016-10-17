@@ -12,8 +12,11 @@ extern "C" {
 #include "libavformat/avformat.h"
 
 } // end of extern C
+
 #include "util/cm_std.h"
 
+#include "MediaFile.h"
+#include "PacketQueue.h"
 
 /**
  * streams type in file media.
@@ -116,6 +119,18 @@ public:
      * media file contain streams type
      */
     av_support_type_e av_support;
+
+    /**
+     * audio packet queue
+     */
+    PacketQueue *audio_queue;
+
+    /**
+    * video packet queue
+    */
+    PacketQueue *video_queue;
+
+
 
 
 };

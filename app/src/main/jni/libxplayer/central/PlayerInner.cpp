@@ -11,7 +11,11 @@
 PlayerInner::PlayerInner()
 {
     // TODO
+    // mediaFile Handle
     mediaFileHandle = new MediaFile();
+
+    // mediaDemuxStateMachine
+    mediaDemuxStateMachineHandle = new MediaDemuxStateMachine();
 
 }
 
@@ -29,4 +33,12 @@ void PlayerInner::player_engine_init()
 CM_BOOL PlayerInner::player_engine_open()
 {
     mediaFileHandle->open();
+
+    // TODO test
+    int i = 0;
+    for (i = 0; i < 100 ; i ++)
+    {
+        mediaDemuxStateMachineHandle->demux_2_packet_queue(mediaFileHandle);
+    }
+
 }

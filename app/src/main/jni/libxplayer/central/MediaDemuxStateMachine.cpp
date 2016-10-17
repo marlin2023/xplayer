@@ -18,11 +18,11 @@ MediaDemuxStateMachine::~MediaDemuxStateMachine()
 
 }
 
-int MediaDemuxStateMachine::demux_2_packet_queue(AVFormatContext *format_ctx)
+int MediaDemuxStateMachine::demux_2_packet_queue(MediaFile *mediaFile)
 {
     AVPacket packet;
     int ret;
-    AVFormatContext *format_context = format_ctx;
+    AVFormatContext *format_context = mediaFile->format_context;
 
     // read packet from stream
     if((ret = av_read_frame(format_context, &packet)) < 0)
@@ -36,59 +36,43 @@ int MediaDemuxStateMachine::demux_2_packet_queue(AVFormatContext *format_ctx)
 
     // here ,audio packet will be put into audio packet queue ;
     // video packet will be put into video packet queue.
-    return add_packet_to_q(&packet);
+    return add_packet_to_q(&packet ,mediaFile);
 
 }
 
-int MediaDemuxStateMachine::add_packet_to_q(AVPacket *pkt)
+int MediaDemuxStateMachine::add_packet_to_q(AVPacket *pkt ,MediaFile *mediaFile)
 {
-    AVFormatContext *pFormatCtx;
 
 
-        //struct data_queue *pq;
-#if 0
-        el_av_packet_qnode_t *pkt_node;
-        int *st_index;
+    AVFormatContext *format_context;
+    int *st_index;
+    PacketQueue *pkt_q;
 
-        pFormatCtx = g_media_file_obj.format_context;
-        st_index = &g_media_file_obj.stream_index[0];
-
-
-        // 视频包
-        if (pkt->stream_index == st_index[AVMEDIA_TYPE_VIDEO])
-        {
-
-            pq = &g_media_file_obj.video_pkt_q;
-        } // 音频包
-        else if (pkt->stream_index == st_index[AVMEDIA_TYPE_AUDIO])
-        {
-
-            pq = &g_media_file_obj.audio_pkt_q;
-        }
-        else
-        {
-            // 没有用的packet，直接释放
-            av_free_packet(pkt);
-
-            return -1;
-        }
-
-        // 把数据放到pkt_node中
-        pkt_node = el_allocate_packet_node();
-        if(!pkt_node)
-        {
-            EL_DBG_LOG("decoder: read pkt alloc err!\n");
-            return -1000;
-        }
-
-        pkt_node->packet = *pkt;
-
-        // 为了后期free，先增加一个引用
-        av_dup_packet(&pkt_node->packet);
-
-        q_push(&(pkt_node->list), pq);
-#endif
-        return 0;
+    format_context = mediaFile->format_context;
+    st_index = &mediaFile->stream_index[0];
 
 
+
+    if (pkt->stream_index == st_index[AVMEDIA_TYPE_VIDEO])
+    {
+        // video packet
+        pkt_q = mediaFile->video_queue;
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>VVVVideo packet queue size = %d\n" ,pkt_q->size());
+    }
+    else if (pkt->stream_index == st_index[AVMEDIA_TYPE_AUDIO])
+    {
+        // audio packet
+        pkt_q = mediaFile->audio_queue;
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>AAAAudio packet queue size = %d\n" ,pkt_q->size());
+    }
+    else
+    {
+        // no used packet ,release directly.
+        av_packet_unref(pkt);   //av_free_packet(pkt);
+        return -1;
+    }
+
+    // Entry queue
+    int ret = pkt_q->put(pkt);
+    return ret;
 }
