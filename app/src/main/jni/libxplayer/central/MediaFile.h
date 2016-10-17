@@ -56,7 +56,6 @@ public:
     CM_BOOL open();
 
 
-
 private:
     /**
     * OPEN given stream by stream_index

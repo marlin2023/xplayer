@@ -18,13 +18,14 @@ MediaDemuxStateMachine::~MediaDemuxStateMachine()
 
 }
 
-int MediaDemuxStateMachine::demux_2_packet_queue(MediaFile *mediaFile)
+int MediaDemuxStateMachine::demux_2_packet_queue(AVFormatContext *format_ctx)
 {
     AVPacket packet;
     int ret;
+    AVFormatContext *format_context = format_ctx;
 
     // read packet from stream
-    if((ret = av_read_frame(mediaFile->format_context, &packet)) < 0)
+    if((ret = av_read_frame(format_context, &packet)) < 0)
     {
         read_retry_count++;
         XLog::e(TAG ,"av_read_frame return: %d\n", ret);

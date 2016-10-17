@@ -10,8 +10,10 @@ extern "C" {
 #include "libavformat/avformat.h"
 
 } // end of extern C
+
 #include "util/cm_std.h"
 
+#include "MediaFile.h"
 
 class PlayerInner{
 
@@ -19,6 +21,10 @@ public:
     PlayerInner();
     ~PlayerInner();
 
+    /**
+     * Media File Handler contain file all information.
+     */
+    MediaFile *mediaFileHandle;
 
 private:
 
@@ -49,7 +55,17 @@ private:
 
 public:
 
+    /**
+     * player engine initialize
+     * 1. register ffmpeg formats & codecs
+     */
     void player_engine_init();
+
+    /**
+     * player engine open
+     * open file and get file streams information
+     */
+    CM_BOOL player_engine_open();
 
 };
 
