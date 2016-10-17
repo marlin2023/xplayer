@@ -20,7 +20,7 @@ static void sayHello(JNIEnv *env, jobject thiz){
     PlayerInner * playerInner = new PlayerInner();  // create player object
 
     playerInner->player_engine_init();  // engine init
-    playerInner->open_file();           // open file ,get stream info
+    //playerInner->open_file();           // open file ,get stream info
 
 }
 

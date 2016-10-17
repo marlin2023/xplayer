@@ -19,7 +19,10 @@ LOCAL_SRC_FILES := jni/onLoad.cpp   \
                 \
                 central/PacketQueue.cpp \
                 central/FrameQueue.cpp \
-                central/PlayerEngineStateMachine.cpp    \
+                central/MediaFile.cpp    \
+                central/MediaDemuxStateMachine.cpp    \
+                central/MediaDecodeVideoStateMachine.cpp    \
+                central/MediaDecodeAudioStateMachine.cpp    \
                 central/PlayerInner.cpp
 
 # compile flags
