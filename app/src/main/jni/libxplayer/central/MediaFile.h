@@ -106,6 +106,17 @@ public:
     AVStream *video_stream;
 
     /**
+     * audio codec context
+     */
+    AVCodecContext  *audio_codec_context ;
+
+    /**
+     * video codec context
+     */
+    AVCodecContext  *video_codec_context ;
+
+
+    /**
      * duration
      */
     int stream_index[AVMEDIA_TYPE_NB];

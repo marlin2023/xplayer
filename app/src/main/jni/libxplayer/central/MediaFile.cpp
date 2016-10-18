@@ -19,6 +19,8 @@ MediaFile::MediaFile()
     video_queue = new PacketQueue();
 
     //
+    audio_codec_context = NULL;
+    video_codec_context = NULL;
 
 }
 
@@ -191,6 +193,13 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
         }
         ret = CM_FALSE;
         goto fail;
+    }
+
+    // set codec context.
+    if (codec_context->codec_type == AVMEDIA_TYPE_AUDIO){
+        audio_codec_context = codec_context;
+    }else if(codec_context->codec_type == AVMEDIA_TYPE_VIDEO){
+        video_codec_context = codec_context;
     }
 
     ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;
