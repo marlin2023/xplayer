@@ -12,6 +12,7 @@ extern "C" {
 } // end of extern C
 
 #include "MediaFile.h"
+#include "PlayerState.h"
 
 #include "util/XMessageQueue.h"
 
@@ -52,6 +53,16 @@ public:
      * message queue for MediaDecodeVideoStateMachine
      */
     XMessageQueue *message_queue;
+
+    /**
+     * video decoder machine Current State
+     */
+    player_state_e                state;
+
+    /**
+     * video decoder machine Previous State
+     */
+    player_state_e                old_state;
 
 
 };

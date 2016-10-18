@@ -78,19 +78,8 @@ CM_BOOL PlayerInner::player_engine_open()
     mediaFileHandle->open();
 
     // demux state machine push EVT_START
-    //mediaDemuxStateMachineHandle->message_queue->
-
-
-
-
-#if 0
-    // TODO test
-    int i = 0;
-    for (i = 0; i < 100 ; i ++)
-    {
-        mediaDemuxStateMachineHandle->demux_2_packet_queue(mediaFileHandle);
-    }
-#endif
+    mediaDemuxStateMachineHandle->message_queue->push(EVT_OPEN);
+    XLog::e(TAG ,"create media demux thread size %d\n",mediaDemuxStateMachineHandle->message_queue->size());
 
 }
 

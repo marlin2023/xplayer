@@ -131,7 +131,7 @@ private:
     /**
      * mutex for current MessageQueue Object
      */
-    pthread_mutex_t *mutexLock;
+    pthread_mutex_t mutexLock;
 
     // if empty, blocked
     pthread_cond_t  has_node;

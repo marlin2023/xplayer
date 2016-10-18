@@ -13,6 +13,9 @@ extern "C" {
 } // end of extern C
 
 #include "MediaFile.h"
+#include "PlayerState.h"
+
+#include "util/XMessageQueue.h"
 
 
 class MediaDecodeAudioStateMachine
@@ -45,6 +48,23 @@ private:
      * media file handle
      */
     MediaFile *mediaFileHandle;
+
+public:
+
+    /**
+     * message queue for MediaDecodeAudioStateMachine
+     */
+    XMessageQueue *message_queue;
+
+    /**
+     * audio decoder machine Current State
+     */
+    player_state_e                state;
+
+    /**
+     * audio decoder machine Previous State
+     */
+    player_state_e                old_state;
 
 };
 

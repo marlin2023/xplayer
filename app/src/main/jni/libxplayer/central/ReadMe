@@ -1,0 +1,22 @@
+-
+-
+video player have the following state machine:
+    demux state machine ,
+    audio decoder state machine,
+    video decoder state machine ,
+
+
+Each State Machine has its own state .
+
+Such as Video Decoder State Machine has state :
+            STATE_DECODER_START,
+            STATE_DECODER_WAIT,
+            STATE_DECODER_DECODING.
+
+
+-
+-
+
+
+
+

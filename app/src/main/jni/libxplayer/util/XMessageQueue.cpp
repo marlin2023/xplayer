@@ -33,17 +33,18 @@ int XMessageQueue::init()
     this->node_count_current = 0;
     this->node_count_max = 0xFFFF;
 
-    pthread_mutex_init(this->mutexLock ,NULL);
-
+    pthread_mutex_init(&this->mutexLock ,NULL);
+    pthread_cond_init(&has_node, NULL);
+    pthread_cond_init(&has_space, NULL);
     return 0;
 }
 
 int XMessageQueue::push(player_event_e evt_type)
 {
-    pthread_mutex_lock(this->mutexLock);
+    pthread_mutex_lock(&this->mutexLock);
 
     if(this->msg_queue.size() >= this->node_count_max){ // full
-        pthread_cond_wait(&this->has_space, this->mutexLock);
+        pthread_cond_wait(&this->has_space, &this->mutexLock);
     }
 
     // add message at the tail.
@@ -51,7 +52,7 @@ int XMessageQueue::push(player_event_e evt_type)
     // alter node_count
     this->node_count_current ++;
 
-    pthread_mutex_unlock(this->mutexLock);
+    pthread_mutex_unlock(&this->mutexLock);
     pthread_cond_signal(&this->has_node);
 
     return 0;
@@ -60,10 +61,10 @@ int XMessageQueue::push(player_event_e evt_type)
 
 int XMessageQueue::push_front(player_event_e evt_type)
 {
-    pthread_mutex_lock(this->mutexLock);
+    pthread_mutex_lock(&this->mutexLock);
 
     if(this->msg_queue.size() >= this->node_count_max){ // full
-        pthread_cond_wait(&this->has_space, this->mutexLock);
+        pthread_cond_wait(&this->has_space, &this->mutexLock);
     }
 
     // add message at the header.
@@ -71,7 +72,7 @@ int XMessageQueue::push_front(player_event_e evt_type)
     // alter node_count
     this->node_count_current ++;
 
-    pthread_mutex_unlock(this->mutexLock);
+    pthread_mutex_unlock(&this->mutexLock);
     pthread_cond_signal(&this->has_node);
 
     return 0;
@@ -101,10 +102,10 @@ int XMessageQueue::push(ipc_msg_node_t *msg_node)
 
 player_event_e XMessageQueue::pop()
 {
-    pthread_mutex_lock(this->mutexLock);
+    pthread_mutex_lock(&this->mutexLock);
 
     if(this->msg_queue.size() == 0){ // empty
-        pthread_cond_wait(&this->has_node, this->mutexLock);
+        pthread_cond_wait(&this->has_node, &this->mutexLock);
     }
 
     // pop a message node
@@ -113,7 +114,7 @@ player_event_e XMessageQueue::pop()
     // alter node count
     this->node_count_current --;
 
-    pthread_mutex_unlock(this->mutexLock);
+    pthread_mutex_unlock(&this->mutexLock);
     pthread_cond_signal(&this->has_space);
     return evt_type;
 }

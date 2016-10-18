@@ -6,6 +6,7 @@
 #define XPLAYER_MEDIADEMUXSTATEMACHINE_H
 
 #include "MediaFile.h"
+#include "PlayerState.h"
 
 #include "util/XMessageQueue.h"
 
@@ -21,6 +22,10 @@ public :
      */
     void media_demux_thread(MediaFile *mediaFile);
 
+    /**
+     * media demux state machine process event
+     */
+    void media_demux_state_machine_process_event(player_event_e evt);
 
     /**
     * Demux inputfile streams to packet queue
@@ -51,6 +56,16 @@ public:
      * message queue for MediaDecodeVideoStateMachine
      */
     XMessageQueue *message_queue;
+
+    /**
+     * demux state machine Current State
+     */
+    player_state_e                state;
+
+    /**
+     * demux state machine Previous State
+     */
+    player_state_e                old_state;
 
 };
 

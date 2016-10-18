@@ -17,7 +17,10 @@ MediaDecodeVideoStateMachine::MediaDecodeVideoStateMachine(MediaFile *mediaFile)
 {
     this->mediaFileHandle = mediaFile;
 
-    message_queue = new XMessageQueue();
+    this->message_queue = new XMessageQueue();
+
+    // initialize the state
+    this->state = STATE_DECODER_START;
 }
 
 

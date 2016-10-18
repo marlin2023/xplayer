@@ -4,8 +4,12 @@
 
 #define TAG "Media_Demux_State_Machine"
 
+#include <android/log.h>
+
 #include "MediaDemuxStateMachine.h"
+
 #include "util/XLog.h"
+#include "util/XMessageType.h"
 
 MediaDemuxStateMachine::MediaDemuxStateMachine()
 {
@@ -82,6 +86,29 @@ int MediaDemuxStateMachine::add_packet_to_q(AVPacket *pkt ,MediaFile *mediaFile)
 
 
 void MediaDemuxStateMachine::media_demux_thread(MediaFile *mediaFile)
+{
+    player_event_e evt;
+
+    while(1){
+
+        evt = message_queue->pop();
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDemuxStateMachine msq evt = %d\n" ,evt);
+
+        // Exit thread
+        if(evt == EVT_EXIT_THREAD)
+        {
+            break;
+        }
+
+        // process others evt
+        media_demux_state_machine_process_event(evt);
+
+    }
+}
+
+// TODO
+// 播放器的状态不同，处理的evt的方式不一样
+void MediaDemuxStateMachine::media_demux_state_machine_process_event(player_event_e evt)
 {
 
 }
