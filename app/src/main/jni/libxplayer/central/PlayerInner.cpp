@@ -4,6 +4,7 @@
 
 #include "PlayerInner.h"
 #include "util/XLog.h"
+#include "util/XMessageType.h"
 
 #define TAG "PLAYER_INNER"
 
@@ -29,6 +30,9 @@ void PlayerInner::player_engine_init()
 
     int ret;
 
+    // media demux thread
+    pthread_t media_demux_tid;
+
     // video decode thread
     pthread_t decode_video_tid;
 
@@ -41,6 +45,14 @@ void PlayerInner::player_engine_init()
     //
 
     // 2.Create player will used threads
+    ret = pthread_create(&media_demux_tid, NULL, media_demux_thread, (void*)this);
+    if(ret)
+    {
+        XLog::e(TAG ,"create media demux thread err %d\n",ret);
+        goto init_eout;
+    }
+
+
     ret = pthread_create(&decode_video_tid, NULL, video_decode_thread, (void*)this);
     if(ret)
     {
@@ -65,20 +77,41 @@ CM_BOOL PlayerInner::player_engine_open()
 {
     mediaFileHandle->open();
 
+    // demux state machine push EVT_START
+    //mediaDemuxStateMachineHandle->message_queue->
+
+
+
+
+#if 0
     // TODO test
     int i = 0;
     for (i = 0; i < 100 ; i ++)
     {
         mediaDemuxStateMachineHandle->demux_2_packet_queue(mediaFileHandle);
     }
+#endif
 
 }
 
 
 
-    //-----------*******************-------------
-    //          Thread according to function
-    //-----------*******************-------------
+//-----------*******************-------------
+//          Thread according to function
+//-----------*******************-------------
+
+/**
+ * Thread 1 the corresponding Demux StateMachine
+ */
+void *media_demux_thread(void *arg)
+{
+    // first ,get PlayerInner Object Handle
+    PlayerInner *playerInner = (PlayerInner *)arg;
+
+    // call media demux thread
+    playerInner->mediaDemuxStateMachineHandle->media_demux_thread(playerInner->mediaFileHandle);
+}
+
 
 /**
  * Thread 2 the corresponding Video Decode StateMachine

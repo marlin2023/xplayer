@@ -13,6 +13,8 @@ extern "C" {
 
 #include "MediaFile.h"
 
+#include "util/XMessageQueue.h"
+
 class MediaDecodeVideoStateMachine
 {
 public :
@@ -43,6 +45,14 @@ private:
      * media file handle
      */
     MediaFile *mediaFileHandle;
+
+public:
+
+    /**
+     * message queue for MediaDecodeVideoStateMachine
+     */
+    XMessageQueue *message_queue;
+
 
 };
 

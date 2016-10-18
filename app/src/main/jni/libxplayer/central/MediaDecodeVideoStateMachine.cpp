@@ -16,6 +16,8 @@
 MediaDecodeVideoStateMachine::MediaDecodeVideoStateMachine(MediaFile *mediaFile)
 {
     this->mediaFileHandle = mediaFile;
+
+    message_queue = new XMessageQueue();
 }
 
 
@@ -28,27 +30,32 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet)
 {
 
     int send_result;
-    AVFrame *video_decode_frame;
+    AVFrame *frame = av_frame_alloc();;
     AVCodecContext *video_codec_context ;
     FrameQueue *video_frame_queue;
-
+    int ret ;
     video_codec_context = mediaFileHandle->video_codec_context;
     video_frame_queue = mediaFileHandle->video_frame_queue;
 
     do {
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>1\n" );
         send_result = avcodec_send_packet(video_codec_context, packet);
+        av_packet_unref(packet);
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>2\n" );
 
-#if 0
-        while ( avcodec_receive_frame(video_codec_context, video_decode_frame) == 0 ) {
-
-          video_frame_queue->put(video_decode_frame);
-          XLog::d(ANDROID_LOG_INFO ,TAG ,"==>Video_Frame_QUEUE size=%d\n" ,video_frame_queue->size());
+        while ( (ret =avcodec_receive_frame(video_codec_context, frame)) == 0 ) {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"==>3\n" );
+            video_frame_queue->put(frame);
+            av_frame_unref(frame);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"==>Video_Frame_QUEUE size=%d\n" ,video_frame_queue->size());
 
         }
-#endif
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>ret = %d\n" ,ret );
+
 
     } while (send_result == AVERROR(EAGAIN));
 
+    av_frame_free(&frame);
 }
 
 
@@ -66,17 +73,9 @@ void * MediaDecodeVideoStateMachine::video_decode_thread(MediaFile *mediaFile)
 
         int i ;
         int j = 0;
-        for(i = 0; i < 100 ; i ++){
+        for(i = 0; i < 10 ; i ++){
 
             XLog::d(ANDROID_LOG_INFO ,TAG ,"==>MediaDecodeVideoStateMachine LOOP=%d\n" ,i);
-            if(media_file_handle->video_queue->get(&pkt ,0) > 0){
-                decode_one_video_packet(&pkt);
-                j ++;
-                if(j > 10){break;}
-            }else{
-                sleep(1);
-            }
-
         }
         break;
 

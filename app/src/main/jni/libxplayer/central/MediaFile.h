@@ -153,7 +153,6 @@ public:
     */
     FrameQueue *video_frame_queue;
 
-
 };
 
 #endif //XPLAYER_MEDIAFILE_H

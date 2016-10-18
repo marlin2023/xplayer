@@ -11,6 +11,9 @@ MediaDemuxStateMachine::MediaDemuxStateMachine()
 {
     read_retry_count = 0;
 
+    // init message queue for media demux state machine.
+    message_queue = new XMessageQueue();
+
 }
 
 MediaDemuxStateMachine::~MediaDemuxStateMachine()
@@ -75,4 +78,10 @@ int MediaDemuxStateMachine::add_packet_to_q(AVPacket *pkt ,MediaFile *mediaFile)
     // Entry queue
     int ret = pkt_q->put(pkt);
     return ret;
+}
+
+
+void MediaDemuxStateMachine::media_demux_thread(MediaFile *mediaFile)
+{
+
 }

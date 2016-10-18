@@ -20,9 +20,9 @@ extern "C" {
 
 
 /**
- * Thread 1 the corresponding Central Engine StateMachine
+ * Thread 1 the corresponding Demux StateMachine
  */
-void *central_engine_thread(void *arg);
+void *media_demux_thread(void *arg);
 
 /**
  * Thread 2 the corresponding Video Decode StateMachine
@@ -38,6 +38,7 @@ void *audio_decode_thread(void *arg);
  * Thread 4 the corresponding video Render StateMachine
  */
 void *video_render_thread(void *arg);
+
 
 
 class PlayerInner{
@@ -65,6 +66,8 @@ public:
      * Media Decode Video State Machine Handle..
      */
     MediaDecodeVideoStateMachine *mediaDecodeVideoStateMachineHandle;
+
+
 
 private:
 

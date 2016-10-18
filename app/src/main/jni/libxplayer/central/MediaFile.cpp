@@ -208,9 +208,12 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
 
     ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;
     ret = CM_TRUE;
-fail:
-    avcodec_free_context(&codec_context);
+    goto sucess;    // here not release codec_context.
 
+fail:
+    //avcodec_free_context(&codec_context);
+
+sucess:
     return ret;
 }
 

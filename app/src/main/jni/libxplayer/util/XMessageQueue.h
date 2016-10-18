@@ -16,6 +16,7 @@
 
 #include <list>
 #include "XMutexLock.h"
+#include "XMessageType.h"
 
 using namespace std;
 
@@ -30,6 +31,7 @@ typedef enum _q_node_mode_e_
 } q_node_mode_e;
 
 
+#if 0
 /**
  * Message Queue Node ADT
  */
@@ -48,7 +50,7 @@ typedef struct _ipc_msg_node_t_
     //struct list_node    list;   // 消息队列
 }ipc_msg_node_t;
 
-
+#endif
 
 
 /**
@@ -58,6 +60,7 @@ class XMessageQueue{
 
 public:
 
+    XMessageQueue();
     XMessageQueue(char *name);
     ~XMessageQueue();
 
@@ -70,19 +73,19 @@ public:
      * add Elements at the front of queue.
      * push_front
      */
-    int push_front(ipc_msg_node_t *msg_node);
+    int push_front(player_event_e evt_type);
 
     /**
      * add Elements at the end of queue.
      * push_back
      */
-    int push(ipc_msg_node_t *msg_node);
+    int push(player_event_e evt_type);
 
     /**
      * pop Elements at the front of queue.
      * pop_front
      */
-    ipc_msg_node_t * pop();
+    player_event_e pop();
 
     /**
      * if the queue has no element return true.
@@ -101,7 +104,7 @@ private:
      * message queue
      * empty queue.
      */
-    list<ipc_msg_node_t *> msg_queue;
+    list<player_event_e> msg_queue;
 
     /**
      * message queue name

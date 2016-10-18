@@ -7,12 +7,20 @@
 
 #include "MediaFile.h"
 
+#include "util/XMessageQueue.h"
+
 class MediaDemuxStateMachine
 {
 public :
 
     MediaDemuxStateMachine();
     ~MediaDemuxStateMachine();
+
+    /**
+     * Main Work Thread ,the corresponding Media Demux StateMachine
+     */
+    void media_demux_thread(MediaFile *mediaFile);
+
 
     /**
     * Demux inputfile streams to packet queue
@@ -30,13 +38,19 @@ private:
     */
     int add_packet_to_q(AVPacket *pkt ,MediaFile *mediaFile);
 
-private:
+
 
     /**
      * av_read_frame- retry count
      */
     int read_retry_count;
 
+public:
+
+    /**
+     * message queue for MediaDecodeVideoStateMachine
+     */
+    XMessageQueue *message_queue;
 
 };
 
