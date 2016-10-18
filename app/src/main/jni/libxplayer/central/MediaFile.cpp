@@ -14,9 +14,13 @@ MediaFile::MediaFile()
     // TODO
     source_url = "/sdcard/hh.mp4";
 
-    // init queue
+    // init packet queue
     audio_queue = new PacketQueue();
     video_queue = new PacketQueue();
+
+    // init frame queue
+    audio_frame_queue = new FrameQueue();
+    video_frame_queue = new FrameQueue();
 
     //
     audio_codec_context = NULL;

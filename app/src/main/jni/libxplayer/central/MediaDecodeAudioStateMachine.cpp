@@ -11,10 +11,10 @@
 #include "MediaDecodeAudioStateMachine.h"
 #include "util/XLog.h"
 
-MediaDecodeAudioStateMachine::MediaDecodeAudioStateMachine()
+MediaDecodeAudioStateMachine::MediaDecodeAudioStateMachine(MediaFile *mediaFile)
 {
-    // init queue
-    audio_frame_queue = new FrameQueue();
+    this->mediaFileHandle = mediaFile;
+
 }
 
 
@@ -24,13 +24,16 @@ MediaDecodeAudioStateMachine::~MediaDecodeAudioStateMachine()
 }
 
 
-void MediaDecodeAudioStateMachine::decode_one_audio_packet(AVPacket *packet ,MediaFile *mediaFile)
+void MediaDecodeAudioStateMachine::decode_one_audio_packet(AVPacket *packet )
 {
 
     int send_result;
     AVFrame *decode_frame;
     AVCodecContext *audio_codec_context ;
-    audio_codec_context = mediaFile->audio_codec_context;
+    FrameQueue *audio_frame_queue;
+
+    audio_codec_context = mediaFileHandle->audio_codec_context;
+    audio_frame_queue = mediaFileHandle->audio_frame_queue;
 
     do {
         send_result = avcodec_send_packet(audio_codec_context, packet);
@@ -43,4 +46,13 @@ void MediaDecodeAudioStateMachine::decode_one_audio_packet(AVPacket *packet ,Med
         }
 
     } while (send_result == AVERROR(EAGAIN));
+}
+
+
+/**
+ * Main Work Thread ,the corresponding Audio Decode StateMachine
+ */
+void * MediaDecodeAudioStateMachine::audio_decode_thread(void *arg)
+{
+
 }

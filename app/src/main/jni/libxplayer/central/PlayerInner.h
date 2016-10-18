@@ -15,6 +15,30 @@ extern "C" {
 
 #include "MediaFile.h"
 #include "MediaDemuxStateMachine.h"
+#include "MediaDecodeAudioStateMachine.h"
+#include "MediaDecodeVideoStateMachine.h"
+
+
+/**
+ * Thread 1 the corresponding Central Engine StateMachine
+ */
+void *central_engine_thread(void *arg);
+
+/**
+ * Thread 2 the corresponding Video Decode StateMachine
+ */
+void *video_decode_thread(void *arg);
+
+/**
+ * Thread 3 the corresponding audio Decode StateMachine
+ */
+void *audio_decode_thread(void *arg);
+
+/**
+ * Thread 4 the corresponding video Render StateMachine
+ */
+void *video_render_thread(void *arg);
+
 
 class PlayerInner{
 
@@ -32,31 +56,21 @@ public:
      */
     MediaDemuxStateMachine *mediaDemuxStateMachineHandle;
 
+    /**
+     * Media Decode Audio State Machine Handle.
+     */
+    MediaDecodeAudioStateMachine *mediaDecodeAudioStateMachineHandle;
+
+    /**
+     * Media Decode Video State Machine Handle..
+     */
+    MediaDecodeVideoStateMachine *mediaDecodeVideoStateMachineHandle;
+
 private:
 
     //-----------*******************-------------
     //          private member function
     //-----------*******************-------------
-
-    /**
-     * Thread 1 the corresponding Central Engine StateMachine
-     */
-    void *central_engine_thread(void *arg);
-
-    /**
-     * Thread 2 the corresponding Video Decode StateMachine
-     */
-    void *video_decode_thread(void *arg);
-
-    /**
-     * Thread 3 the corresponding audio Decode StateMachine
-     */
-    void *audio_decode_thread(void *arg);
-
-    /**
-     * Thread 4 the corresponding video Render StateMachine
-     */
-    void *video_render_thread(void *arg);
 
 
 public:

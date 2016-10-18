@@ -12,14 +12,18 @@ extern "C" {
 } // end of extern C
 
 #include "MediaFile.h"
-#include "FrameQueue.h"
 
 class MediaDecodeVideoStateMachine
 {
 public :
 
-    MediaDecodeVideoStateMachine();
+    MediaDecodeVideoStateMachine(MediaFile *mediaFile);
     ~MediaDecodeVideoStateMachine();
+
+    /**
+     * Main Work Thread ,the corresponding Video Decode StateMachine
+     */
+    void *video_decode_thread(MediaFile *mediaFile);
 
     /**
     * decode one packet to frame ,and then put decoded frame into video frame queue.
@@ -29,14 +33,16 @@ public :
     * @param mediaFile[in]
     *
     */
-    void decode_one_video_packet(AVPacket *packet ,MediaFile *mediaFile);
+    void decode_one_video_packet(AVPacket *packet);
 
 
+
+private:
 
     /**
-    * video frame queue
-    */
-    FrameQueue *video_frame_queue;
+     * media file handle
+     */
+    MediaFile *mediaFileHandle;
 
 };
 

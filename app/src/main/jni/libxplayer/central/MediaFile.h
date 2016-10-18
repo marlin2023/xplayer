@@ -17,6 +17,7 @@ extern "C" {
 
 #include "MediaFile.h"
 #include "PacketQueue.h"
+#include "FrameQueue.h"
 
 /**
  * streams type in file media.
@@ -131,6 +132,7 @@ public:
      */
     av_support_type_e av_support;
 
+
     /**
      * audio packet queue
      */
@@ -141,7 +143,15 @@ public:
     */
     PacketQueue *video_queue;
 
+    /**
+     * audio frame queue
+     */
+    FrameQueue *audio_frame_queue;
 
+    /**
+    * video frame queue
+    */
+    FrameQueue *video_frame_queue;
 
 
 };

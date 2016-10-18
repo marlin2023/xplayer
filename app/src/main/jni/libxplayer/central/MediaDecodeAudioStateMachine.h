@@ -13,14 +13,19 @@ extern "C" {
 } // end of extern C
 
 #include "MediaFile.h"
-#include "FrameQueue.h"
+
 
 class MediaDecodeAudioStateMachine
 {
 public :
 
-    MediaDecodeAudioStateMachine();
+    MediaDecodeAudioStateMachine(MediaFile *mediaFile);
     ~MediaDecodeAudioStateMachine();
+
+    /**
+     * Main Work Thread ,the corresponding Audio Decode StateMachine
+     */
+    void *audio_decode_thread(void *arg);
 
 
     /**
@@ -31,14 +36,15 @@ public :
     * @param mediaFile[in]
     *
     */
-    void decode_one_audio_packet(AVPacket *packet ,MediaFile *mediaFile);
+    void decode_one_audio_packet(AVPacket *packet );
 
+
+private:
 
     /**
-     * audio frame queue
+     * media file handle
      */
-    FrameQueue *audio_frame_queue;
-
+    MediaFile *mediaFileHandle;
 
 };
 
