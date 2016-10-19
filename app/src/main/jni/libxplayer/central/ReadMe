@@ -16,7 +16,9 @@ Such as Video Decoder State Machine has state :
 
 -
 -
+  Demux State Machine Rename to Central Engine State Machine .
+    change media demux work be put into Central Engine State Machine Thread
 
 
-
-
+-
+-

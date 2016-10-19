@@ -15,11 +15,14 @@ PlayerInner::PlayerInner()
     // mediaFile Handle
     mediaFileHandle = new MediaFile();
 
-    // mediaDemuxStateMachine
-    mediaDemuxStateMachineHandle = new MediaDemuxStateMachine();
-
     mediaDecodeAudioStateMachineHandle = new MediaDecodeAudioStateMachine(mediaFileHandle);
     mediaDecodeVideoStateMachineHandle = new MediaDecodeVideoStateMachine(mediaFileHandle);
+
+    // central engine state machine
+    centralEngineStateMachineHandle = new CentralEngineStateMachine(mediaFileHandle ,
+                                                                mediaDecodeAudioStateMachineHandle ,
+                                                                mediaDecodeVideoStateMachineHandle);
+
 }
 
 /**
@@ -45,7 +48,7 @@ void PlayerInner::player_engine_init()
     //
 
     // 2.Create player will used threads
-    ret = pthread_create(&media_demux_tid, NULL, media_demux_thread, (void*)this);
+    ret = pthread_create(&media_demux_tid, NULL, central_engine_thread, (void*)this);
     if(ret)
     {
         XLog::e(TAG ,"create media demux thread err %d\n",ret);
@@ -68,6 +71,8 @@ void PlayerInner::player_engine_init()
         goto init_eout;
     }
 
+    centralEngineStateMachineHandle->state_machine_change_state(STATE_INITIALIZED);
+
 init_eout:
 
     return ;
@@ -75,11 +80,11 @@ init_eout:
 
 CM_BOOL PlayerInner::player_engine_open()
 {
-    mediaFileHandle->open();
-
+    // 1.initialize message queue for all state machines.
     // demux state machine push EVT_START
-    mediaDemuxStateMachineHandle->message_queue->push(EVT_OPEN);
-    XLog::e(TAG ,"create media demux thread size %d\n",mediaDemuxStateMachineHandle->message_queue->size());
+    centralEngineStateMachineHandle->message_queue->push(EVT_OPEN);
+
+    XLog::e(TAG ,"create media demux thread size %d\n",centralEngineStateMachineHandle->message_queue->size());
 
 }
 
@@ -90,15 +95,15 @@ CM_BOOL PlayerInner::player_engine_open()
 //-----------*******************-------------
 
 /**
- * Thread 1 the corresponding Demux StateMachine
+ * Thread 1 the corresponding Central Engine StateMachine
  */
-void *media_demux_thread(void *arg)
+void *central_engine_thread(void *arg)
 {
     // first ,get PlayerInner Object Handle
     PlayerInner *playerInner = (PlayerInner *)arg;
 
     // call media demux thread
-    playerInner->mediaDemuxStateMachineHandle->media_demux_thread(playerInner->mediaFileHandle);
+    playerInner->centralEngineStateMachineHandle->central_engine_thread(playerInner->mediaFileHandle);
 }
 
 

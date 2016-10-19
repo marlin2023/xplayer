@@ -23,7 +23,6 @@ MediaDecodeVideoStateMachine::MediaDecodeVideoStateMachine(MediaFile *mediaFile)
     this->state = STATE_DECODER_START;
 }
 
-
 MediaDecodeVideoStateMachine::~MediaDecodeVideoStateMachine()
 {
 
@@ -61,27 +60,99 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet)
     av_frame_free(&frame);
 }
 
+void MediaDecodeVideoStateMachine::state_machine_change_state(player_state_e new_state)
+{
+    this->old_state = this->state;
+    this->state = new_state;
+
+}
 
 /**
  * Main Work Thread ,the corresponding Video Decode StateMachine
+ * decode video data thread.
  */
 void * MediaDecodeVideoStateMachine::video_decode_thread(MediaFile *mediaFile)
 {
 
-    MediaFile *media_file_handle = mediaFile;
-    AVPacket pkt;
-    //TODO
-    while(1)
+
+    player_event_e evt;
+
+    while(1){
+        evt = this->message_queue->pop();
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine msq evt = %d\n" ,evt);
+
+        // Exit thread until receive the EXIT_THREAD EVT
+        if(evt == EVT_EXIT_THREAD)
+        {
+            break;
+        }
+
+        // process others evt
+        video_decode_state_machine_process_event(evt);
+
+    }
+
+}
+
+// TODO
+void MediaDecodeVideoStateMachine::video_decode_state_machine_process_event(player_event_e evt)
+{
+    switch(this->state)
     {
 
-        int i ;
-        int j = 0;
-        for(i = 0; i < 10 ; i ++){
-
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"==>MediaDecodeVideoStateMachine LOOP=%d\n" ,i);
+        case STATE_DECODER_START:
+        {
+            //el_demux_file_do_process_playing(evt);
+            do_process_video_decode_start(evt);
+            return;
         }
-        break;
+        case STATE_DECODER_WORK:
+        {
+            //el_demux_file_do_process_play_file_end(evt);
+            return;
+        }
+        default:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine Invalid state!\n");
+            return;
+        }
+    }
+}
 
+void MediaDecodeVideoStateMachine::do_process_video_decode_start(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_START:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine recv start event,goto work state!\n");
+            this->state_machine_change_state(STATE_DECODER_WORK);
+            this->message_queue->push(EVT_DECODE_GO_ON);
+            return;
+        }
+        default:
+        {
+            return;
+        }
+    }
+
+}
+
+
+void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_DECODE_GO_ON:
+        {
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_DECODE_GO_ON event!\n");
+
+            return;
+        }
+        default:
+        {
+            return;
+        }
     }
 
 }

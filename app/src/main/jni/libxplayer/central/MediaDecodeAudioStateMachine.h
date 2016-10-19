@@ -41,6 +41,12 @@ public :
     */
     void decode_one_audio_packet(AVPacket *packet );
 
+    /**
+    * Change the state machine state value
+    * state         will be set new_state
+    * old_state     will be set previous state
+    */
+    void state_machine_change_state(player_state_e new_state);
 
 private:
 

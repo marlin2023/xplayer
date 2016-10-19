@@ -20,7 +20,7 @@ LOCAL_SRC_FILES := jni/onLoad.cpp   \
                 central/PacketQueue.cpp \
                 central/FrameQueue.cpp \
                 central/MediaFile.cpp    \
-                central/MediaDemuxStateMachine.cpp    \
+                central/CentralEngineStateMachine.cpp    \
                 central/MediaDecodeVideoStateMachine.cpp    \
                 central/MediaDecodeAudioStateMachine.cpp    \
                 central/PlayerInner.cpp

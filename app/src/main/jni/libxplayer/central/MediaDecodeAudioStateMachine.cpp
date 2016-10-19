@@ -15,6 +15,11 @@ MediaDecodeAudioStateMachine::MediaDecodeAudioStateMachine(MediaFile *mediaFile)
 {
     this->mediaFileHandle = mediaFile;
 
+    this->message_queue = new XMessageQueue();
+
+    // initialize the state
+    this->state = STATE_DECODER_START;
+
 }
 
 
@@ -48,6 +53,12 @@ void MediaDecodeAudioStateMachine::decode_one_audio_packet(AVPacket *packet )
     } while (send_result == AVERROR(EAGAIN));
 }
 
+void MediaDecodeAudioStateMachine::state_machine_change_state(player_state_e new_state)
+{
+    this->old_state = this->state;
+    this->state = new_state;
+
+}
 
 /**
  * Main Work Thread ,the corresponding Audio Decode StateMachine

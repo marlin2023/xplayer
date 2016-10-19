@@ -14,15 +14,15 @@ extern "C" {
 #include "util/cm_std.h"
 
 #include "MediaFile.h"
-#include "MediaDemuxStateMachine.h"
+#include "CentralEngineStateMachine.h"
 #include "MediaDecodeAudioStateMachine.h"
 #include "MediaDecodeVideoStateMachine.h"
 
 
 /**
- * Thread 1 the corresponding Demux StateMachine
+ * Thread 1 the corresponding Central Engine StateMachine
  */
-void *media_demux_thread(void *arg);
+void *central_engine_thread(void *arg);
 
 /**
  * Thread 2 the corresponding Video Decode StateMachine
@@ -48,14 +48,33 @@ public:
     ~PlayerInner();
 
     /**
+     * Create object then player engine initialize
+     * 1. register ffmpeg formats & codecs
+     * 2. create pthreads
+     */
+    void player_engine_init();
+
+
+    /**
+     * player engine open
+     * open file and get file streams information
+     */
+    CM_BOOL player_engine_open();
+
+
+    //-----------*******************-------------
+    //          public member variable
+    //-----------*******************-------------
+
+    /**
      * Media File Handler contain file all information.
      */
     MediaFile *mediaFileHandle;
 
     /**
-     * Media Demux State Machine Handle.
+     * Central Engine State Machine Handle.
      */
-    MediaDemuxStateMachine *mediaDemuxStateMachineHandle;
+    CentralEngineStateMachine *centralEngineStateMachineHandle;
 
     /**
      * Media Decode Audio State Machine Handle.
@@ -76,19 +95,7 @@ private:
     //-----------*******************-------------
 
 
-public:
 
-    /**
-     * player engine initialize
-     * 1. register ffmpeg formats & codecs
-     */
-    void player_engine_init();
-
-    /**
-     * player engine open
-     * open file and get file streams information
-     */
-    CM_BOOL player_engine_open();
 
 };
 

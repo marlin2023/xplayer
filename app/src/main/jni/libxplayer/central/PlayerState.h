@@ -23,7 +23,7 @@ typedef enum _player_state_e_
     /* state below is used for decoding state machine*/
     STATE_DECODER_START,
     STATE_DECODER_WAIT,
-    STATE_DECODER_DECODING,
+    STATE_DECODER_WORK,
 
     STATE_END,                    // the end
 } player_state_e;

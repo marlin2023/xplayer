@@ -38,9 +38,29 @@ public :
     */
     void decode_one_video_packet(AVPacket *packet);
 
+    /**
+    * Change the state machine state value
+    * state         will be set new_state
+    * old_state     will be set previous state
+    */
+    void state_machine_change_state(player_state_e new_state);
 
+    /**
+     * video decode state machine process event
+     */
+    void video_decode_state_machine_process_event(player_event_e evt);
 
 private:
+
+    /**
+     * decode start state processing work
+     */
+    void do_process_video_decode_start(player_event_e evt);
+
+    /**
+     * decode work state processing work
+     */
+    void do_process_video_decode_work(player_event_e evt);
 
     /**
      * media file handle
