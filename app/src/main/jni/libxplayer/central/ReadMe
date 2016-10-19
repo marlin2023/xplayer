@@ -22,3 +22,8 @@ Such as Video Decoder State Machine has state :
 
 -
 -
+ First Decode will happen until is_pkt_q_full(mediaFileHandle->start_playing_buffering_time) be performed.
+ So before that ,you should not call decode function.
+
+-
+-

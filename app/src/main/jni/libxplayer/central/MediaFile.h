@@ -98,6 +98,8 @@ private:
     */
     CM_BOOL stream_component_open(int stream_index);
 
+    CM_BOOL video_stream_component_open(int stream_index);
+
     /**
     * Close given stream by stream_index
     * refer to function from ffplay.c

@@ -86,6 +86,31 @@ int CentralEngineStateMachine::add_packet_to_q(AVPacket *pkt ,MediaFile *mediaFi
         // video packet
         pkt_q = mediaFile->video_queue;
         XLog::d(ANDROID_LOG_INFO ,TAG ,"==>VVVVideo packet queue size = %d\n" ,pkt_q->size());
+
+
+        //
+#if 0
+            AVCodecContext *codec_ctx ;
+            AVFrame *frame ;
+            codec_ctx = mediaFileHandle->video_codec_context;
+            frame = av_frame_alloc();
+            if(!frame){
+                XLog::e(TAG ,"===>ZVideoDecoder::run(), error for av_frame_alloc.\n");
+            }
+            int got_frame = 0;
+            avcodec_decode_video2(codec_ctx,
+                                     frame,
+                                     &got_frame,
+                                     pkt);
+            if(!got_frame)
+            {
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine not got_frame----->\n");
+            }else{
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine got_frame ---!!!!\n");
+            }
+#endif
+
+        //
     }
     else if (pkt->stream_index == st_index[AVMEDIA_TYPE_AUDIO])
     {
@@ -102,6 +127,54 @@ int CentralEngineStateMachine::add_packet_to_q(AVPacket *pkt ,MediaFile *mediaFi
 
     // Entry queue
     int ret = pkt_q->put(pkt);
+
+    //
+#if 1
+    if (pkt->stream_index == st_index[AVMEDIA_TYPE_VIDEO])
+    {
+
+
+        XLog::e(TAG ,"===>pkt_q.size =%d ,pkt->stream_index =%d.\n" ,pkt_q->size() ,pkt->stream_index);
+        AVPacket pkt1;
+        ret = mediaFileHandle->video_queue->get(&pkt1 ,1);
+
+        AVCodecContext *codec_ctx ;
+        AVFrame *frame ;
+        codec_ctx = mediaFileHandle->video_codec_context;
+        frame = av_frame_alloc();
+        if(!frame){
+            XLog::e(TAG ,"===>ZVideoDecoder::run(), error for av_frame_alloc.\n");
+        }
+        XLog::e(TAG ,"===>ZVideoDecoder::run(),pkt1->size =%d ,pkt1.pts =%lld\n" ,pkt1.size ,pkt1.pts);
+
+        if (pkt1.side_data != NULL){
+            XLog::e(TAG ,"===>ZVideoDecoder::run(),pkt1.side_data is not null.\n");
+        }else{
+            XLog::e(TAG ,"===>ZVideoDecoder::run(),pkt1.side_data is null..\n");  // will be perform this statement.
+        }
+
+        if (pkt->side_data != NULL){
+            XLog::e(TAG ,"===>ZVideoDecoder::run(),pkt side_data is not null.\n");
+        }else{
+            XLog::e(TAG ,"===>ZVideoDecoder::run(),pkt side_data is null..\n");  // will be perform this statement.
+        }
+        int got_frame = 0;
+        avcodec_decode_video2(codec_ctx,
+                                 frame,
+                                 &got_frame,
+                                 &pkt1);
+        if(!got_frame)
+        {
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine not got_frame----->\n");
+        }else{
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine got_frame ---!!!!\n");
+        }
+
+    }
+
+
+#endif
+    //
     return ret;
 }
 

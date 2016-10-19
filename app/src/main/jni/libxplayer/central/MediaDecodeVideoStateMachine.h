@@ -36,7 +36,7 @@ public :
     * @param mediaFile[in]
     *
     */
-    void decode_one_video_packet(AVPacket *packet);
+    void decode_one_video_packet(AVPacket *packet );
 
     /**
     * Change the state machine state value
@@ -67,8 +67,8 @@ private:
      */
     MediaFile *mediaFileHandle;
 
-public:
 
+public:
     /**
      * message queue for MediaDecodeVideoStateMachine
      */

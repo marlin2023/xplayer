@@ -148,7 +148,8 @@ CM_BOOL MediaFile::open()
     if (stream_index[AVMEDIA_TYPE_VIDEO] >= 0)
     {
         // open video decoder
-        ret = stream_component_open(stream_index[AVMEDIA_TYPE_VIDEO]);
+        //ret = stream_component_open(stream_index[AVMEDIA_TYPE_VIDEO]);
+        ret = video_stream_component_open(stream_index[AVMEDIA_TYPE_VIDEO]);
         if(!ret)
         {
             XLog::e(TAG ,"state_machine: open video codec err, disable video support\n");
@@ -220,8 +221,11 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
     // set codec context.
     if (codec_context->codec_type == AVMEDIA_TYPE_AUDIO){
         audio_codec_context = codec_context;
+
     }else if(codec_context->codec_type == AVMEDIA_TYPE_VIDEO){
-        video_codec_context = codec_context;
+        //video_codec_context = codec_context;
+        video_codec_context = avcodec_alloc_context3(NULL);
+        avcodec_parameters_to_context(video_codec_context, ic->streams[stream_index]->codecpar);
     }
 
     ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;
@@ -229,7 +233,52 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
     goto sucess;    // here not release codec_context.
 
 fail:
-    //avcodec_free_context(&codec_context);
+    avcodec_free_context(&codec_context);
+
+sucess:
+    return ret;
+}
+
+CM_BOOL MediaFile::video_stream_component_open(int stream_index)
+{
+    AVFormatContext *ic = format_context;
+    AVCodec *codec;
+
+    int ret = 0;
+
+    if (stream_index < 0 || stream_index >= ic->nb_streams)
+    {
+        XLog::e(TAG ,"===> invalid stream_index %d \n" ,stream_index);
+        return CM_FALSE;
+    }
+
+    video_codec_context = avcodec_alloc_context3(NULL);
+    if (!video_codec_context){
+        XLog::e(TAG ,"===> avcodec_alloc_context3 failed\n");
+        return CM_FALSE;
+    }
+
+    ret = avcodec_parameters_to_context(video_codec_context, ic->streams[stream_index]->codecpar);
+    if (ret < 0){
+        XLog::e(TAG ,"===> avcodec_parameters_to_context failed\n");
+        ret = CM_FALSE;
+        goto fail;
+    }
+
+    codec = avcodec_find_decoder(video_codec_context->codec_id);
+    if (!codec || avcodec_open2(video_codec_context, codec, NULL) < 0)
+    {
+        XLog::e(TAG ,"===> open video decoder err\n");
+        ret = CM_FALSE;
+        goto fail;
+    }
+
+    ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;
+    ret = CM_TRUE;
+    goto sucess;    // here not release codec_context.
+
+fail:
+    avcodec_free_context(&video_codec_context);
 
 sucess:
     return ret;

@@ -21,6 +21,8 @@ MediaDecodeVideoStateMachine::MediaDecodeVideoStateMachine(MediaFile *mediaFile)
 
     // initialize the state
     this->state = STATE_DECODER_START;
+
+
 }
 
 MediaDecodeVideoStateMachine::~MediaDecodeVideoStateMachine()
@@ -28,36 +30,58 @@ MediaDecodeVideoStateMachine::~MediaDecodeVideoStateMachine()
 
 }
 
-void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet)
+void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
 {
 
-    int send_result;
-    AVFrame *frame = av_frame_alloc();;
-    AVCodecContext *video_codec_context ;
-    FrameQueue *video_frame_queue;
-    int ret ;
-    video_codec_context = mediaFileHandle->video_codec_context;
-    video_frame_queue = mediaFileHandle->video_frame_queue;
+    if(packet1 == NULL){
+        XLog::e(TAG ,"===>ZVideoDecoder::packet1 is null.\n");
+        return ;
+    }
 
-    do {
-        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>1\n" );
-        send_result = avcodec_send_packet(video_codec_context, packet);
-        av_packet_unref(packet);
-        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>2\n" );
-
-        while ( (ret =avcodec_receive_frame(video_codec_context, frame)) == 0 ) {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"==>3\n" );
-            video_frame_queue->put(frame);
-            av_frame_unref(frame);
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"==>Video_Frame_QUEUE size=%d\n" ,video_frame_queue->size());
-
-        }
-        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>ret = %d\n" ,ret );
+    int send_result ,ret;
+    AVCodecContext *codec_ctx ;
+    AVFrame *frame ;
+    codec_ctx = mediaFileHandle->video_codec_context;
+    frame = av_frame_alloc();
+    if(!frame){
+        XLog::e(TAG ,"===>ZVideoDecoder::run(), error for av_frame_alloc.\n");
+        return;
+    }
 
 
-    } while (send_result == AVERROR(EAGAIN));
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine ,pkt->stream_index =%d\n" ,packet1->stream_index);
+    int got_frame = 0;
+    avcodec_decode_video2(codec_ctx,
+                             frame,
+                             &got_frame,
+                             packet1);
 
+    if(!got_frame)
+    {
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine not got_frame\n");
+        // free packet
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>0.0\n");
+        av_packet_unref(packet1);
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>0.1\n");
+        //free(packet1);
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>0.2\n");
+        return ;
+    }
+
+    //frame->pts = av_frame_get_best_effort_timestamp(frame);
+    // TODO
+    // TODO send frame
+
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME\n");
+
+
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>1\n");
+    //av_packet_unref(packet1);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>2\n");
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>3\n");
     av_frame_free(&frame);
+
+
 }
 
 void MediaDecodeVideoStateMachine::state_machine_change_state(player_state_e new_state)
@@ -76,7 +100,7 @@ void * MediaDecodeVideoStateMachine::video_decode_thread(MediaFile *mediaFile)
 
 
     player_event_e evt;
-
+    sleep(5);
     while(1){
         evt = this->message_queue->pop();
         XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine msq evt = %d\n" ,evt);
@@ -147,14 +171,38 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
             XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_DECODE_GO_ON event!\n");
 
             //
-            AVPacket pkt;
-            mediaFileHandle->video_queue->get(&pkt ,1);
-            int rr = mediaFileHandle->video_queue->size();
-            XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine ,pkt.size = %d ,rr=%d\n" ,pkt.size ,rr);
+            //AVPacket pkt;
+            //int ret = mediaFileHandle->video_queue->get(&pkt ,1);
+            //int rr = mediaFileHandle->video_queue->size();
+            //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine ,pkt.size = %d ,rr=%d ,ret =%d\n" ,pkt.size ,rr ,ret);
 
-            mediaFileHandle->video_queue->get(&pkt ,1);
-            XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine ,pkt.size = %d\n" ,pkt.size);
+            //decode_one_video_packet(&pkt );
+            //
 
+#if 0
+            AVCodecContext *codec_ctx ;
+            AVFrame *frame ;
+            codec_ctx = mediaFileHandle->video_codec_context;
+            frame = av_frame_alloc();
+            if(!frame){
+                XLog::e(TAG ,"===>ZVideoDecoder::run(), error for av_frame_alloc.\n");
+            }
+            int got_frame = 0;
+            avcodec_decode_video2(codec_ctx,
+                                     frame,
+                                     &got_frame,
+                                     &pkt);
+            if(!got_frame)
+            {
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine not got_frame----->\n");
+            }else{
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine got_frame ---!!!!\n");
+            }
+#endif
+            //
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine 1\n");
+            this->message_queue->push(EVT_DECODE_GO_ON);
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine size-%d\n" ,this->message_queue->size());
 
             return;
         }
