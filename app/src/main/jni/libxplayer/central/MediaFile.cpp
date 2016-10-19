@@ -26,6 +26,24 @@ MediaFile::MediaFile()
     audio_codec_context = NULL;
     video_codec_context = NULL;
 
+    //
+    //
+    // 如果是网络文件, 设置Buffer时间以及超时时间
+    if (strstr((const char *)source_url,"http://") ||
+        strstr((const char *)source_url,"rtsp://") ||
+        strstr((const char *)source_url,"rtmp://"))
+    {
+        start_playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;    // 3s
+        max_buffering_time = X_MAX_PKT_Q_NETWORK_BUFFERING_TS;                    // 6s
+
+        //is_network_media = X_TRUE;
+    }
+    else
+    {
+        start_playing_buffering_time = X_MAX_PKT_Q_TS;    // 0.6s
+        max_buffering_time = 2 * X_MAX_PKT_Q_TS;          // 1.2s
+    }
+
 }
 
 
@@ -243,6 +261,86 @@ char * MediaFile::getSourceUrl()
 }
 
 
+CM_BOOL MediaFile::is_pkt_q_full(int64_t max_buffer_ts)
+{
+    int64_t q_v_buffer_ts = -1;
+    int64_t q_a_buffer_ts = -1;
 
+    double buffering_percent = 0.1;
+
+    AVFormatContext *fc = this->format_context;
+
+    // 得到当前视频流的dts
+    if(this->stream_index[AVMEDIA_TYPE_VIDEO] >= 0)
+    {
+        AVStream *vst = fc->streams[stream_index[AVMEDIA_TYPE_VIDEO]];
+        q_v_buffer_ts = video_queue->get_buffer_packet_ts() * av_q2d(vst->time_base) * 1000;
+    }
+
+    // 得到当前音频流的dts
+    if(stream_index[AVMEDIA_TYPE_AUDIO] >= 0)
+    {
+        AVStream *vst = fc->streams[stream_index[AVMEDIA_TYPE_AUDIO]];
+        q_a_buffer_ts = audio_queue->get_buffer_packet_ts() * av_q2d(vst->time_base)*1000;
+    }
+
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"PKT Q, q_v_ts = %lld, q_a_ts = %lld, v count = %d, a count = %d, base_time = %lld\n",
+               q_v_buffer_ts, q_a_buffer_ts, video_queue->size(), audio_queue->size(), max_buffer_ts);
+
+    switch(this->av_support)
+    {
+        case HAS_BOTH:
+        {
+            // 视频包数据大小，超过配置值
+            if(video_queue->q_size >= X_MAX_PKT_VIDEO_Q_MEM_SPACE)
+            {
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"===>pkt video q exceed limit space, q full\n");
+
+                goto is_full;
+            }
+
+            // 音频、视频，缓冲均已经达到最大缓冲的时间值
+            if(q_v_buffer_ts > max_buffer_ts && q_a_buffer_ts > max_buffer_ts)
+            {
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"queue is full: v ts = %lld, a ts = %lld, both > max buffer ts: %lld, is full\n",
+                           q_v_buffer_ts,
+                           q_a_buffer_ts,
+                           max_buffer_ts);
+
+                goto is_full;
+            }
+
+            buffering_percent = x_min(q_v_buffer_ts, q_a_buffer_ts) / (double)max_buffer_ts;
+
+            goto is_not_full;
+        }
+        case HAS_AUDIO:   //TODO
+        case HAS_VIDEO:   //TODO
+        default:
+        {
+            return CM_FALSE;
+        }
+    }
+
+is_full:
+
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"buffering is full");
+
+    this->buffering_percent = 0;
+
+    return CM_TRUE;
+
+is_not_full:
+
+    XLog::d(ANDROID_LOG_WARN ,TAG  ,"buffering is not full, buffering_percent = %f%%, max_buffer_ts = %lld", buffering_percent * 100, max_buffer_ts);
+
+    //el_notify_buffering_percent(buffering_percent);
+    // TODO
+    // TODO notify buffering percent to upper layer.
+    // TODO
+
+    return CM_FALSE;
+
+}
 
 

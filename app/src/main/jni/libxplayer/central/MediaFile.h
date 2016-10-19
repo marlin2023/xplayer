@@ -19,6 +19,33 @@ extern "C" {
 #include "PacketQueue.h"
 #include "FrameQueue.h"
 
+#define x_min(a,b) (((a) < (b)) ? (a):(b))
+#define x_max(a,b) (((a) > (b)) ? (a):(b))
+#define x_abs(a) (((a) >= 0) ? (a) : -(a))
+
+
+#define X_S_2_MS(sec) ((sec) * 1000)
+#define X_MS_2_US(msec) ((msec) * 1000)
+
+#define X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS X_S_2_MS(3)        // in ms unit
+#define X_MAX_PKT_Q_NETWORK_BUFFERING_TS X_S_2_MS(6)              // in ms unit
+
+#define X_MAX_PKT_Q_TS         X_S_2_MS(0.6)                  // in ms unit
+#define X_MAX_PKT_Q_NETWORK_TS X_S_2_MS(40)                   // in ms unit
+
+#define X_MAX_FRAME_VIDEO_Q_NODE_CNT 20                         // max frm q video frame count
+
+#define X_MAX_FRAME_Q_TIME_LIMIT (0.7)                          // s
+
+#define X_MAX_FRAME_AUDIO_Q_NODE_CNT 40                         // max frm q audio frame count
+
+#define X_MEGA_SIZE(t) ((t) * 1024 * 1024)
+#define X_MAX_FRAME_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(40)              // 40M space size
+
+#define X_MAX_PKT_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(10)                // 10M space size
+#define X_MAX_PKT_AUDIO_Q_MEM_SPACE  X_MEGA_SIZE(5)                 // 5M space size
+
+
 /**
  * streams type in file media.
  *
@@ -59,6 +86,10 @@ public:
     */
     CM_BOOL open();
 
+    /**
+    * judge if the packet queue is full by the input parameter ts.
+    */
+    CM_BOOL is_pkt_q_full(int64_t buffer_ts_duration);
 
 private:
     /**
@@ -152,6 +183,23 @@ public:
     * video frame queue
     */
     FrameQueue *video_frame_queue;
+
+
+    //
+    /**
+    * first play ,only need to buffer start_playing_buffering_time data.
+    */
+    long long start_playing_buffering_time;
+
+    /**
+    * max buffering time.
+    */
+    long long max_buffering_time;
+
+    /**
+    * buffering percent.
+    */
+    int buffering_percent;
 
 
 };

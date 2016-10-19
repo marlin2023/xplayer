@@ -142,3 +142,58 @@ void PacketQueue::abort()
     pthread_cond_signal(&cond);
     pthread_mutex_unlock(&mutex);
 }
+
+int64_t PacketQueue::get_buffer_packet_ts()
+{
+    int64_t nfirst = 0;
+    int64_t nlast = 0;
+    nfirst = get_first_pkt_pts();
+    nlast = get_last_pkt_pts();
+    return ((nlast-nfirst > 0) ? (nlast-nfirst) : 0);
+}
+
+int64_t PacketQueue::get_first_pkt_pts()
+{
+    int64_t pts = 0;
+    AVPacketList *pkt1;
+
+    pthread_mutex_lock(&mutex);
+
+    pkt1 = first_packet;
+    if (pkt1) {
+        pts = pkt1->pkt.pts;
+        if(pts == AV_NOPTS_VALUE){
+            pts = pkt1->pkt.dts;
+        }
+    }else {
+      // set pts 0
+        pts = 0;
+    }
+
+    pthread_mutex_unlock(&mutex);
+
+    return pts;
+}
+
+int64_t PacketQueue::get_last_pkt_pts()
+{
+    int64_t pts = 0;
+    AVPacketList *pkt1;
+
+    pthread_mutex_lock(&mutex);
+
+    pkt1 = last_packet;
+    if (pkt1) {
+        pts = pkt1->pkt.pts;
+        if(pts == AV_NOPTS_VALUE){
+            pts = pkt1->pkt.dts;
+        }
+    }else {
+      // set pts 0
+        pts = 0;
+    }
+
+    pthread_mutex_unlock(&mutex);
+
+    return pts;
+}

@@ -47,11 +47,11 @@ CentralEngineStateMachine::~CentralEngineStateMachine()
 
 }
 
-int CentralEngineStateMachine::demux_2_packet_queue(MediaFile *mediaFile)
+int CentralEngineStateMachine::demux_2_packet_queue()
 {
     AVPacket packet;
     int ret;
-    AVFormatContext *format_context = mediaFile->format_context;
+    AVFormatContext *format_context = mediaFileHandle->format_context;
 
     // read packet from stream
     if((ret = av_read_frame(format_context, &packet)) < 0)
@@ -65,13 +65,12 @@ int CentralEngineStateMachine::demux_2_packet_queue(MediaFile *mediaFile)
 
     // here ,audio packet will be put into audio packet queue ;
     // video packet will be put into video packet queue.
-    return add_packet_to_q(&packet ,mediaFile);
+    return add_packet_to_q(&packet ,mediaFileHandle);
 
 }
 
 int CentralEngineStateMachine::add_packet_to_q(AVPacket *pkt ,MediaFile *mediaFile)
 {
-
 
     AVFormatContext *format_context;
     int *st_index;
@@ -289,6 +288,31 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
 {
     switch(evt)
     {
+        case EVT_GO_ON:
+        {
+
+            if (demux_2_packet_queue() == AVERROR_EOF && this->read_retry_count > 5)
+            {
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"===>AVERROR_EOF....\n");
+                break;
+            }
+
+            if(mediaFileHandle->is_pkt_q_full(mediaFileHandle->start_playing_buffering_time))
+            {
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"===>is_pkt_q_full break;.\n");
+                // TODO ,here should to notify upper layer
+                // TODO
+                
+                return;
+            }
+            this->message_queue->push(EVT_GO_ON);
+            return;
+        }
+        default:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_BUFFERING receive others EVT.\n");
+            return;
+        }
 
     }
     return;

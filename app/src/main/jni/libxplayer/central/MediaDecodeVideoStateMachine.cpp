@@ -102,13 +102,12 @@ void MediaDecodeVideoStateMachine::video_decode_state_machine_process_event(play
 
         case STATE_DECODER_START:
         {
-            //el_demux_file_do_process_playing(evt);
             do_process_video_decode_start(evt);
             return;
         }
         case STATE_DECODER_WORK:
         {
-            //el_demux_file_do_process_play_file_end(evt);
+            do_process_video_decode_work(evt);
             return;
         }
         default:
@@ -146,6 +145,16 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
         case EVT_DECODE_GO_ON:
         {
             XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_DECODE_GO_ON event!\n");
+
+            //
+            AVPacket pkt;
+            mediaFileHandle->video_queue->get(&pkt ,1);
+            int rr = mediaFileHandle->video_queue->size();
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine ,pkt.size = %d ,rr=%d\n" ,pkt.size ,rr);
+
+            mediaFileHandle->video_queue->get(&pkt ,1);
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine ,pkt.size = %d\n" ,pkt.size);
+
 
             return;
         }

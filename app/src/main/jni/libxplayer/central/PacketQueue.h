@@ -16,6 +16,9 @@ extern "C" {
 
 } // end of extern C
 
+#include "util/cm_std.h"
+
+
 class PacketQueue
 {
 public:
@@ -42,7 +45,27 @@ public:
 
     void abort();
 
+
+
+    /**
+    * get buffered packet sum duration in packet queue.
+    */
+    int64_t get_buffer_packet_ts();
+
+    unsigned long long q_size;
+
 private:
+
+    /**
+    * get first packet pts in packet queue.
+    */
+    int64_t get_first_pkt_pts();
+
+    /**
+    * get last packet pts in packet queue
+    */
+    int64_t get_last_pkt_pts();
+
 
     /**
     * first packet in packet queue.
@@ -56,7 +79,7 @@ private:
 
     int nb_packets;
 
-    unsigned long long q_size;
+    //unsigned long long q_size;
     int abort_request;
 
     pthread_mutex_t mutex;

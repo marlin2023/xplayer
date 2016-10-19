@@ -42,7 +42,7 @@ public :
     * audio packet put into audio packet queue
     * video packet put into video packet queue
     */
-    int demux_2_packet_queue(MediaFile *mediaFile);
+    int demux_2_packet_queue();
 
     /**
     * Change the state machine state value
