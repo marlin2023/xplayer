@@ -67,11 +67,13 @@ int PacketQueue::put(AVPacket* pkt)
         return AVERROR(ENOMEM);
     }
 
-    if ( (ret = av_packet_ref(&pkt1->pkt, pkt) ) < 0) {
+    if ( (ret = av_packet_ref(pkt, pkt) ) < 0) {
+    //if ( (ret = av_packet_ref(&pkt1->pkt, pkt) ) < 0) {   // if use like this ,will change pkt side_data .
         av_free(pkt1);
         XLog::e(TAG ,"==>av_packet_ref failed.\n");
         return ret;
     }
+    pkt1->pkt = *pkt;
     pkt1->next = NULL;
 
     pthread_mutex_lock(&mutex);

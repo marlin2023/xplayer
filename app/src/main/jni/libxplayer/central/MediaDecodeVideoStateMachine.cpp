@@ -61,24 +61,19 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
         XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine not got_frame\n");
         // free packet
         XLog::d(ANDROID_LOG_WARN ,TAG ,"==>0.0\n");
-        av_packet_unref(packet1);
+        //av_packet_unref(packet1);
         XLog::d(ANDROID_LOG_WARN ,TAG ,"==>0.1\n");
         //free(packet1);
         XLog::d(ANDROID_LOG_WARN ,TAG ,"==>0.2\n");
         return ;
     }
 
-    //frame->pts = av_frame_get_best_effort_timestamp(frame);
+    frame->pts = av_frame_get_best_effort_timestamp(frame);
     // TODO
     // TODO send frame
 
     XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME\n");
-
-
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>1\n");
     //av_packet_unref(packet1);
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>2\n");
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>3\n");
     av_frame_free(&frame);
 
 
@@ -171,12 +166,12 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
             XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_DECODE_GO_ON event!\n");
 
             //
-            //AVPacket pkt;
-            //int ret = mediaFileHandle->video_queue->get(&pkt ,1);
-            //int rr = mediaFileHandle->video_queue->size();
-            //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine ,pkt.size = %d ,rr=%d ,ret =%d\n" ,pkt.size ,rr ,ret);
+            AVPacket pkt;
+            int ret = mediaFileHandle->video_queue->get(&pkt ,1);
+            int rr = mediaFileHandle->video_queue->size();
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine ,pkt.size = %d ,rr=%d ,ret =%d\n" ,pkt.size ,rr ,ret);
 
-            //decode_one_video_packet(&pkt );
+            decode_one_video_packet(&pkt );
             //
 
 #if 0
@@ -200,9 +195,9 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
             }
 #endif
             //
-            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine 1\n");
+            //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine 1\n");
             this->message_queue->push(EVT_DECODE_GO_ON);
-            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine size-%d\n" ,this->message_queue->size());
+            //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine size-%d\n" ,this->message_queue->size());
 
             return;
         }
