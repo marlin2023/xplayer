@@ -33,14 +33,10 @@ MediaDecodeVideoStateMachine::~MediaDecodeVideoStateMachine()
 void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
 {
 
-    if(packet1 == NULL){
-        XLog::e(TAG ,"===>ZVideoDecoder::packet1 is null.\n");
-        return ;
-    }
-
     int send_result ,ret;
     AVCodecContext *codec_ctx ;
     AVFrame *frame ;
+
     codec_ctx = mediaFileHandle->video_codec_context;
     frame = av_frame_alloc();
     if(!frame){
@@ -48,8 +44,6 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
         return;
     }
 
-
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine ,pkt->stream_index =%d\n" ,packet1->stream_index);
     int got_frame = 0;
     avcodec_decode_video2(codec_ctx,
                              frame,
@@ -59,24 +53,22 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
     if(!got_frame)
     {
         XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine not got_frame\n");
-        // free packet
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>0.0\n");
         //av_packet_unref(packet1);
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>0.1\n");
         //free(packet1);
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>0.2\n");
         return ;
     }
 
+
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME\n");
     frame->pts = av_frame_get_best_effort_timestamp(frame);
     // TODO
     // TODO send frame
+    mediaFileHandle->video_frame_queue->put(frame);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME ,vdieo frame q size = %d\n" ,mediaFileHandle->video_frame_queue->size());
 
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME\n");
     //av_packet_unref(packet1);
+    //free(packet1);
     av_frame_free(&frame);
-
-
 }
 
 void MediaDecodeVideoStateMachine::state_machine_change_state(player_state_e new_state)

@@ -49,18 +49,20 @@ int FrameQueue::put(AVFrame *frame)
     int ret;
 
     frame1 = (AVFrameList *) av_malloc(sizeof(AVFrameList));
-
-    if (!frame1){
+    frame1->frame = av_frame_alloc();
+    if (!frame1 || !frame1->frame){
         XLog::e(TAG ,"==>av_malloc failed.\n");
         return AVERROR(ENOMEM);
     }
 
-    if ( (ret = av_frame_ref(frame1->frame, frame) ) < 0) { //// copy frame data
-
+    if ( (ret = av_frame_ref(frame1->frame, frame) ) < 0) { //// copy frame data (only copy meta data .//TODO)
+    //if ( (ret = av_frame_ref(frame, frame) ) < 0) { //// copy frame data (only copy meta data .//TODO)
         av_free(frame1);
         XLog::e(TAG ,"==>av_frame_ref failed.\n");
         return ret;
     }
+
+    //*(frame1->frame) = *frame;
     frame1->next = NULL;
 
     pthread_mutex_lock(&mutex);
