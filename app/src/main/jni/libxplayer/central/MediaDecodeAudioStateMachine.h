@@ -28,7 +28,7 @@ public :
     /**
      * Main Work Thread ,the corresponding Audio Decode StateMachine
      */
-    void *audio_decode_thread(void *arg);
+    void *audio_decode_thread();
 
 
     /**
@@ -48,7 +48,23 @@ public :
     */
     void state_machine_change_state(player_state_e new_state);
 
+    /**
+     * audio decode state machine process event
+     */
+    void audio_decode_state_machine_process_event(player_event_e evt);
+
 private:
+
+    /**
+     * decode start state processing work
+     */
+    void do_process_audio_decode_start(player_event_e evt);
+
+    /**
+     * decode work state processing work
+     */
+    void do_process_audio_decode_work(player_event_e evt);
+
 
     /**
      * media file handle

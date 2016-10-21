@@ -19,8 +19,6 @@ YuvGLRender::YuvGLRender(MediaFile *mediaFile)
     this->init();
 }
 
-
-
 YuvGLRender::~YuvGLRender()
 {
 
@@ -126,7 +124,7 @@ GLuint YuvGLRender::buildShader(const char* source, GLenum shaderType)
                 if (buf)
                 {
                     glGetShaderInfoLog(shaderHandle, infoLen, NULL, buf);
-                    __android_log_print(ANDROID_LOG_ERROR ,"chris_magic" ,"error::Could not compile shader %d:\n%s\n", shaderType, buf);
+                    XLog::e(TAG ,"error::Could not compile shader %d:\n%s\n", shaderType, buf);
                     free(buf);
                 }
                 glDeleteShader(shaderHandle);

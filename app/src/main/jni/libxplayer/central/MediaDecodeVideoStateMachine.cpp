@@ -33,41 +33,34 @@ MediaDecodeVideoStateMachine::~MediaDecodeVideoStateMachine()
 void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
 {
 
-    int send_result ,ret;
+    int send_result;
+    AVFrame *frame;
     AVCodecContext *codec_ctx ;
-    AVFrame *frame ;
+    FrameQueue *frame_queue;
 
-    codec_ctx = mediaFileHandle->video_codec_context;
     frame = av_frame_alloc();
     if(!frame){
-        XLog::e(TAG ,"===>ZVideoDecoder::run(), error for av_frame_alloc.\n");
+        XLog::e(TAG ,"===>decode_one_video_packet, error for av_frame_alloc.\n");
         return;
     }
 
-    int got_frame = 0;
-    avcodec_decode_video2(codec_ctx,
-                             frame,
-                             &got_frame,
-                             packet1);
+    codec_ctx = mediaFileHandle->video_codec_context;
+    frame_queue = mediaFileHandle->video_frame_queue;
 
-    if(!got_frame)
-    {
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine not got_frame\n");
-        //av_packet_unref(packet1);
-        //free(packet1);
-        return ;
-    }
+    do {
+        send_result = avcodec_send_packet(codec_ctx, packet1);
+        while ( avcodec_receive_frame(codec_ctx, frame) == 0 ) {
 
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME\n");
+            frame->pts = av_frame_get_best_effort_timestamp(frame);
+            // TODO
+            // TODO send frame
+            mediaFileHandle->video_frame_queue->put(frame);
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME ,vdieo frame q size = %d\n" ,mediaFileHandle->video_frame_queue->size());
+        }
 
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME\n");
-    frame->pts = av_frame_get_best_effort_timestamp(frame);
-    // TODO
-    // TODO send frame
-    mediaFileHandle->video_frame_queue->put(frame);
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME ,vdieo frame q size = %d\n" ,mediaFileHandle->video_frame_queue->size());
+    } while (send_result == AVERROR(EAGAIN));
 
-    //av_packet_unref(packet1);
-    //free(packet1);
     av_frame_free(&frame);
 }
 

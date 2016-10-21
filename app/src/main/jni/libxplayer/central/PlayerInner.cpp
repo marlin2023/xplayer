@@ -125,7 +125,11 @@ void *video_decode_thread(void *arg)
  */
 void *audio_decode_thread(void *arg)
 {
+    // first ,get PlayerInner Object Handle
+    PlayerInner *playerInner = (PlayerInner *)arg;
 
+    // call audio decode thread
+    playerInner->mediaDecodeAudioStateMachineHandle->audio_decode_thread();
 
 }
 
