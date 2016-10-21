@@ -17,6 +17,7 @@ extern "C" {
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
 
+#include "MediaFile.h"
 
 static const char* FRAG_SHADER =
     "varying lowp vec2 tc;\n"
@@ -53,14 +54,14 @@ enum {
 };
 
 
-GLfloat squareVertices[] = {
+static GLfloat squareVertices[] = {
     0.0f, 0.0f,
     1.0f, 0.0f,
     0.0f,  1.0f,
     1.0f,  1.0f,
 };
 
-GLfloat coordVertices[] = {
+static GLfloat coordVertices[] = {
     -1.0f, 1.0f,
     1.0f, 1.0f,
     -1.0f,  -1.0f,
@@ -70,13 +71,20 @@ GLfloat coordVertices[] = {
 class YuvGLRender{
 
 public:
-    YuvGLRender();
+    YuvGLRender(MediaFile *mediaFile);
     ~YuvGLRender();
 
     /**
      * render the source frame.
      */
-    void render_frame(AVFrame *src_frame);
+    //void render_frame(AVFrame *src_frame);
+    void render_frame();
+
+
+    /**
+     * initialize .
+     */
+    void init();
 
     /**
      * build opengl program
@@ -88,6 +96,12 @@ public:
      */
     GLuint buildProgram(const char* vertexShaderSource,
             const char* fragmentShaderSource);
+
+    /**
+     * media file handle
+     */
+    MediaFile *mediaFileHandle;
+
 
 private:
 
@@ -132,6 +146,7 @@ private:
      * gl es program handle
      */
     GLuint simpleProgram;
+
 
 };
 

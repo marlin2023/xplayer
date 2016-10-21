@@ -91,7 +91,6 @@ int FrameQueue::get(AVFrame *frame)
     int ret;
 
     pthread_mutex_lock(&mutex);
-
     for(;;) {
 
         frame1 = first_frame;
@@ -102,7 +101,6 @@ int FrameQueue::get(AVFrame *frame)
             }
 
             nb_frames --;
-
             av_frame_ref(frame, frame1->frame); // set frame
             av_frame_free(&frame1->frame);
             av_free(frame1);

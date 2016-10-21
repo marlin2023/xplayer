@@ -19,4 +19,7 @@ public class XPlayer {
     // native function
     public native void sayHello();
 
+    public native void init();
+    public native void renderFrame();
+
 }

@@ -2,6 +2,7 @@ package com.cmcm.v.cmplayersdk;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,8 +13,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        XPlayer xPlayer  = new XPlayer();
-        xPlayer.sayHello();
+//        XPlayer xPlayer  = new XPlayer();
+//        xPlayer.sayHello();
+
+        // 取得LinearLayout 物件
+        LinearLayout ll = (LinearLayout)findViewById(R.id.viewObj);
+
+        VideoSurfaceView surfaceView = new VideoSurfaceView(this);
+
+        ll.addView(surfaceView);
 
     }
 }

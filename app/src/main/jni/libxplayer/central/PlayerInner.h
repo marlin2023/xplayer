@@ -17,7 +17,7 @@ extern "C" {
 #include "CentralEngineStateMachine.h"
 #include "MediaDecodeAudioStateMachine.h"
 #include "MediaDecodeVideoStateMachine.h"
-
+#include "YuvGLRender.h"
 
 /**
  * Thread 1 the corresponding Central Engine StateMachine
@@ -86,6 +86,10 @@ public:
      */
     MediaDecodeVideoStateMachine *mediaDecodeVideoStateMachineHandle;
 
+    /**
+     * video view Render
+     */
+     YuvGLRender *yuvGLRender;
 
 
 private:

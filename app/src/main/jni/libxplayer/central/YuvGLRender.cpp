@@ -12,20 +12,11 @@
 
 #include "util/XLog.h"
 
-YuvGLRender::YuvGLRender()
+YuvGLRender::YuvGLRender(MediaFile *mediaFile)
 {
+    this->mediaFileHandle = mediaFile;
 
-    simpleProgram = buildProgram(VERTEX_SHADER, FRAG_SHADER);
-    glUseProgram(simpleProgram);
-
-    glGenTextures(1, &textureYId);
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>textureYId:%d\n", textureYId);
-    glGenTextures(1, &textureUId);
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>textureUId:%d\n", textureUId);
-    glGenTextures(1, &textureVId);
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>textureVId:%d\n", textureVId);
-
-
+    this->init();
 }
 
 
@@ -36,12 +27,36 @@ YuvGLRender::~YuvGLRender()
 
 }
 
-
-void YuvGLRender::render_frame(AVFrame *src_frame)
+void YuvGLRender::init()
 {
+    simpleProgram = buildProgram(VERTEX_SHADER, FRAG_SHADER);
+    glUseProgram(simpleProgram);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>simpleProgram:%d\n", simpleProgram);
 
-    bindTexture(textureYId, src_frame->data[0], src_frame->linesize[0], src_frame->height);
+    glGenTextures(1, &textureYId);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>textureYId:%d\n", textureYId);
+    glGenTextures(1, &textureUId);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>textureUId:%d\n", textureUId);
+    glGenTextures(1, &textureVId);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>textureVId:%d\n", textureVId);
+
+}
+
+
+//void YuvGLRender::render_frame(AVFrame *src_frame)
+void YuvGLRender::render_frame()
+{
+    AVFrame *src_frame;
+    src_frame = av_frame_alloc();
+    // TODO
+    this->mediaFileHandle->video_frame_queue->get(src_frame);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>video frame queue size :%d\n", this->mediaFileHandle->video_frame_queue->size());
+
+    // src_frame->data[0]
+    bindTexture(textureYId, src_frame->data[0], src_frame->linesize[0], src_frame->height); // first parameter use linesize.
+    // src_frame->data[1]
     bindTexture(textureUId, src_frame->data[1], src_frame->linesize[1], src_frame->height/2);
+    // src_frame->data[2]
     bindTexture(textureVId, src_frame->data[2], src_frame->linesize[2], src_frame->height/2);
 
     //

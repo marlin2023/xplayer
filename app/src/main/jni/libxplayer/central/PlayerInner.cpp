@@ -22,7 +22,7 @@ PlayerInner::PlayerInner()
     centralEngineStateMachineHandle = new CentralEngineStateMachine(mediaFileHandle ,
                                                                 mediaDecodeAudioStateMachineHandle ,
                                                                 mediaDecodeVideoStateMachineHandle);
-
+    yuvGLRender = new YuvGLRender(mediaFileHandle);
 }
 
 /**

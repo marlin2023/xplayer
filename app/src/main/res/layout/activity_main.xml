@@ -9,8 +9,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.cmcm.v.cmplayersdk.MainActivity">
 
-    <TextView
+    <LinearLayout
+        android:id="@+id/viewObj"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:orientation="vertical"
+        />
+
 </RelativeLayout>
