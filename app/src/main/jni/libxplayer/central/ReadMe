@@ -27,3 +27,17 @@ Such as Video Decoder State Machine has state :
 
 -
 -
+
+-
+- Audio OutPut
+-- opensl es
+    任何一个 OpenSL ES 的对象，创建成功后，都进入 SL_OBJECT_STATE_UNREALIZED 状态，这种状态下，系统不会为它分配任何资源，直到调用 Realize 函数为止。
+    Realize 后的对象，就会进入 SL_OBJECT_STATE_REALIZED 状态，这是一种“可用”的状态，只有在这种状态下，对象的各个功能和资源才能正常地访问。
+
+    OpenSL ES major operations is interfaces ,such as: SLObjectItf ---Itf = Interface.
+
+-- audio track
+
+-
+-
+

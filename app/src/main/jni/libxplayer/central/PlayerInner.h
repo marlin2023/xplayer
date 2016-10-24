@@ -18,6 +18,7 @@ extern "C" {
 #include "MediaDecodeAudioStateMachine.h"
 #include "MediaDecodeVideoStateMachine.h"
 #include "YuvGLRender.h"
+#include "OpenSLEngine.h"
 
 /**
  * Thread 1 the corresponding Central Engine StateMachine
@@ -61,6 +62,10 @@ public:
      */
     CM_BOOL player_engine_open();
 
+    /**
+     * player start play.
+     */
+    CM_BOOL player_start();
 
     //-----------*******************-------------
     //          public member variable
@@ -91,7 +96,10 @@ public:
      */
      YuvGLRender *yuvGLRender;
 
-
+    /**
+     * audio output use opensl es engine.
+     */
+     OpenSLEngine *audioRender;
 private:
 
     //-----------*******************-------------

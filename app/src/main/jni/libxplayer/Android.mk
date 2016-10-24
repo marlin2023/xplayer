@@ -24,13 +24,14 @@ LOCAL_SRC_FILES := jni/onLoad.cpp   \
                 central/MediaDecodeVideoStateMachine.cpp    \
                 central/MediaDecodeAudioStateMachine.cpp    \
                 central/YuvGLRender.cpp    \
+                central/OpenSLEngine.cpp    \
                 central/PlayerInner.cpp
 
 # compile flags
 LOCAL_CFLAGS := -D__STDC_CONSTANT_MACROS
 
 # linked library
-LOCAL_LDLIBS :=  -llog -lffmpeg -lGLESv2
+LOCAL_LDLIBS :=  -llog -lffmpeg -lGLESv2 -lOpenSLES
 
 # linked library search path.
 LOCAL_LDFLAGS += \

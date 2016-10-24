@@ -23,6 +23,7 @@ PlayerInner::PlayerInner()
                                                                 mediaDecodeAudioStateMachineHandle ,
                                                                 mediaDecodeVideoStateMachineHandle);
     yuvGLRender = new YuvGLRender(mediaFileHandle);
+    audioRender = new OpenSLEngine(mediaFileHandle);
 }
 
 /**
@@ -88,6 +89,15 @@ CM_BOOL PlayerInner::player_engine_open()
 
 }
 
+CM_BOOL PlayerInner::player_start()
+{
+    audioRender->InitPlayout();
+    audioRender->play();
+
+    //TODO
+
+
+}
 
 
 //-----------*******************-------------

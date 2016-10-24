@@ -40,7 +40,7 @@ MediaFile::MediaFile()
     }
     else
     {
-        start_playing_buffering_time = X_MAX_PKT_Q_TS;    // 0.6s
+        start_playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;// X_MAX_PKT_Q_TS;    // 0.6s
         max_buffering_time = 2 * X_MAX_PKT_Q_TS;          // 1.2s
     }
 
