@@ -40,4 +40,34 @@ Such as Video Decoder State Machine has state :
 
 -
 -
+- GLSurfaceView.Renderer
+    -- GLSurfaceView onPause;
+            /**
+            * Inform the view that the activity is paused. The owner of this view must
+            * call this method when the activity is paused. Calling this method will
+            * pause the rendering thread.
+            * Must not be called before a renderer has been set.
+            */
+           public void onPause();
+
+    -- GLSurfaceView onResume;
+            /**
+             * Inform the view that the activity is resumed. The owner of this view must
+             * call this method when the activity is resumed. Calling this method will
+             * recreate the OpenGL display and resume the rendering
+             * thread.
+             * Must not be called before a renderer has been set.
+             */
+            public void onResume();
+
+    --  void queueEvent (Runnable r)
+        Queue a runnable to be run on the GL rendering thread. This can be used to communicate with the Renderer on the rendering thread. Must not be called before a renderer has been set.
+        r	Runnable: the runnable to be run on the GL rendering thread.
+
+    -- GLSurfaceView.Render pause()
+        this.setRenderMode(RENDERMODE_WHEN_DIRTY);  & queueEvent
+
+
+
+
 

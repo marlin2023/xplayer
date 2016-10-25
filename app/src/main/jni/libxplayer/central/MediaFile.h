@@ -72,7 +72,7 @@ public:
     /**
      * set source url
      */
-    void setSourceUrl(char *source_url);
+    void setSourceUrl(const char *source_url);
 
     /**
      * get source url

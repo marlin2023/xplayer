@@ -14,7 +14,6 @@ PlayerInner::PlayerInner()
     // TODO
     // mediaFile Handle
     mediaFileHandle = new MediaFile();
-
     mediaDecodeAudioStateMachineHandle = new MediaDecodeAudioStateMachine(mediaFileHandle);
     mediaDecodeVideoStateMachineHandle = new MediaDecodeVideoStateMachine(mediaFileHandle);
 
@@ -22,8 +21,6 @@ PlayerInner::PlayerInner()
     centralEngineStateMachineHandle = new CentralEngineStateMachine(mediaFileHandle ,
                                                                 mediaDecodeAudioStateMachineHandle ,
                                                                 mediaDecodeVideoStateMachineHandle);
-    yuvGLRender = new YuvGLRender(mediaFileHandle);
-    audioRender = new OpenSLEngine(mediaFileHandle);
 }
 
 /**
@@ -47,6 +44,8 @@ void PlayerInner::player_engine_init()
     av_register_all();
     avformat_network_init();
     //
+    yuvGLRender = new YuvGLRender(mediaFileHandle);
+    audioRender = new OpenSLEngine(mediaFileHandle);
 
     // 2.Create player will used threads
     ret = pthread_create(&media_demux_tid, NULL, central_engine_thread, (void*)this);
@@ -79,24 +78,24 @@ init_eout:
     return ;
 }
 
-CM_BOOL PlayerInner::player_engine_open()
+void PlayerInner::set_data_source(const char *source_url)
+{
+    this->mediaFileHandle->setSourceUrl(source_url);
+}
+
+CM_BOOL PlayerInner::player_engine_prepare()
 {
     // 1.initialize message queue for all state machines.
     // demux state machine push EVT_START
     centralEngineStateMachineHandle->message_queue->push(EVT_OPEN);
-
     XLog::e(TAG ,"create media demux thread size %d\n",centralEngineStateMachineHandle->message_queue->size());
-
 }
 
 CM_BOOL PlayerInner::player_start()
 {
     audioRender->InitPlayout();
     audioRender->play();
-
     //TODO
-
-
 }
 
 

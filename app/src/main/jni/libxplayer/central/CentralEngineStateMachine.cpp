@@ -266,7 +266,7 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
             {
                 // open success.
                 this->state_machine_change_state(STATE_PREPARED);
-                XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: open file success !!!\n");
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: open file:-%s- success !!!\n" ,mediaFileHandle->getSourceUrl());
 
                 // TODO notify upper open success ,and upper will send EVT_START and go into Buffering state.
                 // TODO
@@ -275,7 +275,7 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
             else
             {
                 // open failed
-                XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: open file failed !!!\n");
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: open file:-%s- failed !!!\n" ,mediaFileHandle->getSourceUrl());
                 this->state_machine_change_state(STATE_INITIALIZED);
             }
 

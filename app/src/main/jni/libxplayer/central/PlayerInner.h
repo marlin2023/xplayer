@@ -55,12 +55,16 @@ public:
      */
     void player_engine_init();
 
+    /**
+     * set data source
+     */
+    void set_data_source(const char *source_url);
 
     /**
      * player engine open
      * open file and get file streams information
      */
-    CM_BOOL player_engine_open();
+    CM_BOOL player_engine_prepare();
 
     /**
      * player start play.

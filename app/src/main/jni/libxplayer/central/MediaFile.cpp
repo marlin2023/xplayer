@@ -12,7 +12,7 @@
 MediaFile::MediaFile()
 {
     // TODO
-    source_url = "/sdcard/hh.mp4";
+    source_url = "/sdcard/hh.mp4";  // default
 
     // init packet queue
     audio_queue = new PacketQueue();
@@ -251,13 +251,16 @@ void MediaFile::stream_component_close(int stream_index)
 }
 
 
-void MediaFile::setSourceUrl(char *source_url)
+void MediaFile::setSourceUrl(const char *source_url)
 {
-    this->source_url = source_url;
+    XLog::e(TAG ,"===>in setSourceUrl ,source_url = %s\n",source_url);
+    this->source_url = (char *)source_url;
+    XLog::e(TAG ,"===>in setSourceUrl ,this->source_url = %s\n",this->source_url);
 }
 
 char * MediaFile::getSourceUrl()
 {
+    XLog::e(TAG ,"===>in getSourceUrl ,this->source_url = %s\n",this->source_url);
     return this->source_url;
 }
 

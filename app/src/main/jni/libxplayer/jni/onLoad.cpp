@@ -18,28 +18,37 @@ static const char *className = "com/cmcm/v/cmplayersdk/XPlayer";
 //TODO
 static PlayerInner * playerInner;
 
-static void sayHello(JNIEnv *env, jobject thiz){
-    XLog::e(TAG ,"======>say hello .");
 
+static void native_setup(JNIEnv *env, jobject thiz)
+{
+    XLog::e(TAG ,"======>native_setup .");
     // new PlayerInner
-    //PlayerInner * playerInner = new PlayerInner();  // create player object
-
     playerInner = new PlayerInner();  // create player object
-
-    playerInner->player_engine_init();  // engine init
-    playerInner->player_engine_open();  // open file ,get stream info
 
 }
 
-static void native_init(JNIEnv *env, jobject thiz){
+
+static void native_init(JNIEnv *env, jobject thiz)
+{
     XLog::e(TAG ,"======>native_init .");
-
-    // new PlayerInner
-    playerInner = new PlayerInner();  // create player object
-
     playerInner->player_engine_init();  // engine init
-    playerInner->player_engine_open();  // open file ,get stream info
+}
 
+static void native_setDataSource(JNIEnv *env, jobject thiz ,jstring dataSource)
+{
+    const char *c_data_source = env->GetStringUTFChars(dataSource, NULL );
+
+    //
+    playerInner->set_data_source(c_data_source);
+
+    XLog::e(TAG ,"======>set_data_source,source_url=%s." ,c_data_source);
+    //env->ReleaseStringUTFChars(dataSource, c_data_source);    // not release TODO
+
+}
+
+static void native_prepareAsync(JNIEnv *env, jobject thiz){
+
+    playerInner->player_engine_prepare();  // open file ,get stream info
 }
 
 static void native_renderFrame(JNIEnv *env, jobject thiz){
@@ -49,13 +58,19 @@ static void native_renderFrame(JNIEnv *env, jobject thiz){
 
 }
 
+static void native_notify(JNIEnv *env, jobject thiz){
 
+
+}
 
 // define the native method mapping .
-static JNINativeMethod methods[] = {
-    {"sayHello", "()V", (void*)sayHello},
+static JNINativeMethod methods[] =
+{
 
+    {"native_setup", "()V", (void*)native_setup},
     {"init", "()V", (void*)native_init},
+    {"setDataSource", "(Ljava/lang/String;)V", (void*)native_setDataSource},
+    {"prepareAsync", "()V", (void*)native_prepareAsync},
 
     {"renderFrame", "()V", (void*)native_renderFrame},  // render frame.
 
