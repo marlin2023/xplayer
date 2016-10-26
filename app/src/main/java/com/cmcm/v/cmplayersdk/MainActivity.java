@@ -22,8 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
         //surfaceView.setOnPreparedListener(mOnPreparedListener);
 
-        surfaceView.init(); //TODO
-        surfaceView.setDataSource("/sdcard/video.mp4");
+        surfaceView.init(); //will not create opengl program.
+        surfaceView.setDataSource("/sdcard/hh.mp4");
         surfaceView.prepareAsync();
 
     }

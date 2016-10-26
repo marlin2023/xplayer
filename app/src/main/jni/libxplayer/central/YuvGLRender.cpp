@@ -16,7 +16,7 @@ YuvGLRender::YuvGLRender(MediaFile *mediaFile)
 {
     this->mediaFileHandle = mediaFile;
 
-    this->init();
+    //this->init();
 }
 
 YuvGLRender::~YuvGLRender()

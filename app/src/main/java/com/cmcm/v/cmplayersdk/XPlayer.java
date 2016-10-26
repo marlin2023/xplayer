@@ -54,6 +54,11 @@ public class XPlayer {
     public native void init();
 
     /**
+     * init opengl context .
+     */
+    public native void initEGLCtx();
+
+    /**
      * set DataSource
      */
     public native void setDataSource(String path);

@@ -12,7 +12,7 @@
 MediaFile::MediaFile()
 {
     // TODO
-    source_url = "/sdcard/hh.mp4";  // default
+    //source_url = "/sdcard/hh.mp4";  // default
 
     // init packet queue
     audio_queue = new PacketQueue();
@@ -29,20 +29,20 @@ MediaFile::MediaFile()
     //
     //
     // 如果是网络文件, 设置Buffer时间以及超时时间
-    if (strstr((const char *)source_url,"http://") ||
-        strstr((const char *)source_url,"rtsp://") ||
-        strstr((const char *)source_url,"rtmp://"))
-    {
+    //if (strstr((const char *)source_url,"http://") ||
+    //    strstr((const char *)source_url,"rtsp://") ||
+    //    strstr((const char *)source_url,"rtmp://"))
+    //{
         start_playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;    // 3s
         max_buffering_time = X_MAX_PKT_Q_NETWORK_BUFFERING_TS;                    // 6s
 
         //is_network_media = X_TRUE;
-    }
-    else
-    {
-        start_playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;// X_MAX_PKT_Q_TS;    // 0.6s
-        max_buffering_time = 2 * X_MAX_PKT_Q_TS;          // 1.2s
-    }
+    //}
+    //else
+    //{
+    //    start_playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;// X_MAX_PKT_Q_TS;    // 0.6s
+    //    max_buffering_time = 2 * X_MAX_PKT_Q_TS;          // 1.2s
+    //}
 
 }
 

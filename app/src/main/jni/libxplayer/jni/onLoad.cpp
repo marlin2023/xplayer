@@ -34,6 +34,13 @@ static void native_init(JNIEnv *env, jobject thiz)
     playerInner->player_engine_init();  // engine init
 }
 
+static void native_initEGLCtx(JNIEnv *env, jobject thiz)
+{
+    XLog::e(TAG ,"======>native_initEGLCtx .");
+    playerInner->yuvGLRender->init();  // engine init
+}
+
+
 static void native_setDataSource(JNIEnv *env, jobject thiz ,jstring dataSource)
 {
     const char *c_data_source = env->GetStringUTFChars(dataSource, NULL );
@@ -86,6 +93,8 @@ static JNINativeMethod methods[] =
 
     {"native_setup", "()V", (void*)native_setup},
     {"init", "()V", (void*)native_init},
+    {"initEGLCtx", "()V", (void*)native_initEGLCtx},
+
     {"setDataSource", "(Ljava/lang/String;)V", (void*)native_setDataSource},
     {"prepareAsync", "()V", (void*)native_prepareAsync},
 

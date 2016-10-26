@@ -29,13 +29,14 @@ public class VideoSurfaceView extends GLSurfaceView implements IMediaPlayer ,GLS
 
     XPlayer xPlayer = null ;
 
-    boolean isInitilized;
+    boolean isEGLContextInitilized;
+
 
     public VideoSurfaceView(Context context) {
         super(context);
         Log.i(TAG, "VideoSurfaceView Construct...");
 
-        isInitilized = false;
+        isEGLContextInitilized = false;
         //if(xPlayer == null){
         xPlayer = new XPlayer();
         //}
@@ -59,7 +60,13 @@ public class VideoSurfaceView extends GLSurfaceView implements IMediaPlayer ,GLS
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         Log.i(TAG ,"========>onSurfaceCreated");
+        // create gl program
+        if(!isEGLContextInitilized){
+            this.xPlayer.initEGLCtx();
+            isEGLContextInitilized = true;
+        }
 
+        //
     }
 
     @Override
@@ -93,15 +100,12 @@ public class VideoSurfaceView extends GLSurfaceView implements IMediaPlayer ,GLS
 
     public void init() {
         // start
-        queueEvent(new Runnable(){
-            @Override
-            public void run() {
-                Log.i(TAG, "xPlayer.init() run in GLRender thread. .........");
-                if(xPlayer != null){
-                    xPlayer.init();
-                }
-            }
-        });
+
+        Log.i(TAG, "xPlayer.init() run in main thread. .........");
+        if(xPlayer != null){
+            xPlayer.init();
+        }
+
         // end
     }
 

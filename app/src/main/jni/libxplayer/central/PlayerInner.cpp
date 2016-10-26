@@ -21,6 +21,10 @@ PlayerInner::PlayerInner()
     centralEngineStateMachineHandle = new CentralEngineStateMachine(mediaFileHandle ,
                                                                 mediaDecodeAudioStateMachineHandle ,
                                                                 mediaDecodeVideoStateMachineHandle);
+    //
+    yuvGLRender = new YuvGLRender(mediaFileHandle);
+    audioRender = new OpenSLEngine(mediaFileHandle);
+
 }
 
 /**
@@ -43,9 +47,6 @@ void PlayerInner::player_engine_init()
     //1. Register all formats and codecs
     av_register_all();
     avformat_network_init();
-    //
-    yuvGLRender = new YuvGLRender(mediaFileHandle);
-    audioRender = new OpenSLEngine(mediaFileHandle);
 
     // 2.Create player will used threads
     ret = pthread_create(&media_demux_tid, NULL, central_engine_thread, (void*)this);
