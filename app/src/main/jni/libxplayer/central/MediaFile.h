@@ -18,6 +18,7 @@ extern "C" {
 #include "MediaFile.h"
 #include "PacketQueue.h"
 #include "FrameQueue.h"
+#include "MediaPlayerListener.h"
 
 #define x_min(a,b) (((a) < (b)) ? (a):(b))
 #define x_max(a,b) (((a) > (b)) ? (a):(b))
@@ -59,6 +60,24 @@ typedef enum av_support_type_e_
     HAS_END
 } av_support_type_e;
 
+/**
+ * Listen Event Type
+ *
+ */
+typedef enum listen_event_type_e_
+{
+    MEDIA_NOP               = 0, // interface test message
+    MEDIA_PREPARED          = 1,
+
+    MEDIA_PLAYBACK_COMPLETE = 2,
+    MEDIA_BUFFERING_UPDATE  = 3,
+
+    MEDIA_SEEK_COMPLETE     = 4,
+    MEDIA_SET_VIDEO_SIZE    = 5,
+    MEDIA_ERROR             = 100,
+    MEDIA_INFO              = 200,
+} listen_event_type_e;
+
 
 
 class MediaFile
@@ -68,6 +87,12 @@ public:
 
     MediaFile();
     ~MediaFile();
+
+
+    int setListener(MediaPlayerListener* listener);
+
+    void notify(int msg, int ext1, int ext2);
+
 
     /**
      * set source url
@@ -201,6 +226,7 @@ public:
     */
     int buffering_percent;
 
+    MediaPlayerListener*   mListener; //mediaplayer listener for java
 
 };
 

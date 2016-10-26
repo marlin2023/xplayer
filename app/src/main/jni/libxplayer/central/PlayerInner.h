@@ -42,7 +42,8 @@ void *video_render_thread(void *arg);
 
 
 
-class PlayerInner{
+class PlayerInner
+{
 
 public:
     PlayerInner();
@@ -103,7 +104,10 @@ public:
     /**
      * audio output use opensl es engine.
      */
-     OpenSLEngine *audioRender;
+    OpenSLEngine *audioRender;
+
+    //MediaPlayerListener*   mListener; //mediaplayer listener for java
+
 private:
 
     //-----------*******************-------------

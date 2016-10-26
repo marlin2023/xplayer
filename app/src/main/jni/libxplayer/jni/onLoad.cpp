@@ -15,20 +15,169 @@ static const char *TAG = "JNI_ONLOAD";
 // define the target class name .
 static const char *className = "com/cmcm/v/cmplayersdk/XPlayer";
 
+struct fields_t {
+    jfieldID    context;
+    jmethodID   post_event;
+};
+fields_t fields;
+
+static JavaVM *sVm;
 //TODO
 static PlayerInner * playerInner;
 
+/*
+ * Throw an exception with the specified class and an optional message.
+ */
+int jniThrowException(JNIEnv* env, const char* className, const char* msg) {
+    jclass exceptionClass = env->FindClass(className);
+    if (exceptionClass == NULL) {
+        XLog::d(ANDROID_LOG_ERROR,
+            TAG,
+            "Unable to find exception class %s",
+                    className);
+        return -1;
+    }
 
-static void native_setup(JNIEnv *env, jobject thiz)
+    if (env->ThrowNew(exceptionClass, msg) != JNI_OK) {
+        XLog::d(ANDROID_LOG_ERROR,
+            TAG,
+            "Failed throwing '%s' '%s'",
+            className, msg);
+    }
+    return 0;
+}
+
+JavaVM* getJvm()
+{
+    return sVm;
+}
+
+JNIEnv* getJNIEnv() {
+    JNIEnv* env = NULL;
+    bool isAttached = false;
+    int status = 0;
+
+    if (sVm->GetEnv((void**) &env, JNI_VERSION_1_4) < 0) {
+        return NULL;
+    }
+    return env;
+}
+
+// ----------------------------------------------------------------------------
+// ref-counted object for callbacks
+class JNIMediaPlayerListener: public MediaPlayerListener
+{
+public:
+    JNIMediaPlayerListener(JNIEnv* env, jobject thiz, jobject weak_thiz);
+    ~JNIMediaPlayerListener();
+    void notify(int msg, int ext1, int ext2);
+
+private:
+    JNIMediaPlayerListener();
+    jclass      mClass;     // Reference to MediaPlayer class
+    jobject     mObject;    // Weak ref to MediaPlayer Java object to call on
+};
+
+
+JNIMediaPlayerListener::JNIMediaPlayerListener(JNIEnv* env, jobject thiz, jobject weak_thiz)
+{
+
+    // Hold onto the MediaPlayer class for use in calling the static method
+    // that posts events to the application thread.
+
+    jclass clazz = env->GetObjectClass(thiz);
+    if (clazz == NULL) {
+        XLog::e(TAG ,"Can't find android/media/MediaPlayer");
+        jniThrowException(env, "java/lang/Exception", NULL);
+        return;
+    }
+    mClass = (jclass)env->NewGlobalRef(clazz);
+
+    // We use a weak reference so the MediaPlayer object can be garbage collected.
+    // The reference is only used as a proxy for callbacks.
+    mObject  = env->NewGlobalRef(weak_thiz);
+}
+
+JNIMediaPlayerListener::~JNIMediaPlayerListener()
+{
+    // remove global references
+    JNIEnv *env = getJNIEnv();
+    if(env){
+        env->DeleteGlobalRef(mObject);
+        env->DeleteGlobalRef(mClass);
+    }
+}
+
+void JNIMediaPlayerListener::notify(int msg, int ext1, int ext2)
+{
+    JNIEnv *env = getJNIEnv();
+    JavaVM *svm = getJvm();
+    bool isAttached = false;
+    if(env == NULL)
+    {
+        svm->AttachCurrentThread(&env, NULL);
+        isAttached = true;
+    }
+    env->CallStaticVoidMethod(mClass, fields.post_event, mObject, msg, ext1, ext2, 0);
+
+    if(isAttached)
+    {
+        svm->DetachCurrentThread();
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+// be called when library be loaded.
+static void
+jni_native_init(JNIEnv *env , jobject thiz)
+{
+    jclass clazz;
+    clazz = env->FindClass(className);
+    if (clazz == NULL) {
+        jniThrowException(env, "java/lang/RuntimeException", "Can't find android/media/MediaPlayer");
+        return;
+    }
+
+    fields.post_event = env->GetStaticMethodID(clazz, "postEventFromNative",
+                                                   "(Ljava/lang/Object;IIILjava/lang/Object;)V");
+    if (fields.post_event == NULL) {
+        jniThrowException(env, "java/lang/RuntimeException", "Can't find FFMpegMediaPlayer.postEventFromNative");
+        return;
+    }
+}
+//
+static void jni_native_setup(JNIEnv *env, jobject thiz ,jobject weak_this)
 {
     XLog::e(TAG ,"======>native_setup .");
-    // new PlayerInner
-    playerInner = new PlayerInner();  // create player object
+
+    #if 0
+    if(mbPlayer)
+    {
+         Log::d(ANDROID_LOG_INFO, TAG, "=core=[%s,%s:%d] Player Already exists!",
+        __FILE__, __FUNCTION__, __LINE__);
+        return -2;
+    }
+    #endif
+
+    playerInner = new PlayerInner();
+    if (playerInner == NULL) {
+        jniThrowException(env, "java/lang/RuntimeException", "Out of memory");
+        return;
+    }
+
+     // create new listener and give it to MediaPlayer
+    JNIMediaPlayerListener *listener = new JNIMediaPlayerListener(env, thiz, weak_this);
+    playerInner->mediaFileHandle->setListener(listener);
+
+    // Stow our new C++ MediaPlayer in an opaque field in the Java object.
+    //setMediaPlayer(env, thiz, playerInner);
 
 }
 
 
-static void native_init(JNIEnv *env, jobject thiz)
+
+static void native_init1(JNIEnv *env, jobject thiz)
 {
     XLog::e(TAG ,"======>native_init .");
     playerInner->player_engine_init();  // engine init
@@ -65,40 +214,20 @@ static void native_renderFrame(JNIEnv *env, jobject thiz){
 
 }
 
-static void native_notify(JNIEnv *env, jobject thiz){
-#if 0
-    //JNIEnv *env = getJNIEnv();
-    JavaVM *svm = getJvm();
-    bool isAttached = false;
-    if(env == NULL)
-    {
-        svm->AttachCurrentThread(&env, NULL);
-        isAttached = true;
-    }
-
-    //Log::d(ANDROID_LOG_INFO, TAG, "notify 1");
-    env->CallStaticVoidMethod(mClass, fields.post_event, mObject, msg, ext1, ext2, 0);
-    //Log::d(ANDROID_LOG_INFO, TAG, "notify ok");
-
-    if(isAttached)
-    {
-        svm->DetachCurrentThread();
-    }
-    #endif
-}
-
 // define the native method mapping .
 static JNINativeMethod methods[] =
 {
 
-    {"native_setup", "()V", (void*)native_setup},
-    {"init", "()V", (void*)native_init},
-    {"initEGLCtx", "()V", (void*)native_initEGLCtx},
+    {"native_init",     "()V",                                      (void*)jni_native_init},
+    {"native_setup",    "(Ljava/lang/Object;)V",                    (void*)jni_native_setup},
 
-    {"setDataSource", "(Ljava/lang/String;)V", (void*)native_setDataSource},
-    {"prepareAsync", "()V", (void*)native_prepareAsync},
+    {"init",            "()V",                                      (void*)native_init1},
+    {"initEGLCtx",      "()V",                                      (void*)native_initEGLCtx},
 
-    {"renderFrame", "()V", (void*)native_renderFrame},  // render frame.
+    {"setDataSource",   "(Ljava/lang/String;)V",                    (void*)native_setDataSource},
+    {"prepareAsync",    "()V",                                      (void*)native_prepareAsync},
+
+    {"renderFrame",     "()V",                                      (void*)native_renderFrame},  // render frame.
 
 };
 
@@ -110,6 +239,9 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved)
     JNIEnv* env = NULL;
     jclass clazz;
     int methodsLenght;
+
+    //
+    sVm = vm;
 
     // get java vm .
     if (vm->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK) {

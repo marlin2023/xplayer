@@ -6,8 +6,7 @@
 #ifndef XPLAYER_MEDIAPLAYERLISTENER_H
 #define XPLAYER_MEDIAPLAYERLISTENER_H
 
-// ref-counted object for callbacks
-class MediaPlayerListener: virtual public RefBase
+class MediaPlayerListener
 {
 public:
     virtual void notify(int msg, int ext1, int ext2) = 0;

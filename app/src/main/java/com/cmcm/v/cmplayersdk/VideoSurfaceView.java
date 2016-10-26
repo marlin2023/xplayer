@@ -104,6 +104,7 @@ public class VideoSurfaceView extends GLSurfaceView implements IMediaPlayer ,GLS
         Log.i(TAG, "xPlayer.init() run in main thread. .........");
         if(xPlayer != null){
             xPlayer.init();
+            Log.i(TAG, "after xPlayer.init()  .........");
         }
 
         // end
@@ -213,7 +214,8 @@ public class VideoSurfaceView extends GLSurfaceView implements IMediaPlayer ,GLS
 
     @Override
     public void setOnPreparedListener(OnPreparedListener listener) {
-
+        // set xplayer listener
+        xPlayer.setOnPreparedListener(listener);
     }
 
     @Override

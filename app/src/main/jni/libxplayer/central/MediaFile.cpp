@@ -52,6 +52,22 @@ MediaFile::~MediaFile()
 
 }
 
+int MediaFile::setListener(MediaPlayerListener* listener)
+{
+    mListener = listener;
+
+    return 0;
+}
+
+void MediaFile::notify(int msg, int ext1, int ext2)
+{
+
+    if (mListener != NULL)
+    {
+        mListener->notify(msg, ext1, ext2);
+    }
+}
+
 
 CM_BOOL MediaFile::open()
 {

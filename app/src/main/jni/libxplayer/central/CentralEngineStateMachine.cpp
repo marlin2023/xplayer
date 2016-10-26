@@ -270,7 +270,9 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
 
                 // TODO notify upper open success ,and upper will send EVT_START and go into Buffering state.
                 // TODO
-                this->message_queue->push(EVT_START);   //TODO here should be performed in upper layer
+                //this->message_queue->push(EVT_START);   //TODO here should be performed in upper layer
+                //
+                this->mediaFileHandle->notify(MEDIA_PREPARED ,0 ,0);
             }
             else
             {

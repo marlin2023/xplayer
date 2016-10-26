@@ -21,10 +21,19 @@ import java.lang.ref.WeakReference;
  */
 public class XPlayer {
 
+    public static String TAG = "XPlayer";
+
+
     /**
      * Event Handle for event from native.
      */
     EventHandler mEventHandler;
+
+    /**
+     * OnPreparedListener for XPlayer
+     */
+    private IMediaPlayer.OnPreparedListener mOnPreparedListener;
+
 
     static {
         try {
@@ -34,17 +43,138 @@ public class XPlayer {
         } catch(Exception e) {
             e.printStackTrace(System.out);
         }
+
+        //
+        native_init();
     }
 
     public XPlayer() {
         // new player object ,and get player handle.
-        native_setup();
+        Looper looper;
+        if ((looper = Looper.myLooper()) != null) {
+            mEventHandler = new EventHandler(this, looper);
+        } else if ((looper = Looper.getMainLooper()) != null) {
+            mEventHandler = new EventHandler(this, looper);
+        } else {
+            mEventHandler = null;
+        }
+
+        mOnPreparedListener = null;
+
+
+        //native_setup();
+        native_setup(new WeakReference<XPlayer>(this));
+    }
+
+    public void setOnPreparedListener(IMediaPlayer.OnPreparedListener listener)
+    {
+        mOnPreparedListener = listener;
     }
 
     /**
-     * native setup function ,create mediaplayer.
+     * receive native message.
      */
-    public native void native_setup();
+    private static void postEventFromNative(Object weakThiz, int what, int arg1, int arg2, Object obj)
+    {
+
+        XPlayer mp = (XPlayer) ((WeakReference<?>) weakThiz).get();
+        if (mp == null)
+        {
+            Log.e(TAG ,"===>in postEventFromNative ,but mp equal null.");
+            return;
+        }
+        if (mp.mEventHandler != null)
+        {
+            Message m = mp.mEventHandler.obtainMessage(what, arg1, arg2, obj);
+            mp.mEventHandler.sendMessage(m);
+        }
+
+    }
+
+
+    private static final int MEDIA_NOP = 0; // interface test message
+    private static final int MEDIA_PREPARED = 1;
+    private static final int MEDIA_PLAYBACK_COMPLETE = 2;
+    private static final int MEDIA_BUFFERING_UPDATE = 3;
+    private static final int MEDIA_SEEK_COMPLETE = 4;
+    private static final int MEDIA_SET_VIDEO_SIZE = 5;
+    private static final int MEDIA_ERROR = 100;
+    private static final int MEDIA_INFO = 200;
+
+    private class EventHandler extends Handler
+    {
+        private XPlayer mMediaPlayer;
+
+        public EventHandler(XPlayer ffmpegPlayer, Looper looper)
+        {
+            super(looper);
+            mMediaPlayer = ffmpegPlayer;
+        }
+
+        @Override
+        public void handleMessage(Message msg)
+        {
+            Log.e("xll","FFMPEG msg "+msg.what);
+            //if (mMediaPlayer.mNativeContext == 0)
+            {
+               // return;
+            }
+
+            switch (msg.what)
+            {
+                case MEDIA_PREPARED:
+                    Log.e(TAG ,"====>on ...MEDIA_PREPARED");
+//                    if (mOnPreparedListener != null){
+//                        mOnPreparedListener.onPrepared(mMediaPlayer); // call player start function ,on jni start function will send according to EVT message.
+//                    }
+                    return;
+                case MEDIA_PLAYBACK_COMPLETE:
+//                    if (mOnCompletionListener != null)
+//                        mOnCompletionListener.onCompletion(mMediaPlayer);
+//                    stayAwake(false);
+                    return;
+
+                case MEDIA_BUFFERING_UPDATE:
+//                    if (mOnBufferingUpdateListener != null)
+//                        mOnBufferingUpdateListener.onBufferingUpdate(mMediaPlayer, msg.arg1);
+                    return;
+
+                case MEDIA_SEEK_COMPLETE:
+                    return;
+
+                case MEDIA_SET_VIDEO_SIZE:
+                    return;
+
+                case MEDIA_ERROR:
+                    Log.e(TAG, "Error (" + msg.arg1 + "," + msg.arg2 + ")");
+                    return;
+
+                case MEDIA_INFO:
+                    Log.i(TAG, "Info (" + msg.arg1 + "," + msg.arg2 + ")");
+                    return;
+
+                case MEDIA_NOP: // interface test message - ignore
+                    break;
+
+                default:
+                    Log.e(TAG, "Unknown message type " + msg.what);
+                    return;
+            }
+
+        }
+    }
+
+
+
+    public static native void native_init();
+
+    /**
+     * native setup function ,create mediaplayer.
+     * Native setup requires a weak reference to our object.
+     * It's easier to create it here than in C++.
+     * @param mediaplayer_this
+     */
+    public native void native_setup(Object mediaplayer_this); //(WeakReference<XPlayer> xPlayerWeakReference);
 
     /**
      * init xplayer .
@@ -70,66 +200,5 @@ public class XPlayer {
 
 
     public native void renderFrame();
-
-
-    /**
-     * receive native message.
-     */
-    private static void postEventFromNative(Object weakThiz, int what, int arg1, int arg2, Object obj)
-    {
-
-        XPlayer mp = (XPlayer) ((WeakReference<?>) weakThiz).get();
-        if (mp == null)
-        {
-            return;
-        }
-        if (mp.mEventHandler != null)
-        {
-            Message m = mp.mEventHandler.obtainMessage(what, arg1, arg2, obj);
-            mp.mEventHandler.sendMessage(m);
-        }
-
-    }
-
-    private class EventHandler extends Handler
-    {
-        private XPlayer mMediaPlayer;
-
-        public EventHandler(XPlayer ffmpegPlayer, Looper looper)
-        {
-            super(looper);
-            mMediaPlayer = ffmpegPlayer;
-        }
-
-        @Override
-        public void handleMessage(Message msg)
-        {
-            Log.e("xll","FFMPEG msg "+msg.what);
-            //if (mMediaPlayer.mNativeContext == 0)
-            {
-               // return;
-            }
-
-            switch (msg.what)
-            {
-                case 0:
-
-                    break;
-                //case MEDIA_PREPARED:
-                //    if (mOnPreparedListener != null)
-                //        mOnPreparedListener.onPrepared(mMediaPlayer);
-                //    return;
-
-                //case MEDIA_PLAYBACK_COMPLETE:
-                //    if (mOnCompletionListener != null)
-                 //       mOnCompletionListener.onCompletion(mMediaPlayer);
-                 //   return;
-
-                default:
-                    return;
-            }
-
-        }
-    }
 
 }

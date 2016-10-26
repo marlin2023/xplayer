@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
         VideoSurfaceView surfaceView = new VideoSurfaceView(this);
         ll.addView(surfaceView);
 
-        //surfaceView.setOnPreparedListener(mOnPreparedListener);
+        surfaceView.setOnPreparedListener(mOnPreparedListener);
 
         surfaceView.init(); //will not create opengl program.
         surfaceView.setDataSource("/sdcard/hh.mp4");
@@ -31,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private IMediaPlayer.OnPreparedListener mOnPreparedListener =
             new IMediaPlayer.OnPreparedListener() {
                 public void onPrepared(IMediaPlayer mp) {
-                    Log.i(TAG ,"====>onPrepared....");
+                    Log.d(TAG ,"====>onPrepared....");
+
                 }
 
             };
