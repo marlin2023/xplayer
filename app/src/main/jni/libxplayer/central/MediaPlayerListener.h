@@ -1,0 +1,17 @@
+//
+// Created by chris on 10/26/16.
+// Refer to:
+//          https://gitlab.tubit.tu-berlin.de/justus.beyer/streamagame_platform_frameworks_base/blob/d670b8c61ebd13324ac21bdbc08d8a02fc0a765a/include/media/mediaplayer.h
+
+#ifndef XPLAYER_MEDIAPLAYERLISTENER_H
+#define XPLAYER_MEDIAPLAYERLISTENER_H
+
+// ref-counted object for callbacks
+class MediaPlayerListener: virtual public RefBase
+{
+public:
+    virtual void notify(int msg, int ext1, int ext2) = 0;
+
+};
+
+#endif //XPLAYER_MEDIAPLAYERLISTENER_H
