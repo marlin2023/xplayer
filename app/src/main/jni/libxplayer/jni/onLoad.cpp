@@ -59,8 +59,25 @@ static void native_renderFrame(JNIEnv *env, jobject thiz){
 }
 
 static void native_notify(JNIEnv *env, jobject thiz){
+#if 0
+    //JNIEnv *env = getJNIEnv();
+    JavaVM *svm = getJvm();
+    bool isAttached = false;
+    if(env == NULL)
+    {
+        svm->AttachCurrentThread(&env, NULL);
+        isAttached = true;
+    }
 
+    //Log::d(ANDROID_LOG_INFO, TAG, "notify 1");
+    env->CallStaticVoidMethod(mClass, fields.post_event, mObject, msg, ext1, ext2, 0);
+    //Log::d(ANDROID_LOG_INFO, TAG, "notify ok");
 
+    if(isAttached)
+    {
+        svm->DetachCurrentThread();
+    }
+    #endif
 }
 
 // define the native method mapping .

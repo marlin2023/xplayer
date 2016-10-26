@@ -10,9 +10,20 @@ import java.lang.ref.WeakReference;
 
 /**
  * Created by chris on 9/26/16.
+ * Refer to:
+ *  1. https://github.com/commshare/testSparrow/blob/92ec6613f916d4575d4c78f61820108aeec22dcd/ref/FFmpegMediaPlayer/gradle/fmp-library/library/src/main/jni/player/mediaplayer.cpp
+ *  2. https://github.com/IllusionLP/platform_frameworks_base/blob/da5223eaf23dda165962fccb1974425a941a82e1/core/jni/android_media_DeviceCallback.cpp
+ *  3. https://github.com/commshare/testSparrow/blob/92ec6613f916d4575d4c78f61820108aeec22dcd/ref/FFmpegMediaPlayer/gradle/fmp-library/library/src/main/jni/player/wseemann_media_MediaPlayer.cpp
+ *  4. Media 播放器 postEventFromNative  研究明白 再写这块。
+ *      http://blog.csdn.net/llping2011/article/details/21239635
+ *      postEventFromNative(): 传递来自Native的事件
+ *      // MediaPlayer postEventFromNative
  */
 public class XPlayer {
 
+    /**
+     * Event Handle for event from native.
+     */
     EventHandler mEventHandler;
 
     static {
@@ -56,10 +67,13 @@ public class XPlayer {
     public native void renderFrame();
 
 
-    private static void postEventFromNative(Object mediaplayer_ref, int what, int arg1, int arg2, Object obj)
+    /**
+     * receive native message.
+     */
+    private static void postEventFromNative(Object weakThiz, int what, int arg1, int arg2, Object obj)
     {
 
-        XPlayer mp = (XPlayer) ((WeakReference<?>) mediaplayer_ref).get();
+        XPlayer mp = (XPlayer) ((WeakReference<?>) weakThiz).get();
         if (mp == null)
         {
             return;
