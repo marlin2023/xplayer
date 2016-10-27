@@ -37,6 +37,11 @@ public class XPlayer implements IMediaPlayer{
      */
     private IMediaPlayer.OnPreparedListener mOnPreparedListener;
 
+    /**
+     * OnBufferingUpdateListener for XPlayer
+     */
+    private IMediaPlayer.OnBufferingUpdateListener mOnBufferingUpdateListener;
+
 
     static {
         try {
@@ -92,6 +97,10 @@ public class XPlayer implements IMediaPlayer{
     @Override
     public void start() throws IllegalStateException {
         _start();
+    }
+
+    public void play() {
+        _play();
     }
 
     @Override
@@ -181,7 +190,7 @@ public class XPlayer implements IMediaPlayer{
 
     @Override
     public void setOnBufferingUpdateListener(OnBufferingUpdateListener listener) {
-
+        mOnBufferingUpdateListener = listener;
     }
 
     @Override
@@ -307,7 +316,6 @@ public class XPlayer implements IMediaPlayer{
         @Override
         public void handleMessage(Message msg)
         {
-            Log.e("xll","FFMPEG msg "+msg.what);
             //if (mMediaPlayer.mNativeContext == 0)
             {
                // return;
@@ -321,15 +329,17 @@ public class XPlayer implements IMediaPlayer{
                         mOnPreparedListener.onPrepared(mMediaPlayer); // TODO call player start function ,on jni start function will send according to EVT message.
                     }
                     return;
+
+                case MEDIA_BUFFERING_UPDATE:
+                    if (mOnBufferingUpdateListener != null){
+                        mOnBufferingUpdateListener.onBufferingUpdate(mMediaPlayer, msg.arg1);
+                    }
+                    return;
+
                 case MEDIA_PLAYBACK_COMPLETE:
 //                    if (mOnCompletionListener != null)
 //                        mOnCompletionListener.onCompletion(mMediaPlayer);
 //                    stayAwake(false);
-                    return;
-
-                case MEDIA_BUFFERING_UPDATE:
-//                    if (mOnBufferingUpdateListener != null)
-//                        mOnBufferingUpdateListener.onBufferingUpdate(mMediaPlayer, msg.arg1);
                     return;
 
                 case MEDIA_SEEK_COMPLETE:
@@ -392,6 +402,8 @@ public class XPlayer implements IMediaPlayer{
     public native void _prepareAsync() throws IllegalStateException;
 
     public native void _start();
+
+    public native void _play();
 
     public native void _renderFrame();
 

@@ -308,11 +308,6 @@ void CentralEngineStateMachine::central_engine_do_process_prepared(player_event_
             // TODO here ,send EVT_START to audio decode state machine & video decode state machine
             //
             //el_do_start_central_engine();
-            // TODO send EVT_START to audio decode state machine & video decode state machine should be put in el_do_start_central_engine
-            //
-            //
-            this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_START);
-            this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_START);
 
             return;
         }
@@ -345,7 +340,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"===>is_pkt_q_full break;.\n");
                 // TODO ,here should to notify upper layer
                 // TODO
-                
+                this->mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
                 return;
             }
             this->message_queue->push(EVT_GO_ON);

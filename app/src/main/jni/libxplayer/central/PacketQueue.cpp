@@ -163,9 +163,14 @@ int64_t PacketQueue::get_first_pkt_pts()
 
     pkt1 = first_packet;
     if (pkt1) {
-        pts = pkt1->pkt.pts;
+        //pts = pkt1->pkt.pts;
+        //if(pts == AV_NOPTS_VALUE){
+        //    pts = pkt1->pkt.dts;
+        //}
+        // DTS Monotonic Increase ,But PTS not.
+        pts = pkt1->pkt.dts;
         if(pts == AV_NOPTS_VALUE){
-            pts = pkt1->pkt.dts;
+            pts = pkt1->pkt.pts;
         }
     }else {
       // set pts 0
@@ -186,10 +191,10 @@ int64_t PacketQueue::get_last_pkt_pts()
 
     pkt1 = last_packet;
     if (pkt1) {
-        pts = pkt1->pkt.pts;
-        if(pts == AV_NOPTS_VALUE){
+        //pts = pkt1->pkt.pts;
+        //if(pts == AV_NOPTS_VALUE){
             pts = pkt1->pkt.dts;
-        }
+        //}
     }else {
       // set pts 0
         pts = 0;

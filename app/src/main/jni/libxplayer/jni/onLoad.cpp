@@ -213,6 +213,13 @@ static void native_start(JNIEnv *env, jobject thiz)
     playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_START);   //TODO here should be performed in upper layer
 }
 
+static void native_play(JNIEnv *env, jobject thiz)
+{
+    // start audio decoder & video decoder thread.
+    // TODO send EVT_START to audio decode state machine & video decode state machine should be put in el_do_start_central_engine
+    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_START);
+    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_START);
+}
 
 static void native_renderFrame(JNIEnv *env, jobject thiz)
 {
@@ -236,6 +243,7 @@ static JNINativeMethod methods[] =
     {"_prepareAsync",    "()V",                                      (void*)native_prepareAsync},
 
     {"_start",           "()V",                                      (void*)native_start},
+    {"_play",            "()V",                                      (void*)native_play},
 
     {"_renderFrame",     "()V",                                      (void*)native_renderFrame},  // render frame.
 

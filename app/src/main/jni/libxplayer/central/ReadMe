@@ -72,7 +72,15 @@ Such as Video Decoder State Machine has state :
 - MediaPlayer start() function
     -- Change state to Buffering State.
     -- In Buffering state notify Java Layer buffering percent
+
+- MediaPlayer play() function
     -- When Buffering percent 100% ,then audio decoder & video decoder thread begain to work.
+    -- Notify GLSurfaceView Render Thread to change render mode from  RENDERMODE_WHEN_DIRTY to RENDERMODE_CONTINUOUSLY.
+-
+
+
+
+
 
 
 

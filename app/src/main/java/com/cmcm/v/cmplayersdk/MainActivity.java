@@ -23,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
         ll.addView(surfaceView);
 
         surfaceView.setOnPreparedListener(mOnPreparedListener);
+        surfaceView.setOnBufferingUpdateListener(mOnBufferingUpdateListener);
 
         surfaceView.init(); //will not create opengl program.
         surfaceView.setDataSource("/sdcard/hh.mp4");
@@ -30,6 +31,9 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
+    // Need Java Layer implements
     private IMediaPlayer.OnPreparedListener mOnPreparedListener =
             new IMediaPlayer.OnPreparedListener() {
                 public void onPrepared(IMediaPlayer mp) {
@@ -39,6 +43,19 @@ public class MainActivity extends AppCompatActivity {
                 }
 
             };
+
+    private IMediaPlayer.OnBufferingUpdateListener mOnBufferingUpdateListener =
+            new IMediaPlayer.OnBufferingUpdateListener() {
+                @Override
+                public void onBufferingUpdate(IMediaPlayer mp, int percent) {
+                    Log.d(TAG ,"====>onBufferingUpdate...." + percent + "%");
+                    // TODO
+                    if(percent == 100){
+                        surfaceView.play();
+                    }
+                }
+            };
+
 
 
 }

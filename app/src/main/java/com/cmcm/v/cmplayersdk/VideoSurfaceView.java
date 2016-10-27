@@ -76,7 +76,9 @@ public class VideoSurfaceView extends GLSurfaceView implements GLSurfaceView.Ren
 
     @Override
     public void onDrawFrame(GL10 gl) {
-
+        if(xPlayer!= null){
+            xPlayer._renderFrame();
+        }
     }
 
     @Override
@@ -124,9 +126,19 @@ public class VideoSurfaceView extends GLSurfaceView implements GLSurfaceView.Ren
         xPlayer.start();
     }
 
+    public void play(){
+        xPlayer.play();
+        // set GLSurfaceView.Render MODE
+        setRenderMode(RENDERMODE_CONTINUOUSLY); // set render mode RENDERMODE_CONTINUOUSLY
+    }
+
     // =================set listener=======
     public void setOnPreparedListener(IMediaPlayer.OnPreparedListener listener) {
         xPlayer.setOnPreparedListener(listener);
+    }
+
+    public void setOnBufferingUpdateListener(IMediaPlayer.OnBufferingUpdateListener listener) {
+        xPlayer.setOnBufferingUpdateListener(listener);
     }
 
 
