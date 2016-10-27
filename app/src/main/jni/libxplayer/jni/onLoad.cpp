@@ -202,12 +202,20 @@ static void native_setDataSource(JNIEnv *env, jobject thiz ,jstring dataSource)
 
 }
 
-static void native_prepareAsync(JNIEnv *env, jobject thiz){
-
+static void native_prepareAsync(JNIEnv *env, jobject thiz)
+{
     playerInner->player_engine_prepare();  // open file ,get stream info
 }
 
-static void native_renderFrame(JNIEnv *env, jobject thiz){
+static void native_start(JNIEnv *env, jobject thiz)
+{
+    playerInner->player_engine_prepare();
+    playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_START);   //TODO here should be performed in upper layer
+}
+
+
+static void native_renderFrame(JNIEnv *env, jobject thiz)
+{
 
     YuvGLRender *yuvGLRender = playerInner->yuvGLRender;
     yuvGLRender->render_frame();
@@ -226,6 +234,8 @@ static JNINativeMethod methods[] =
 
     {"_setDataSource",   "(Ljava/lang/String;)V",                    (void*)native_setDataSource},
     {"_prepareAsync",    "()V",                                      (void*)native_prepareAsync},
+
+    {"_start",           "()V",                                      (void*)native_start},
 
     {"_renderFrame",     "()V",                                      (void*)native_renderFrame},  // render frame.
 

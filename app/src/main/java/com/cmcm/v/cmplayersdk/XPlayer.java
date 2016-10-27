@@ -91,7 +91,7 @@ public class XPlayer implements IMediaPlayer{
 
     @Override
     public void start() throws IllegalStateException {
-
+        _start();
     }
 
     @Override
@@ -391,6 +391,7 @@ public class XPlayer implements IMediaPlayer{
      */
     public native void _prepareAsync() throws IllegalStateException;
 
+    public native void _start();
 
     public native void _renderFrame();
 

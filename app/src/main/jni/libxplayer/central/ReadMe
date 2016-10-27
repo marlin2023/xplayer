@@ -67,6 +67,13 @@ Such as Video Decoder State Machine has state :
     -- GLSurfaceView.Render pause()
         this.setRenderMode(RENDERMODE_WHEN_DIRTY);  & queueEvent
 
+-
+-
+- MediaPlayer start() function
+    -- Change state to Buffering State.
+    -- In Buffering state notify Java Layer buffering percent
+    -- When Buffering percent 100% ,then audio decoder & video decoder thread begain to work.
+
 
 
 

@@ -9,6 +9,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static String TAG = "MainActivity";
 
+    VideoSurfaceView surfaceView;   // video view
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -17,7 +19,7 @@ public class MainActivity extends AppCompatActivity {
         // 取得LinearLayout 物件
         LinearLayout ll = (LinearLayout)findViewById(R.id.viewObj);
 
-        VideoSurfaceView surfaceView = new VideoSurfaceView(this);
+        surfaceView = new VideoSurfaceView(this);
         ll.addView(surfaceView);
 
         surfaceView.setOnPreparedListener(mOnPreparedListener);
@@ -33,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onPrepared(IMediaPlayer mp) {
                     Log.d(TAG ,"====>onPrepared....");
                     // call start function
-
+                    surfaceView.start();
                 }
 
             };

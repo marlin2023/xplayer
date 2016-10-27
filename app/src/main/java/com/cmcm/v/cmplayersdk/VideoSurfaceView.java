@@ -116,8 +116,13 @@ public class VideoSurfaceView extends GLSurfaceView implements GLSurfaceView.Ren
         xPlayer.prepareAsync();
     }
 
-
-
+    /**
+     * Start To Play
+     * Change State into Buffering State.
+     */
+    public void start() throws IllegalStateException {
+        xPlayer.start();
+    }
 
     // =================set listener=======
     public void setOnPreparedListener(IMediaPlayer.OnPreparedListener listener) {
