@@ -218,16 +218,16 @@ static void native_renderFrame(JNIEnv *env, jobject thiz){
 static JNINativeMethod methods[] =
 {
 
-    {"native_init",     "()V",                                      (void*)jni_native_init},
-    {"native_setup",    "(Ljava/lang/Object;)V",                    (void*)jni_native_setup},
+    {"_native_init",     "()V",                                      (void*)jni_native_init},
+    {"_native_setup",    "(Ljava/lang/Object;)V",                    (void*)jni_native_setup},
 
-    {"init",            "()V",                                      (void*)native_init1},
-    {"initEGLCtx",      "()V",                                      (void*)native_initEGLCtx},
+    {"_init",            "()V",                                      (void*)native_init1},
+    {"_initEGLCtx",      "()V",                                      (void*)native_initEGLCtx},
 
-    {"setDataSource",   "(Ljava/lang/String;)V",                    (void*)native_setDataSource},
-    {"prepareAsync",    "()V",                                      (void*)native_prepareAsync},
+    {"_setDataSource",   "(Ljava/lang/String;)V",                    (void*)native_setDataSource},
+    {"_prepareAsync",    "()V",                                      (void*)native_prepareAsync},
 
-    {"renderFrame",     "()V",                                      (void*)native_renderFrame},  // render frame.
+    {"_renderFrame",     "()V",                                      (void*)native_renderFrame},  // render frame.
 
 };
 

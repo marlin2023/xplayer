@@ -32,10 +32,12 @@ public class MainActivity extends AppCompatActivity {
             new IMediaPlayer.OnPreparedListener() {
                 public void onPrepared(IMediaPlayer mp) {
                     Log.d(TAG ,"====>onPrepared....");
+                    // call start function
 
                 }
 
             };
+
 
 }
 
