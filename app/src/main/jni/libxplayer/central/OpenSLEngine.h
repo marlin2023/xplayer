@@ -14,6 +14,11 @@
 #include <SLES/OpenSLES.h>
 #include <SLES/OpenSLES_Android.h>
 
+extern "C" {
+#include "libswresample/swresample.h"
+} // end of extern C
+
+
 #include "MediaFile.h"
 
 /**
@@ -59,7 +64,7 @@ public:
     /**
      * create audio player
      */
-    void createAudioPlayer();
+    int createAudioPlayer();
 
 
 
@@ -120,6 +125,11 @@ private:
     bool m_paused;
 
     bool m_running;
+
+public:
+    uint8_t * resampled_buf;
+
+    SwrContext *swr_ctx;
 
 };
 

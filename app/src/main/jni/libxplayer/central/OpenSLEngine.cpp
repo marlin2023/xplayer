@@ -31,13 +31,25 @@ void audioPlayerCallback(SLAndroidSimpleBufferQueueItf bq,
 
     OpenSLEngine *openSLEngine = (OpenSLEngine *)context;
     // get decode audio pcm data
-    AVFrame *src_frame;
-    src_frame = av_frame_alloc();
+    AVFrame *audioFrame;
+    audioFrame = av_frame_alloc();
     // TODO
-    openSLEngine->mediaFileHandle->audio_frame_queue->get(src_frame);
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>audio frame queue size :%d ,linesize[0] =%d\n", openSLEngine->mediaFileHandle->audio_frame_queue->size() ,src_frame->linesize[0]);
+    openSLEngine->mediaFileHandle->audio_frame_queue->get(audioFrame);
 
-    (*bq)->Enqueue(bq, src_frame->data[0] ,src_frame->linesize[0]);
+    //
+    int needed_buf_size = av_samples_get_buffer_size(NULL,
+                                           audioFrame->channels,
+                                           audioFrame->nb_samples,
+                                           AV_SAMPLE_FMT_S16, 0);
+
+    int outsamples = swr_convert(openSLEngine->swr_ctx,&openSLEngine->resampled_buf,needed_buf_size,(const uint8_t**)audioFrame->data, audioFrame->nb_samples);
+
+    int resampled_data_size = outsamples * audioFrame->channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
+
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>audio frame queue size :%d ,linesize[0] =%d ,resampled_data_size=%d\n", openSLEngine->mediaFileHandle->audio_frame_queue->size() ,audioFrame->linesize[0] ,resampled_data_size);
+
+    //(*bq)->Enqueue(bq, audioFrame->data[0] ,audioFrame->linesize[0]);
+    (*bq)->Enqueue(bq, openSLEngine->resampled_buf ,resampled_data_size);
     // en queue.
 
 }
@@ -146,7 +158,7 @@ void OpenSLEngine::createOutputMix()
 
 }
 
-void OpenSLEngine::createAudioPlayer()
+int OpenSLEngine::createAudioPlayer()
 {
     // get audio stream codec parameters
     AVCodecParameters *audioCodecParameters = mediaFileHandle->audio_stream->codecpar;
@@ -220,6 +232,34 @@ void OpenSLEngine::createAudioPlayer()
     // set the player's state to playing
     //result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
     //assert(result == SL_RESULT_SUCCESS);
+
+    if(audioCodecParameters->format != AV_SAMPLE_FMT_S16){
+        // init context
+        #define MAX_AUDIO_FRAME_SIZE 192000 // 1 second of 48khz 32bit audio
+
+        int out_size = MAX_AUDIO_FRAME_SIZE*100;
+        resampled_buf = (uint8_t *)malloc(out_size);;
+        if(resampled_buf == NULL){
+            XLog::e(TAG ,"===resampled_buf malloc failed. ");
+            return -1;
+        }
+
+        swr_ctx = swr_alloc();
+        swr_ctx = swr_alloc_set_opts(NULL,
+                               audioCodecParameters->channel_layout, AV_SAMPLE_FMT_S16, audioCodecParameters->sample_rate,
+                               audioCodecParameters->channel_layout, (AVSampleFormat)audioCodecParameters->format, audioCodecParameters->sample_rate,
+                               0, NULL);
+        int ret = 0;
+
+        if ((ret = swr_init(swr_ctx)) < 0) {
+
+            XLog::e(TAG ,"Failed to initialize the resampling context\n");
+            return -1;
+
+        }
+    }
+
+    return 0;
 }
 
 int OpenSLEngine::InitPlayout()
@@ -227,8 +267,6 @@ int OpenSLEngine::InitPlayout()
     createEngine();
     createOutputMix();
     createAudioPlayer();
-    XLog::e(TAG ,"==>SimpleBufferQueueCallback InitPlayout 4===============>\n");
+
     return 0;
 }
-
-
