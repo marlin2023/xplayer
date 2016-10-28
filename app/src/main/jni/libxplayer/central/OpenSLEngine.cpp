@@ -17,11 +17,11 @@
 #include "util/XLog.h"
 
 /**
- * SimpleBufferQueueCallback
+ * audioPlayerCallback
  * play audio buffer.
  * this callback handler is called every time a buffer finishes playing
  */
-void SimpleBufferQueueCallback1(SLAndroidSimpleBufferQueueItf bq,
+void audioPlayerCallback(SLAndroidSimpleBufferQueueItf bq,
                                         void* context)
 {
     // int bytes = fread(playBuffer, 1, 2048 * sizeof(short), file);    // TODO
@@ -182,10 +182,19 @@ void OpenSLEngine::createAudioPlayer()
     dataSink.pLocator = &outputMixLocator;
 
     // 3. create audio player object
-    const SLInterfaceID ids1[] = { SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
-    const SLboolean req1[] = { SL_BOOLEAN_TRUE };
+    //const SLInterfaceID ids1[] = { SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
+    //const SLboolean req1[] = { SL_BOOLEAN_TRUE };
+    const SLInterfaceID ids1[3] = {SL_IID_BUFFERQUEUE, SL_IID_EFFECTSEND,
+            SL_IID_VOLUME};
+    const SLboolean req1[3] = {SL_BOOLEAN_TRUE, SL_BOOLEAN_TRUE,
+            SL_BOOLEAN_TRUE};
+    XLog::e(TAG ,"SimpleBufferQueueCallback ,CreateAudioPlayer \nformatType[%d]\nnumChannels[%d]\nsamplesPerSec[%d]\nbitsPerSample[%d]\ncontainerSize[%d]\nchannelMask[%d]\nendianness[%d]",
+        dataFormat.formatType,dataFormat.numChannels,dataFormat.samplesPerSec,
+        dataFormat.bitsPerSample,dataFormat.containerSize,dataFormat.channelMask,
+        dataFormat.endianness);
+
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &dataSource, &dataSink,
-            1, ids1, req1);
+            3, ids1, req1);
     assert(result == SL_RESULT_SUCCESS);
 
 
@@ -196,18 +205,21 @@ void OpenSLEngine::createAudioPlayer()
     assert(result == SL_RESULT_SUCCESS);
 
     //
-    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &bqPlayerBufferQueue);
+    //result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_ANDROIDSIMPLEBUFFERQUEUE, &bqPlayerBufferQueue);
+    result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_BUFFERQUEUE, &bqPlayerBufferQueue);
     assert(result == SL_RESULT_SUCCESS);
 
     // register callback
-    //result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, &SimpleBufferQueueCallback, this);
-    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, SimpleBufferQueueCallback1, this);
+    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, audioPlayerCallback, this);
     assert(result == SL_RESULT_SUCCESS);
 
-//    // set the player's state to playing
-    result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
-    assert(result == SL_RESULT_SUCCESS);
-    XLog::e(TAG ,"==>SimpleBufferQueueCallback ,createAudioPlayer===>\n");
+    // TODO
+    uint8_t silence_buf[1024];
+    (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, (uint8_t *) silence_buf , 1);  // must add this statement .
+
+    // set the player's state to playing
+    //result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+    //assert(result == SL_RESULT_SUCCESS);
 }
 
 int OpenSLEngine::InitPlayout()

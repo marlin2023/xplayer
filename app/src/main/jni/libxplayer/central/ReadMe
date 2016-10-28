@@ -36,6 +36,11 @@ Such as Video Decoder State Machine has state :
 
     OpenSL ES major operations is interfaces ,such as: SLObjectItf ---Itf = Interface.
 
+    - opensl es 遇到一个问题：
+    - 所有逻辑走完 调用开始播放 SetPlayState(player->slPlay,  SL_PLAYSTATE_PLAYING ）,但是并没有调用回调函数。-----》最后解决方法： 在SetPlayState 之前调用下 Enqueue 方法，然后后面就可以调用了。
+
+
+
 -- audio track
 
 -
