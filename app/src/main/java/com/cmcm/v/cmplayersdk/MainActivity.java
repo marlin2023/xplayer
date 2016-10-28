@@ -11,11 +11,13 @@ public class MainActivity extends AppCompatActivity {
 
     VideoSurfaceView surfaceView;   // video view
 
+    int isCalledPlay ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        isCalledPlay = 0;   // TODO
         // 取得LinearLayout 物件
         LinearLayout ll = (LinearLayout)findViewById(R.id.viewObj);
 
@@ -50,7 +52,9 @@ public class MainActivity extends AppCompatActivity {
                 public void onBufferingUpdate(IMediaPlayer mp, int percent) {
                     Log.d(TAG ,"====>onBufferingUpdate...." + percent + "%");
                     // TODO
-                    if(percent == 100){
+
+                    if((percent == 100) && (isCalledPlay == 0)){
+                        isCalledPlay = 1;
                         surfaceView.play();
                     }
                 }

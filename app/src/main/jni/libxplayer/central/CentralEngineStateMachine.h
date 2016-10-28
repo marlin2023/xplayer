@@ -97,9 +97,14 @@ private:
     void central_engine_do_process_buffering(player_event_e evt);
 
     /**
+     * play_wait state processing work ,will process PLAY_EVT from JAVA Layer.
+     */
+    void central_engine_do_process_play_wait(player_event_e evt);
+
+    /**
      * started state processing work
      */
-    void central_engine_do_process_started(player_event_e evt);
+    void central_engine_do_process_playing(player_event_e evt);
 
     /**
      * av_read_frame- retry count

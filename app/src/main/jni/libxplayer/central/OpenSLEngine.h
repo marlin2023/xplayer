@@ -16,6 +16,14 @@
 
 #include "MediaFile.h"
 
+/**
+ * SimpleBufferQueueCallback
+ * These callback methods are called when data is required for playout.
+ * They are both called from an internal "OpenSL ES thread" which is not attached to the Dalvik VM.
+ */
+void SimpleBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq,
+                                        void* context);
+
 class OpenSLEngine
 {
 
@@ -53,13 +61,7 @@ public:
      */
     void createAudioPlayer();
 
-    /**
-     * SimpleBufferQueueCallback
-     * These callback methods are called when data is required for playout.
-     * They are both called from an internal "OpenSL ES thread" which is not attached to the Dalvik VM.
-     */
-    static void SimpleBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq,
-                                            void* context);
+
 
     /**
      * media file handle
@@ -111,7 +113,7 @@ private:
 
     enum
     {
-        BUFFER_COUNT = 5,
+        BUFFER_COUNT = 2,   // 5
     };
 
 

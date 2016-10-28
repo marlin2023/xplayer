@@ -6,6 +6,9 @@
 //      3.http://www.cnblogs.com/wainiwann/archive/2013/03/27/2984307.html
 //      4.https://github.com/KTXSoftware/Kore/blob/5981cf8ce0b982cdfe30a6e1f32260c504bf14c5/Backends/Android/Sources/Kore/Audio.cpp
 //
+
+#define TAG "OpenSLEngine_AUDIO_OUT"
+
 #include <assert.h>
 #include <stdio.h>
 
@@ -13,10 +16,36 @@
 
 #include "util/XLog.h"
 
+/**
+ * SimpleBufferQueueCallback
+ * play audio buffer.
+ * this callback handler is called every time a buffer finishes playing
+ */
+void SimpleBufferQueueCallback1(SLAndroidSimpleBufferQueueItf bq,
+                                        void* context)
+{
+    // int bytes = fread(playBuffer, 1, 2048 * sizeof(short), file);    // TODO
+    // (*bq)->Enqueue(bq, playBuffer,bytes);                            // TODO
+
+    XLog::e(TAG ,"==>SimpleBufferQueueCallback ===============in callback.>\n");
+
+    OpenSLEngine *openSLEngine = (OpenSLEngine *)context;
+    // get decode audio pcm data
+    AVFrame *src_frame;
+    src_frame = av_frame_alloc();
+    // TODO
+    openSLEngine->mediaFileHandle->audio_frame_queue->get(src_frame);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>audio frame queue size :%d ,linesize[0] =%d\n", openSLEngine->mediaFileHandle->audio_frame_queue->size() ,src_frame->linesize[0]);
+
+    (*bq)->Enqueue(bq, src_frame->data[0] ,src_frame->linesize[0]);
+    // en queue.
+
+}
+
 OpenSLEngine::OpenSLEngine(MediaFile *mediaFile)
 {
 
-    this->mediaFileHandle = mediaFile;
+    mediaFileHandle = mediaFile;
 
     m_paused = false;
     m_running = true;
@@ -30,11 +59,15 @@ OpenSLEngine::~OpenSLEngine()
 
 void OpenSLEngine::play()
 {
-    if (bqPlayerPlay == NULL){ return;}
-
+    if (bqPlayerPlay == NULL){
+        XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in play function ,bqPlayerPlay == NULL===============>\n");
+        return;
+    }
+    XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in play function start===============>\n");
     SLresult result;
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);   // start play.
     assert(SL_RESULT_SUCCESS == result);
+    XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in play function end===============>\n");
 }
 
 void OpenSLEngine::pause()
@@ -102,7 +135,7 @@ void OpenSLEngine::createOutputMix()
     SLresult result;
 
     // create output mix
-    const SLInterfaceID ids[1] = {SL_IID_ENVIRONMENTALREVERB};  // Sound effects
+    const SLInterfaceID ids[1] = {SL_IID_VOLUME};
     const SLboolean req[1] = {SL_BOOLEAN_FALSE};
     result = (*engineEngine)->CreateOutputMix(engineEngine, &outputMixObject, 1, ids, req);
     assert(SL_RESULT_SUCCESS == result);
@@ -128,8 +161,8 @@ void OpenSLEngine::createAudioPlayer()
     SLDataFormat_PCM dataFormat = {};
     dataFormat.formatType    = SL_DATAFORMAT_PCM;
     dataFormat.numChannels   = audioCodecParameters->channels;
-    dataFormat.samplesPerSec = audioCodecParameters->sample_rate;
-    dataFormat.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16; // Notice Here PCM 16
+    dataFormat.samplesPerSec = audioCodecParameters->sample_rate * 1000;    // pAudioSrc: samplesPerSec=44100  SL_RESULT_CONTENT_UNSUPPORTED
+    dataFormat.bitsPerSample = SL_PCMSAMPLEFORMAT_FIXED_16; // Notice Here PCM  16
     dataFormat.containerSize = SL_PCMSAMPLEFORMAT_FIXED_16;
     dataFormat.channelMask   = SL_SPEAKER_FRONT_LEFT | SL_SPEAKER_FRONT_RIGHT;
     if(dataFormat.numChannels == 1){dataFormat.channelMask   = SL_SPEAKER_FRONT_CENTER;}
@@ -138,7 +171,7 @@ void OpenSLEngine::createAudioPlayer()
     // 1. configure data source
     SLDataSource dataSource = {};
     dataSource.pLocator = &bufferQueueLocator;  // TODO buffer queue locator
-    dataSource.pFormat  = &dataFormat;  // TODO data formate
+    dataSource.pFormat  = &dataFormat;  // TODO data format
 
     // 2. configure audio sink
     SLDataLocator_OutputMix outputMixLocator = {};
@@ -149,10 +182,10 @@ void OpenSLEngine::createAudioPlayer()
     dataSink.pLocator = &outputMixLocator;
 
     // 3. create audio player object
-    static const SLInterfaceID interfaceIds[] = { SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
-    static const SLboolean required[] = { SL_BOOLEAN_TRUE };
+    const SLInterfaceID ids1[] = { SL_IID_ANDROIDSIMPLEBUFFERQUEUE };
+    const SLboolean req1[] = { SL_BOOLEAN_TRUE };
     result = (*engineEngine)->CreateAudioPlayer(engineEngine, &bqPlayerObject, &dataSource, &dataSink,
-        1, interfaceIds, required);
+            1, ids1, req1);
     assert(result == SL_RESULT_SUCCESS);
 
 
@@ -167,39 +200,23 @@ void OpenSLEngine::createAudioPlayer()
     assert(result == SL_RESULT_SUCCESS);
 
     // register callback
-    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, &OpenSLEngine::SimpleBufferQueueCallback, this);
+    //result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, &SimpleBufferQueueCallback, this);
+    result = (*bqPlayerBufferQueue)->RegisterCallback(bqPlayerBufferQueue, SimpleBufferQueueCallback1, this);
     assert(result == SL_RESULT_SUCCESS);
 
 //    // set the player's state to playing
-//    result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
-//    assert(result == SL_RESULT_SUCCESS);
+    result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+    assert(result == SL_RESULT_SUCCESS);
+    XLog::e(TAG ,"==>SimpleBufferQueueCallback ,createAudioPlayer===>\n");
 }
 
 int OpenSLEngine::InitPlayout()
 {
     createEngine();
-
     createOutputMix();
-
     createAudioPlayer();
+    XLog::e(TAG ,"==>SimpleBufferQueueCallback InitPlayout 4===============>\n");
     return 0;
 }
 
 
-/**
- * SimpleBufferQueueCallback
- * play audio buffer.
- * this callback handler is called every time a buffer finishes playing
- */
-void OpenSLEngine::SimpleBufferQueueCallback(SLAndroidSimpleBufferQueueItf bq,
-                                        void* context)
-{
-    // int bytes = fread(playBuffer, 1, 2048 * sizeof(short), file);    // TODO
-    // (*bq)->Enqueue(bq, playBuffer,bytes);                            // TODO
-
-
-    // get decode audio pcm data
-
-    // en queue.
-
-}

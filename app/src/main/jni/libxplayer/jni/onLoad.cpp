@@ -219,6 +219,14 @@ static void native_play(JNIEnv *env, jobject thiz)
     // TODO send EVT_START to audio decode state machine & video decode state machine should be put in el_do_start_central_engine
     playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_START);
     playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_START);
+
+    // TODO
+    playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_PLAY);
+
+    // audio render thread.
+    playerInner->player_start();
+    XLog::e(TAG ,"======>playerInner->player_start.SimpleBufferQueueCallback");
+
 }
 
 static void native_renderFrame(JNIEnv *env, jobject thiz)

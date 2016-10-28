@@ -201,9 +201,15 @@ void CentralEngineStateMachine::central_engine_state_machine_process_event(playe
             central_engine_do_process_buffering(evt);
             return;
         }
-        case STATE_PLAY_STARTED:
+        case STATE_PLAY_WAIT:
         {
-            central_engine_do_process_started(evt);
+            central_engine_do_process_play_wait(evt);
+            return;
+        }
+
+        case STATE_PLAY_PLAYING:
+        {
+            central_engine_do_process_playing(evt);
             return;
         }
         case STATE_PLAY_PAUSED:
@@ -340,7 +346,9 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"===>is_pkt_q_full break;.\n");
                 // TODO ,here should to notify upper layer
                 // TODO
+                this->state_machine_change_state(STATE_PLAY_WAIT);
                 this->mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
+
                 return;
             }
             this->message_queue->push(EVT_GO_ON);
@@ -357,11 +365,48 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
 
 }
 
-void CentralEngineStateMachine::central_engine_do_process_started(player_event_e evt)
+void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event_e evt)
 {
     switch(evt)
     {
+        // buffering ready(buffering percent 100%) is sent to upper layer, then upper layer calls play
+        case EVT_PLAY:
+        {
+            this->state_machine_change_state(STATE_PLAY_PLAYING);
+            this->message_queue->push(EVT_GO_ON);
+            return;
+        }
 
+    }
+    return;
+
+}
+
+
+void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_GO_ON:
+        {
+            int ret = 0;
+            // the eof of file or read error .
+            if (demux_2_packet_queue() == AVERROR_EOF && this->read_retry_count > 5)
+            {
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"state_machine:PLAYING FILE EOF,vpktq = %d,apktq = %d\n",
+                        mediaFileHandle->video_queue->size(),
+                        mediaFileHandle->audio_queue->size());
+
+                //g_media_file_obj.is_file_eof = EL_TRUE;
+                //el_state_machine_change_state(demux_file_state_machine, EL_ENGINE_CENTRAL_STATE_PLAY_FILE_END);
+
+                //el_notify_buffering_ready();
+
+                return;
+            }
+            this->message_queue->push(EVT_GO_ON);
+            return;
+        }
     }
     return;
 
