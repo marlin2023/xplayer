@@ -6,6 +6,7 @@
 
 
 #include <android/log.h>
+#include <unistd.h>
 
 #include "CentralEngineStateMachine.h"
 #include "PlayerState.h"
@@ -105,44 +106,6 @@ int CentralEngineStateMachine::add_packet_to_q(AVPacket *pkt ,MediaFile *mediaFi
     int ret = pkt_q->put(pkt);
 
     //
-#if 0
-    if (pkt->stream_index == st_index[AVMEDIA_TYPE_VIDEO])
-    {
-
-        XLog::e(TAG ,"===>pkt_q.size =%d ,pkt->stream_index =%d.\n" ,pkt_q->size() ,pkt->stream_index);
-        AVPacket packet;
-        ret = mediaFileHandle->video_queue->get(&packet ,1);
-
-        AVCodecContext *codec_ctx ;
-        AVFrame *frame ;
-        codec_ctx = mediaFileHandle->video_codec_context;
-        frame = av_frame_alloc();
-        if(!frame){
-            XLog::e(TAG ,"===>ZVideoDecoder::run(), error for av_frame_alloc.\n");
-        }
-        XLog::e(TAG ,"===>ZVideoDecoder::run(),packet->size =%d ,packet.pts =%lld\n" ,packet.size ,packet.pts);
-
-        if (packet.side_data != NULL){
-            XLog::e(TAG ,"===>ZVideoDecoder::run(),packet.side_data is not null. ,pkt->side_data_elems = %d\n" ,packet.side_data_elems);
-        }else{
-            XLog::e(TAG ,"===>ZVideoDecoder::run(),packet.side_data is null..\n");  // will be perform this statement.
-        }
-
-        int got_frame = 0;
-        avcodec_decode_video2(codec_ctx,
-                                 frame,
-                                 &got_frame,
-                                 &packet);
-        if(!got_frame)
-        {
-            XLog::e(TAG ,"==>MediaDecodeVideoStateMachine not got_frame----->\n");
-        }else{
-            XLog::e(TAG ,"==>MediaDecodeVideoStateMachine got_frame ---!!!!\n");
-        }
-
-    }
-#endif
-    //
     return ret;
 }
 
@@ -161,7 +124,7 @@ void CentralEngineStateMachine::central_engine_thread(MediaFile *mediaFile)
     while(1){
 
         evt = message_queue->pop();
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDemuxStateMachine msq evt = %d\n" ,evt);
+        //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDemuxStateMachine msq evt = %d\n" ,evt);
 
         // Exit thread until receive the EXIT_THREAD EVT
         if(evt == EVT_EXIT_THREAD)
@@ -263,7 +226,6 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
 {
     switch(evt)
     {
-        //mediaFileHandle->open();
         case EVT_OPEN:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: initialized state recv EVT_OPEN\n");
@@ -356,7 +318,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
         }
         default:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_BUFFERING receive others EVT.\n");
+            XLog::e(TAG ,"===>STATE_BUFFERING receive others EVT:%d\n" ,evt);
             return;
         }
 
@@ -369,9 +331,9 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
 {
     switch(evt)
     {
-        // buffering ready(buffering percent 100%) is sent to upper layer, then upper layer calls play
         case EVT_PLAY:
         {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_PLAY Event.\n");
             this->state_machine_change_state(STATE_PLAY_PLAYING);
             this->message_queue->push(EVT_GO_ON);
             return;
@@ -390,20 +352,38 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
         case EVT_GO_ON:
         {
             int ret = 0;
+            //XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAYING ,receive EVT_GO_ON Event .\n");
             // the eof of file or read error .
             if (demux_2_packet_queue() == AVERROR_EOF && this->read_retry_count > 5)
             {
-                XLog::d(ANDROID_LOG_WARN ,TAG ,"state_machine:PLAYING FILE EOF,vpktq = %d,apktq = %d\n",
+                XLog::e(TAG ,"state_machine:PLAYING FILE EOF,vpktq = %d,apktq = %d\n",
                         mediaFileHandle->video_queue->size(),
                         mediaFileHandle->audio_queue->size());
 
-                //g_media_file_obj.is_file_eof = EL_TRUE;
-                //el_state_machine_change_state(demux_file_state_machine, EL_ENGINE_CENTRAL_STATE_PLAY_FILE_END);
-
-                //el_notify_buffering_ready();
-
                 return;
             }
+
+            // Video packet q is full
+            if(mediaFileHandle->video_queue->q_size >= X_MAX_PKT_VIDEO_Q_MEM_SPACE)
+            {
+                ret = 1;
+
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"===> pkt q full, %d,%d,%d\n",
+                mediaFileHandle->video_queue->size(),
+                mediaFileHandle->audio_queue->size(),
+                mediaFileHandle->video_queue->q_size);
+            }
+
+            if(ret)
+            {
+                usleep(10000);
+            }
+            else
+            {
+                usleep(1000);
+            }
+
+            //
             this->message_queue->push(EVT_GO_ON);
             return;
         }

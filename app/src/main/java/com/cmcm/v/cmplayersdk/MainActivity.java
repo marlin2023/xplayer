@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
             new IMediaPlayer.OnBufferingUpdateListener() {
                 @Override
                 public void onBufferingUpdate(IMediaPlayer mp, int percent) {
-                    Log.d(TAG ,"====>onBufferingUpdate...." + percent + "%");
+                    Log.d(TAG ,"====>onBufferingUpdate...." + percent + "% ,isCalledPlay =" + isCalledPlay );
                     // TODO
 
                     if((percent == 100) && (isCalledPlay == 0)){

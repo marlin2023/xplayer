@@ -87,6 +87,14 @@ Such as Video Decoder State Machine has state :
 
 
 
+-
+- Memory
+    adb shell dumpsys meminfo com.cmcm.v.cmplayersdk
+
+-
+
+
+
 
 
 

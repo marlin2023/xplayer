@@ -24,10 +24,7 @@
 void audioPlayerCallback(SLAndroidSimpleBufferQueueItf bq,
                                         void* context)
 {
-    // int bytes = fread(playBuffer, 1, 2048 * sizeof(short), file);    // TODO
-    // (*bq)->Enqueue(bq, playBuffer,bytes);                            // TODO
-
-    XLog::e(TAG ,"==>SimpleBufferQueueCallback ===============in callback.>\n");
+    //XLog::e(TAG ,"==>SimpleBufferQueueCallback ===============in callback.>\n");
 
     OpenSLEngine *openSLEngine = (OpenSLEngine *)context;
     // get decode audio pcm data

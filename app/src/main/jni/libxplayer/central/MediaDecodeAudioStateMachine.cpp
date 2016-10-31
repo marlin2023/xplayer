@@ -46,15 +46,14 @@ void MediaDecodeAudioStateMachine::decode_one_audio_packet(AVPacket *packet )
 
     do {
         send_result = avcodec_send_packet(audio_codec_context, packet);
-        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>Audio_Frame_QUEUE --->1");
         while ( avcodec_receive_frame(audio_codec_context, frame) == 0 ) {
-          XLog::d(ANDROID_LOG_INFO ,TAG ,"==>Audio_Frame_QUEUE --->2");
           audio_frame_queue->put(frame);
-          XLog::d(ANDROID_LOG_INFO ,TAG ,"==>Audio_Frame_QUEUE size=%d\n" ,audio_frame_queue->size());
-
         }
 
     } while (send_result == AVERROR(EAGAIN));
+
+    av_frame_free(&frame);
+    av_packet_unref(packet);
 }
 
 void MediaDecodeAudioStateMachine::state_machine_change_state(player_state_e new_state)
@@ -73,11 +72,10 @@ void * MediaDecodeAudioStateMachine::audio_decode_thread()
 
 
     player_event_e evt;
-    sleep(1);   //TODO delete this line ??
     while(1){
 
         evt = this->message_queue->pop();
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeAudioStateMachine msq evt = %d\n" ,evt);
+        //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeAudioStateMachine msq evt = %d\n" ,evt);
 
         // Exit thread until receive the EXIT_THREAD EVT
         if(evt == EVT_EXIT_THREAD)
@@ -141,16 +139,24 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
     {
         case EVT_DECODE_GO_ON:
         {
-            XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeAudioStateMachine recv EVT_DECODE_GO_ON event!\n");
+            //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeAudioStateMachine recv EVT_DECODE_GO_ON event!\n");
+            if(mediaFileHandle->audio_frame_queue->node_count >= mediaFileHandle->audio_frame_queue->max_node_count)
+            {
+                //audio_frame_q->full_func(audio_frame_q->full_parm);
+                usleep(50000);
+                this->message_queue->push(EVT_DECODE_GO_ON);
+                return;
+            }
+
             //
             AVPacket pkt;
             int ret = mediaFileHandle->audio_queue->get(&pkt ,1);
             int rr = mediaFileHandle->audio_queue->size();
-            XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeAudioStateMachine ,pkt.size = %d ,rr=%d ,ret =%d\n" ,pkt.size ,rr ,ret);
+            //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeAudioStateMachine ,pkt.size = %d ,rr=%d ,ret =%d\n" ,pkt.size ,rr ,ret);
 
             decode_one_audio_packet(&pkt );
-            //
             this->message_queue->push(EVT_DECODE_GO_ON);
+
             return;
         }
         default:

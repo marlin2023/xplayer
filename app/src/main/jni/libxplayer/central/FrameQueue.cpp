@@ -13,7 +13,18 @@ FrameQueue::FrameQueue()
     pthread_cond_init(&cond, NULL);
     first_frame = NULL;
     last_frame = NULL;
-    nb_frames = 0;;
+    node_count = 0;
+}
+
+FrameQueue::FrameQueue(int max_node_count)
+{
+    pthread_mutex_init(&mutex, NULL);
+    pthread_cond_init(&cond, NULL);
+    first_frame = NULL;
+    last_frame = NULL;
+    node_count = 0;
+    //
+    this->max_node_count = max_node_count;
 }
 
 FrameQueue::~FrameQueue()
@@ -37,7 +48,7 @@ void FrameQueue::flush()
 
     last_frame = NULL;
     first_frame = NULL;
-    nb_frames = 0;
+    node_count = 0;
 
     pthread_mutex_unlock(&mutex);
 }
@@ -75,7 +86,7 @@ int FrameQueue::put(AVFrame *frame)
     }
 
     last_frame = frame1;
-    nb_frames ++;
+    node_count ++;
 
     pthread_cond_signal(&cond);
     pthread_mutex_unlock(&mutex);
@@ -100,8 +111,9 @@ int FrameQueue::get(AVFrame *frame)
                 last_frame = NULL;
             }
 
-            nb_frames --;
+            node_count --;
             av_frame_ref(frame, frame1->frame); // set frame
+            av_frame_unref(frame1->frame);
             av_frame_free(&frame1->frame);
             av_free(frame1);
 
@@ -121,7 +133,7 @@ int FrameQueue::get(AVFrame *frame)
 int FrameQueue::size()
 {
     pthread_mutex_lock(&mutex);
-    int nb_frame = nb_frames;
+    int nb_frame = node_count;
     pthread_mutex_unlock(&mutex);
 
     return nb_frame;

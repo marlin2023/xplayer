@@ -19,8 +19,8 @@ MediaFile::MediaFile()
     video_queue = new PacketQueue();
 
     // init frame queue
-    audio_frame_queue = new FrameQueue();
-    video_frame_queue = new FrameQueue();
+    audio_frame_queue = new FrameQueue(X_MAX_FRAME_AUDIO_Q_NODE_CNT);
+    video_frame_queue = new FrameQueue(X_MAX_FRAME_VIDEO_Q_NODE_CNT);
 
     //
     audio_codec_context = NULL;
@@ -306,8 +306,8 @@ CM_BOOL MediaFile::is_pkt_q_full(int64_t max_buffer_ts)
         q_a_buffer_ts = audio_queue->get_buffer_packet_ts() * av_q2d(vst->time_base)*1000;
     }
 
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"PKT Q, q_v_ts = %lld, q_a_ts = %lld, v count = %d, a count = %d, base_time = %lld\n",
-               q_v_buffer_ts, q_a_buffer_ts, video_queue->size(), audio_queue->size(), max_buffer_ts);
+    //XLog::d(ANDROID_LOG_WARN ,TAG ,"PKT Q, q_v_ts = %lld, q_a_ts = %lld, v count = %d, a count = %d, base_time = %lld\n",
+    //           q_v_buffer_ts, q_a_buffer_ts, video_queue->size(), audio_queue->size(), max_buffer_ts);
 
     switch(this->av_support)
     {
@@ -346,7 +346,7 @@ CM_BOOL MediaFile::is_pkt_q_full(int64_t max_buffer_ts)
 
 is_full:
 
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"buffering is full");
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"===>buffering is full");
 
     this->buffering_percent = 0;
 

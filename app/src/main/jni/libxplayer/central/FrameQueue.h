@@ -32,6 +32,7 @@ class FrameQueue
 {
 public:
     FrameQueue();
+    FrameQueue(int max_node_count);
     ~FrameQueue();
 
     /**
@@ -51,6 +52,16 @@ public:
 
     int size(); //nb_frames
 
+    /**
+    * current node count.
+    */
+    int node_count;
+
+    /**
+    * max node count.
+    */
+    int max_node_count; // upper limit node count
+
 private:
 
     /**
@@ -62,8 +73,6 @@ private:
     * last frame in frame queue.
     */
     AVFrameList*   last_frame;
-
-    int nb_frames;
 
     unsigned long long q_size;
 

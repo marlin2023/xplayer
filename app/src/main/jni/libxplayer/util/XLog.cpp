@@ -18,13 +18,14 @@ void XLog::e(const char *tag,  const char *fmt, ...)
 {
     va_list ap;
     va_start(ap,fmt);
-    if (mLogEnable){
+    //if (mLogEnable){
         __android_log_vprint(ANDROID_LOG_ERROR,tag,fmt,ap);
-    }
+    //}
     va_end(ap);
 }
 
 // if set mLogEnable to false ,
 // then debug log will not be printed.
-bool XLog::mLogEnable = true ;
+//bool XLog::mLogEnable = true ;
+bool XLog::mLogEnable = false ;
 

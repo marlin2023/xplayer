@@ -51,6 +51,8 @@ void YuvGLRender::render_frame()
     this->mediaFileHandle->video_frame_queue->get(src_frame);
     XLog::d(ANDROID_LOG_WARN ,TAG ,"==>video frame queue size :%d\n", this->mediaFileHandle->video_frame_queue->size());
 
+
+
     // For synchronization start
     double video_frame_render_pts = (double) src_frame->pts * av_q2d(mediaFileHandle->video_stream->time_base) * 1000;   // in millisecond
     double sync_audio_clock_time = mediaFileHandle->sync_audio_clock_time;
@@ -61,6 +63,8 @@ void YuvGLRender::render_frame()
     if(diff_time > 100){ // 100 millisecond
         usleep(diff_time * 1000); //in microseconds
     }
+
+    return; // TODO
 
     // For synchronization end
 
@@ -115,6 +119,7 @@ void YuvGLRender::render_frame()
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     checkGlError("glDrawArrays");
 
+    av_frame_unref(src_frame);  // free.
 }
 
 GLuint YuvGLRender::buildShader(const char* source, GLenum shaderType)
