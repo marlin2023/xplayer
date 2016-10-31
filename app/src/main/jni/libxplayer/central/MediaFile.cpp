@@ -44,6 +44,8 @@ MediaFile::MediaFile()
     //    max_buffering_time = 2 * X_MAX_PKT_Q_TS;          // 1.2s
     //}
 
+
+    sync_audio_clock_time = 0.f;
 }
 
 

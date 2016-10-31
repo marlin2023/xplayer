@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <unistd.h>
 
 #include "YuvGLRender.h"
 
@@ -49,6 +50,19 @@ void YuvGLRender::render_frame()
     // TODO
     this->mediaFileHandle->video_frame_queue->get(src_frame);
     XLog::d(ANDROID_LOG_WARN ,TAG ,"==>video frame queue size :%d\n", this->mediaFileHandle->video_frame_queue->size());
+
+    // For synchronization start
+    double video_frame_render_pts = (double) src_frame->pts * av_q2d(mediaFileHandle->video_stream->time_base) * 1000;   // in millisecond
+    double sync_audio_clock_time = mediaFileHandle->sync_audio_clock_time;
+    double diff_time = video_frame_render_pts - sync_audio_clock_time;
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,diff_time =%f\n", video_frame_render_pts ,diff_time);
+    // TODO filter some error diff_time.
+
+    if(diff_time > 100){ // 100 millisecond
+        usleep(diff_time * 1000); //in microseconds
+    }
+
+    // For synchronization end
 
     // src_frame->data[0]
     bindTexture(textureYId, src_frame->data[0], src_frame->linesize[0], src_frame->height); // first parameter use linesize.

@@ -228,6 +228,9 @@ public:
 
     MediaPlayerListener*   mListener; //mediaplayer listener for java
 
+    // audio sync clock time
+    double sync_audio_clock_time;
+
 };
 
 #endif //XPLAYER_MEDIAFILE_H

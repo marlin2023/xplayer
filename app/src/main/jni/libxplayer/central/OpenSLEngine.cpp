@@ -44,11 +44,14 @@ void audioPlayerCallback(SLAndroidSimpleBufferQueueItf bq,
 
     int outsamples = swr_convert(openSLEngine->swr_ctx,&openSLEngine->resampled_buf,needed_buf_size,(const uint8_t**)audioFrame->data, audioFrame->nb_samples);
 
+    // set audio pts TODO
+    openSLEngine->mediaFileHandle->sync_audio_clock_time = (double) audioFrame->pkt_pts * av_q2d(openSLEngine->mediaFileHandle->audio_stream->time_base) * 1000;   // in millisecond , use
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_audio_clock_time=%f\n", openSLEngine->mediaFileHandle->sync_audio_clock_time);
+
+    // end
     int resampled_data_size = outsamples * audioFrame->channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
+    //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>audio frame queue size :%d ,linesize[0] =%d ,resampled_data_size=%d\n", openSLEngine->mediaFileHandle->audio_frame_queue->size() ,audioFrame->linesize[0] ,resampled_data_size);
 
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>audio frame queue size :%d ,linesize[0] =%d ,resampled_data_size=%d\n", openSLEngine->mediaFileHandle->audio_frame_queue->size() ,audioFrame->linesize[0] ,resampled_data_size);
-
-    //(*bq)->Enqueue(bq, audioFrame->data[0] ,audioFrame->linesize[0]);
     (*bq)->Enqueue(bq, openSLEngine->resampled_buf ,resampled_data_size);
     // en queue.
 
