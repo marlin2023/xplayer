@@ -163,7 +163,8 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
             int rr = mediaFileHandle->video_queue->size();
             //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine ,pkt.size = %d ,rr=%d ,ret =%d\n" ,pkt.size ,rr ,ret);
 
-            //decode_one_video_packet(&pkt );
+            // TODO
+            decode_one_video_packet(&pkt );
             this->message_queue->push(EVT_DECODE_GO_ON);
 
             return;

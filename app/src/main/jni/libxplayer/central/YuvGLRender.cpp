@@ -61,14 +61,11 @@ void YuvGLRender::render_frame()
     XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,diff_time =%f\n", video_frame_render_pts ,diff_time);
 
     // TODO filter some error diff_time.
-
-    //av_frame_unref(src_frame);  // free.
-    av_frame_free(&src_frame);
+    //av_frame_free(&src_frame);
     if(diff_time > 100){ // 100 millisecond
         usleep(diff_time * 1000); //in microseconds
     }
-    return; // TODO
-
+    //return; // TODO
     // For synchronization end
 
     // src_frame->data[0]
@@ -122,7 +119,8 @@ void YuvGLRender::render_frame()
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     checkGlError("glDrawArrays");
 
-    av_frame_unref(src_frame);  // free.
+    //av_frame_unref(src_frame);
+    av_frame_free(&src_frame);  // free frame memory
 }
 
 GLuint YuvGLRender::buildShader(const char* source, GLenum shaderType)
