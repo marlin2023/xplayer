@@ -67,12 +67,12 @@ int FrameQueue::put(AVFrame *frame)
     }
 
     if ( (ret = av_frame_ref(frame1->frame, frame) ) < 0) { //// copy frame data (only copy meta data .//TODO)
-    //if ( (ret = av_frame_ref(frame, frame) ) < 0) { //// copy frame data (only copy meta data .//TODO)
         av_free(frame1);
         XLog::e(TAG ,"==>av_frame_ref failed.\n");
         return ret;
     }
 
+    av_frame_unref(frame);
     //*(frame1->frame) = *frame;
     frame1->next = NULL;
 

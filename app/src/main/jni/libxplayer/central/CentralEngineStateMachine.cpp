@@ -86,7 +86,7 @@ int CentralEngineStateMachine::add_packet_to_q(AVPacket *pkt ,MediaFile *mediaFi
     {
         // video packet
         pkt_q = mediaFile->video_queue;
-        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>VVVVideo packet queue size = %d ,pkt->size =%d\n" ,pkt_q->size() ,pkt->size);
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>VVVVideo packet queue size = %d ,pkt->q_size =%d\n" ,pkt_q->size() ,pkt_q->q_size);
 
     }
     else if (pkt->stream_index == st_index[AVMEDIA_TYPE_AUDIO])

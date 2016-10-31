@@ -49,6 +49,7 @@ void YuvGLRender::render_frame()
     src_frame = av_frame_alloc();
     // TODO
     this->mediaFileHandle->video_frame_queue->get(src_frame);
+
     XLog::d(ANDROID_LOG_WARN ,TAG ,"==>video frame queue size :%d\n", this->mediaFileHandle->video_frame_queue->size());
 
 
@@ -58,12 +59,14 @@ void YuvGLRender::render_frame()
     double sync_audio_clock_time = mediaFileHandle->sync_audio_clock_time;
     double diff_time = video_frame_render_pts - sync_audio_clock_time;
     XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,diff_time =%f\n", video_frame_render_pts ,diff_time);
+
     // TODO filter some error diff_time.
 
+    //av_frame_unref(src_frame);  // free.
+    av_frame_free(&src_frame);
     if(diff_time > 100){ // 100 millisecond
         usleep(diff_time * 1000); //in microseconds
     }
-
     return; // TODO
 
     // For synchronization end

@@ -43,8 +43,11 @@ extern "C" {
 #define X_MEGA_SIZE(t) ((t) * 1024 * 1024)
 #define X_MAX_FRAME_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(40)              // 40M space size
 
-#define X_MAX_PKT_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(10)                // 10M space size
-#define X_MAX_PKT_AUDIO_Q_MEM_SPACE  X_MEGA_SIZE(5)                 // 5M space size
+//#define X_MAX_PKT_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(10)                // 10M space size
+//#define X_MAX_PKT_AUDIO_Q_MEM_SPACE  X_MEGA_SIZE(5)                 // 5M space size
+
+#define X_MAX_PKT_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(0.5)                // 10M space size
+#define X_MAX_PKT_AUDIO_Q_MEM_SPACE  X_MEGA_SIZE(0.25)                 // 5M space size
 
 
 /**

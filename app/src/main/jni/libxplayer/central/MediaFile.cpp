@@ -356,6 +356,9 @@ is_not_full:
 
     //XLog::d(ANDROID_LOG_WARN ,TAG  ,"buffering is not full, buffering_percent = %f%%, max_buffer_ts = %lld", buffering_percent * 100, max_buffer_ts);
     // TODO notify buffering percent to upper layer.
+    if((int)(buffering_percent* 100) == 100){
+        buffering_percent = 99;
+    }
     this->notify(MEDIA_BUFFERING_UPDATE ,buffering_percent* 100 ,100);
 
     return CM_FALSE;

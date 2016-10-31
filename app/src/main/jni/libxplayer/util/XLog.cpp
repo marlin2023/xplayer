@@ -26,6 +26,6 @@ void XLog::e(const char *tag,  const char *fmt, ...)
 
 // if set mLogEnable to false ,
 // then debug log will not be printed.
-//bool XLog::mLogEnable = true ;
-bool XLog::mLogEnable = false ;
+bool XLog::mLogEnable = true ;
+//bool XLog::mLogEnable = false ;
 

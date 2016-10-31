@@ -151,12 +151,19 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
         {
             //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_DECODE_GO_ON event!\n");
             //
+            if(mediaFileHandle->video_frame_queue->node_count >= mediaFileHandle->video_frame_queue->max_node_count)
+            {
+                usleep(50000);
+                this->message_queue->push(EVT_DECODE_GO_ON);
+                return;
+            }
+
             AVPacket pkt;
             int ret = mediaFileHandle->video_queue->get(&pkt ,1);
             int rr = mediaFileHandle->video_queue->size();
             //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine ,pkt.size = %d ,rr=%d ,ret =%d\n" ,pkt.size ,rr ,ret);
 
-            decode_one_video_packet(&pkt );
+            //decode_one_video_packet(&pkt );
             this->message_queue->push(EVT_DECODE_GO_ON);
 
             return;

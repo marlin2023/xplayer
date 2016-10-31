@@ -52,6 +52,12 @@ void audioPlayerCallback(SLAndroidSimpleBufferQueueItf bq,
     (*bq)->Enqueue(bq, openSLEngine->resampled_buf ,resampled_data_size);
     // en queue.
 
+    // free avframe memory
+    if(audioFrame){
+        av_frame_free(&audioFrame);
+    }
+
+
 }
 
 OpenSLEngine::OpenSLEngine(MediaFile *mediaFile)
