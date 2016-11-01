@@ -85,11 +85,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         if(mMediaPlayer!= null){
             mMediaPlayer.renderFrame();
         }
-//        try {
-//            Thread.sleep(250);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+
     }
 
     @Override

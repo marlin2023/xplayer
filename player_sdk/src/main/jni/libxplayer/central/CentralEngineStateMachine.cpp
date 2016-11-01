@@ -418,6 +418,8 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
                 (mediaFileHandle->audio_frame_queue->size() == 0)){
 
                 XLog::e(TAG ,"====>state_machine: notify eof and should quit ...\n");
+                this->state_machine_change_state(STATE_PLAY_COMPLETE);
+                this->message_queue->push(EVT_STOP);    // receive stop msg
                 this->mediaFileHandle->notify(MEDIA_PLAYBACK_COMPLETE ,0 ,0);
             }else{
                 usleep(50000);
@@ -439,6 +441,20 @@ void CentralEngineStateMachine::central_engine_do_process_play_complete(player_e
 
             return;
         }
+        case EVT_STOP:
+        {
+            // do stop actions
+            //el_do_stop_central_engine();
+            this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_STOP);
+            this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_STOP);
+            //
+            //q_all_destruction(EL_VOID)
+            //
+            this->state_machine_change_state(STATE_STOPPED);
+
+            return;
+        }
+
     }
     return;
 

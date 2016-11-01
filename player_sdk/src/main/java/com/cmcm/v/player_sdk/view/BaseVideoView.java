@@ -225,8 +225,8 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
         mHeaders = headers;
         mSeekWhenPrepared = 0;
         openVideo();
-        //requestLayout();
-        //invalidate();
+        requestLayout();
+        invalidate();
     }
 
     @Override
