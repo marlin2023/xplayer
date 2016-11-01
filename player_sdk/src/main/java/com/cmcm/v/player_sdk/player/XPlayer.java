@@ -380,6 +380,25 @@ public class XPlayer implements IMediaPlayer {
     }
 
 
+    @Override
+    public void initEGLCtx(){
+        _initEGLCtx();
+    }
+
+    @Override
+    public void renderFrame(){
+        _renderFrame();
+    }
+
+    @Override
+    public void initPlayer(){
+        _init();
+    }
+
+    @Override
+    public void playInterface(){
+        _play();
+    }
 
     public static native void _native_init();
 

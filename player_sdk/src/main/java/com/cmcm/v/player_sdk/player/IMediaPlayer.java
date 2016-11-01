@@ -180,4 +180,16 @@ public interface IMediaPlayer {
      * @return bitmap
      */
     Bitmap getCurrentFrame();
+
+
+    /*xplayer需要的函数，androidplayer直接置空就好*/
+    void initEGLCtx();
+
+    void renderFrame();
+
+    void initPlayer();
+
+    void playInterface();
+    /*xplayer需要的函数，androidplayer直接置空就好*/
+
 }

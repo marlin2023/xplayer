@@ -2,17 +2,16 @@ package com.cmcm.v.player_sdk.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
-import android.widget.MediaController;
+
 
 import com.cmcm.v.player_sdk.player.IMediaPlayer;
 import com.cmcm.v.player_sdk.player.XPlayer;
 
-import java.util.Map;
+import java.io.IOException;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -25,32 +24,34 @@ import javax.microedition.khronos.opengles.GL10;
  *
  */
 
-public class VideoSurfaceView extends GLSurfaceView implements GLSurfaceView.Renderer ,CMPlayerControl{
+public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Renderer{
 
     public static String TAG = "VideoSurfaceView";
 
-    XPlayer xPlayer = null ;
-
     boolean isEGLContextInitilized;
 
-    // set VIDEO_LAYOUT_SCALE as default.
-    private int mVideoLayout = VIDEO_LAYOUT_FIT_PARENT;
 
-    protected int mVideoWidth;
-    protected int mVideoHeight;
-    protected int mVideoSarNum;
-    protected int mVideoSarDen;
+    public VideoSurfaceView(Context context, IjkLibLoader libLoader) {
+        super(context, libLoader);
+        initView();
+    }
 
-    private int mVideoRotationDegree = 0;
+    public VideoSurfaceView(Context context, AttributeSet attrs, IjkLibLoader libLoader) {
+        super(context, attrs, libLoader);
+        initView();
+    }
 
-    public VideoSurfaceView(Context context) {
-        super(context);
+    @Override
+    public View getView(){
+        return this;
+    }
+
+    protected void initView(){
         Log.i(TAG, "VideoSurfaceView Construct...");
 
         isEGLContextInitilized = false;
-        //if(xPlayer == null){
-        xPlayer = new XPlayer();
-        //}
+
+        mMediaPlayer = new XPlayer();
 
         setEGLContextClientVersion(2);                  // set opengl es version
         // setEGLConfigChooser(8, 8, 8, 8, 8, 0);
@@ -62,21 +63,15 @@ public class VideoSurfaceView extends GLSurfaceView implements GLSurfaceView.Ren
         Log.i(TAG, "VideoSurfaceView Construct ok...");
     }
 
-    public VideoSurfaceView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-
-    }
-
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         Log.i(TAG ,"========>onSurfaceCreated");
         // create gl program
         if(!isEGLContextInitilized){
-            this.xPlayer._initEGLCtx();
+            this.mMediaPlayer.initEGLCtx();
             isEGLContextInitilized = true;
         }
-
         //
     }
 
@@ -87,109 +82,15 @@ public class VideoSurfaceView extends GLSurfaceView implements GLSurfaceView.Ren
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        if(xPlayer!= null){
-            xPlayer._renderFrame();
+        if(mMediaPlayer!= null){
+            mMediaPlayer.renderFrame();
         }
+//        try {
+//            Thread.sleep(250);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
-
-
-
-
-    @Override
-    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-
-        if (mVideoRotationDegree == 90 || mVideoRotationDegree == 270) {
-            int tempSpec = widthMeasureSpec;
-            widthMeasureSpec  = heightMeasureSpec;
-            heightMeasureSpec = tempSpec;
-        }
-
-        int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
-        int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
-        if (mVideoWidth > 0 && mVideoHeight > 0) {
-            int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
-            int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
-
-            float specAspectRatio = (float) widthSpecSize / (float)heightSpecSize;
-            float displayAspectRatio;
-            switch (mVideoLayout) {
-                case VIDEO_LAYOUT_16_9_FIT_PARENT:
-                    displayAspectRatio = 16.0f / 9.0f;
-                    if (mVideoRotationDegree == 90 || mVideoRotationDegree == 270)
-                        displayAspectRatio = 1.0f / displayAspectRatio;
-                    break;
-                case VIDEO_LAYOUT_4_3_FIT_PARENT:
-                    displayAspectRatio = 4.0f / 3.0f;
-                    if (mVideoRotationDegree == 90 || mVideoRotationDegree == 270)
-                        displayAspectRatio = 1.0f / displayAspectRatio;
-                    break;
-                case VIDEO_LAYOUT_FIT_PARENT:
-                case VIDEO_LAYOUT_FILL_PARENT:
-                case VIDEO_LAYOUT_WRAP_CONTENT:
-                default:
-                    displayAspectRatio = (float) mVideoWidth / (float) mVideoHeight;
-                    if (mVideoSarNum > 0 && mVideoSarDen > 0)
-                        displayAspectRatio = displayAspectRatio * mVideoSarNum / mVideoSarDen;
-                    break;
-            }
-            boolean shouldBeWider = displayAspectRatio > specAspectRatio;
-
-            switch (mVideoLayout) {
-                case VIDEO_LAYOUT_FIT_PARENT:
-                case VIDEO_LAYOUT_16_9_FIT_PARENT:
-                case VIDEO_LAYOUT_4_3_FIT_PARENT:
-                    if (shouldBeWider) {
-                        // too wide, fix width
-                        width = widthSpecSize;
-                        height = (int) (width / displayAspectRatio);
-                    } else {
-                        // too high, fix height
-                        height = heightSpecSize;
-                        width = (int) (height * displayAspectRatio);
-                    }
-                    break;
-                case VIDEO_LAYOUT_FILL_PARENT:
-                    if (shouldBeWider) {
-                        // not high enough, fix height
-                        height = heightSpecSize;
-                        width = (int) (height * displayAspectRatio);
-                    } else {
-                        // not wide enough, fix width
-                        width = widthSpecSize;
-                        height = (int) (width / displayAspectRatio);
-                    }
-                    break;
-                case VIDEO_LAYOUT_WRAP_CONTENT:
-                default:
-                    if (shouldBeWider) {
-                        // too wide, fix width
-                        width = Math.min(mVideoWidth, widthSpecSize);
-                        height = (int) (width / displayAspectRatio);
-                    } else {
-                        // too high, fix height
-                        height = Math.min(mVideoHeight, heightSpecSize);
-                        width = (int) (height * displayAspectRatio);
-                    }
-                    break;
-            }
-        }
-
-        setMeasuredDimension(width, height);
-    }
-
-    @Override
-    public int getVideoLayout() {
-        return mVideoLayout;
-    }
-
-    @Override
-    public void setVideoLayout(int layout) {
-        mVideoLayout = layout;
-        requestLayout();
-    }
-
-
-
 
     @Override
     public void onResume() {
@@ -210,193 +111,218 @@ public class VideoSurfaceView extends GLSurfaceView implements GLSurfaceView.Ren
         // end
     }
 
-
-    @Override
-    public void setVideoPath(String path) {
-        setVideoURI(Uri.parse(path));
-    }
-
-    @Override
-    public void setVideoURI(Uri uri) {
-        setVideoURI(uri, null);
-    }
-
-    @Override
-    public void setVideoURI(Uri uri, Map<String, String> headers) {
-
-        // TODO openVideo abstract function
-        xPlayer.setDataSource(uri.getPath());
-//        requestLayout();
-//        invalidate();
-    }
-
-    @Override
-    public void stopPlayback() {
-
-    }
-
-    @Override
-    public void setMediaController(MediaController controller) {
-
-    }
-
-
-    @Override
-    public void release(boolean clearTargetState) {
-
-    }
-
-    @Override
-    public View getView() {
-        return null;
-    }
-
-    @Override
-    public int getCurrentState() {
-        return 0;
-    }
-
-
-    @Override
-    public void setVideoRotation(int degree) {
-
-    }
-
-    @Override
-    public int getIsLiveVideo() throws IllegalStateException {
-        return 0;
-    }
-
-    @Override
-    public String getHttpInfoStr() throws IllegalStateException {
-        return null;
-    }
-
-    @Override
-    public String getLibCompileTime() {
-        return null;
-    }
-
-    @Override
-    public Bitmap getCurrentFrame() {
-        return null;
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public int getDuration() {
-        return 0;
-    }
-
-    @Override
-    public int getCurrentPosition() {
-        return 0;
-    }
-
-    @Override
-    public void seekTo(int pos) {
-
-    }
-
-    @Override
-    public boolean isPlaying() {
-        return false;
-    }
-
-    @Override
-    public int getBufferPercentage() {
-        return 0;
-    }
-
-    @Override
-    public boolean canPause() {
-        return false;
-    }
-
-    @Override
-    public boolean canSeekBackward() {
-        return false;
-    }
-
-    @Override
-    public boolean canSeekForward() {
-        return false;
-    }
-
-    @Override
-    public int getAudioSessionId() {
-        return 0;
-    }
-
     public void init() {
         // start
         Log.i(TAG, "xPlayer.init() run in main thread. .........");
-        if(xPlayer != null){
-            xPlayer._init();
+        if(mMediaPlayer != null){
+            mMediaPlayer.initPlayer();
             Log.i(TAG, "after xPlayer.init()  .........");
         }
         // end
     }
 
+    public void setDataSource(String path) throws IOException{
+        mMediaPlayer.setDataSource(path);
+    }
+
     public void prepareAsync() throws IllegalStateException {
-        xPlayer.prepareAsync();
+        mMediaPlayer.prepareAsync();
     }
 
     /**
      * Start To Play
      * Change State into Buffering State.
      */
+    @Override
     public void start() throws IllegalStateException {
-        xPlayer.start();
+        try {
+            if (isInPlaybackState()) {
+                mMediaPlayer.start();
+                mCurrentState = STATE_PLAYING;
+            }
+            mTargetState = STATE_PLAYING;
+        } catch (Exception e) {
+
+        }
     }
 
     public void play(){
-        xPlayer.play();
+        mMediaPlayer.playInterface();
         // set GLSurfaceView.Render MODE
         setRenderMode(RENDERMODE_CONTINUOUSLY); // set render mode RENDERMODE_CONTINUOUSLY
     }
 
+    // =================set listener=======
+//    public void setOnPreparedListener(IMediaPlayer.OnPreparedListener listener) {
+//        mMediaPlayer.setOnPreparedListener(listener);
+//    }
+//
+//    public void setOnBufferingUpdateListener(IMediaPlayer.OnBufferingUpdateListener listener) {
+//        mMediaPlayer.setOnBufferingUpdateListener(listener);
+//    }
 
-    // set listener start
+
 
     @Override
-    public void setOnPreparedListener(IMediaPlayer.OnPreparedListener l) {
-        xPlayer.setOnPreparedListener(l);
+    protected void openVideo() {
+        if (mUri == null) {
+            // not ready for playback just yet, will try again later
+            return;
+        }
+        // we shouldn't clear the target state, because somebody might have
+        // called start() previously
+        //release(false);
+
+//        AudioManager am = (AudioManager) mAppContext.getSystemService(Context.AUDIO_SERVICE);
+//        am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+
+        try {
+
+            mMediaPlayer.setOnPreparedListener(mPreparedListener);
+            mMediaPlayer.setOnCompletionListener(mCompletionListener);
+            mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
+            mMediaPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
+            mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
+            mMediaPlayer.setOnErrorListener(mErrorListener);
+            mMediaPlayer.setOnInfoListener(mInfoListener);
+            mCurrentBufferPercentage = 0;
+            mDuration = -1;
+            mLastPositionOnCompletion = 0;
+            mMediaPlayer.setDataSource(mUri.toString());
+            //mMediaPlayer.setDisplay(mSurfaceHolder);
+//            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mMediaPlayer.setScreenOnWhilePlaying(true);
+            mMediaPlayer.prepareAsync();
+
+            // we don't set the target state here either, but preserve the
+            // target state that was there before.
+            mCurrentState = STATE_PREPARING;
+            attachMediaController();
+        } catch (IllegalArgumentException ex) {
+            Log.w(TAG, "Unable to open content: " + mUri, ex);
+            mCurrentState = STATE_ERROR;
+            mTargetState = STATE_ERROR;
+            mErrorListener.onError(mMediaPlayer, MediaConst.MEDIA_ERROR_OPEN_VIDEO_EXCEPTION, MediaConst.ERROR_EXTRA_ILLEGAL_ARG);
+            return;
+        } catch (IllegalStateException ex) {
+            Log.w(TAG, "Unable to open content: " + mUri, ex);
+            mCurrentState = STATE_ERROR;
+            mTargetState = STATE_ERROR;
+            mErrorListener.onError(mMediaPlayer, MediaConst.MEDIA_ERROR_OPEN_VIDEO_EXCEPTION, MediaConst.ERROR_EXTRA_ILLEGAL_STAT);
+            return;
+        } catch (SecurityException ex) {
+            Log.w(TAG, "Unable to open content: " + mUri, ex);
+            mCurrentState = STATE_ERROR;
+            mTargetState = STATE_ERROR;
+            mErrorListener.onError(mMediaPlayer, MediaConst.MEDIA_ERROR_OPEN_VIDEO_EXCEPTION, MediaConst.ERROR_EXTRA_SECURITY);
+            return;
+        }  catch (UnsatisfiedLinkError ex) {
+            Log.w(TAG, "Unable to open content: " + mUri, ex);
+            mCurrentState = STATE_ERROR;
+            mTargetState = STATE_ERROR;
+            mErrorListener.onError(mMediaPlayer, MediaConst.MEDIA_ERROR_OPEN_VIDEO_EXCEPTION, MediaConst.ERROR_EXTRA_UNSATISFIEDLINK);
+            return;
+        }  catch (Exception ex) {
+            Log.w(TAG, "Unable to open content: " + mUri, ex);
+            mCurrentState = STATE_ERROR;
+            mTargetState = STATE_ERROR;
+            mErrorListener.onError(mMediaPlayer, MediaConst.MEDIA_ERROR_OPEN_VIDEO_EXCEPTION, MediaConst.ERROR_EXTRA_EXCETPION);
+            return;
+        } finally {
+        }
+    }
+
+
+    private int isCalledPlay = 0;
+    protected IMediaPlayer.OnBufferingUpdateListener mBufferingUpdateListener =
+            new IMediaPlayer.OnBufferingUpdateListener() {
+                public void onBufferingUpdate(IMediaPlayer mp, int percent) {
+                    mCurrentBufferPercentage = percent;
+//                    if (mOnBufferingUpdateListener != null) {
+//                        mOnBufferingUpdateListener.onBufferingUpdate(mp,
+//                                percent);
+//                    }
+                    if((percent == 100) && (isCalledPlay == 0)){
+                        isCalledPlay = 1;
+                        play();
+                    }
+                }
+            };
+
+
+    @Override
+    protected boolean hasErrorWhenComplete() {
+        if (mMediaPlayer == null) {
+            return true;
+        }
+        boolean result = false;
+
+        boolean islive = false;
+        if (mMediaPlayer.getIsLiveVideo() == IMediaPlayer.MEDIA_VIDEO_PLAYER_LIVE) {
+            islive = true;
+        }
+
+        // 满足一下情况认为是错误的onComplete:
+        // 1.直播
+        // 2.普通视频没有播完
+        if (islive) {
+            result = true;
+        } else if (mDuration >= 0 && mLastPositionOnCompletion >= 0) {
+            if ((mDuration - mLastPositionOnCompletion) > ONCOMPLETE_RESTART_THRES) {
+                // 未播放完成
+                result = true;
+            }
+        }
+        Log.i(TAG, "hasErrorWhenComplete()=" + result + ", islive=" + islive + ", mLastPositionOnCompletion=" + mLastPositionOnCompletion + ", mDuration=" + mDuration);
+        return result;
     }
 
     @Override
-    public void setOnCompletionListener(IMediaPlayer.OnCompletionListener l) {
-        xPlayer.setOnCompletionListener(l);
+    public void setVideoRotation(int degree) {
+
+    }
+
+    /**
+     * 直播的判断  返回值0-非直播， 1-直播
+     * @return
+     * @throws IllegalStateException
+     */
+    @Override
+    public int getIsLiveVideo() throws IllegalStateException {
+        if(mMediaPlayer != null) {
+            return mMediaPlayer.getIsLiveVideo();
+        }
+        return IMediaPlayer.MEDIA_UNKNOW_STATUS;
+    }
+
+    /**
+     * 获取视频源的http请求信息（http_code, mime_type, content, url）
+     * @return
+     * @throws IllegalStateException
+     */
+    @Override
+    public String getHttpInfoStr() throws IllegalStateException {
+        if(mMediaPlayer != null) {
+            return mMediaPlayer.getHttpInfoStr();
+        }
+        return "";
     }
 
     @Override
-    public void setOnBufferingUpdateListener(IMediaPlayer.OnBufferingUpdateListener l) {
-        xPlayer.setOnBufferingUpdateListener(l);
+    public String getLibCompileTime() {
+        if(mMediaPlayer != null) {
+            return mMediaPlayer.getLibCompileTime();
+        }
+        return "";
     }
 
     @Override
-    public void setOnSeekCompleteListener(IMediaPlayer.OnSeekCompleteListener l) {
-
+    public Bitmap getCurrentFrame() {
+        if(mMediaPlayer != null) {
+            return mMediaPlayer.getCurrentFrame();
+        }
+        return null;
     }
 
-    @Override
-    public void setOnVideoSizeChangedListener(IMediaPlayer.OnVideoSizeChangedListener l) {
-
-    }
-
-    @Override
-    public void setOnErrorListener(IMediaPlayer.OnErrorListener l) {
-
-    }
-
-    @Override
-    public void setOnInfoListener(IMediaPlayer.OnInfoListener l) {
-
-    }
-    // set listener end
-
+    // =================set listener end=======
 }
