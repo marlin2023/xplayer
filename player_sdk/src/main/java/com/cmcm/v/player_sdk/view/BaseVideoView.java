@@ -194,6 +194,11 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
     }
 
     @Override
+    public View getView(){
+        return this;
+    }
+
+    @Override
     public int getVideoLayout() {
         return mVideoLayout;
     }
@@ -201,7 +206,7 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
     @Override
     public void setVideoLayout(int layout) {
         mVideoLayout = layout;
-        //requestLayout();
+        requestLayout();
     }
 
     public boolean isValid() {
@@ -225,8 +230,8 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
         mHeaders = headers;
         mSeekWhenPrepared = 0;
         openVideo();
-        //requestLayout();
-        //invalidate();
+        requestLayout();
+        invalidate();
     }
 
     @Override
@@ -318,19 +323,18 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                 seekTo(seekToPosition);
             }else{
                 if(!mHasFistrPic) {
-                    //TODO
-//                    if (BaseVideoView.this instanceof AndroidVideoSurfaceView) {
-//                        if (mOnInfoListener != null) {
-//                            mOnInfoListener.onInfo(mMediaPlayer, IMediaPlayer.MEDIA_INFO_FIRST_SHOW_PIC, 0);
-//                        }
-//                    }
+                    if (BaseVideoView.this instanceof VideoViewAndroid) {
+                        if (mOnInfoListener != null) {
+                            mOnInfoListener.onInfo(mMediaPlayer, IMediaPlayer.MEDIA_INFO_FIRST_SHOW_PIC, 0);
+                        }
+                    }
                     mHasFistrPic = true;
                 }
             }
 
             if (mVideoWidth != 0 && mVideoHeight != 0) {
                 setVideoLayout(mVideoLayout);
-//                getHolder().setFixedSize(mVideoWidth, mVideoHeight);
+                getHolder().setFixedSize(mVideoWidth, mVideoHeight);
                 if (mSurfaceWidth == mVideoWidth &&
                         mSurfaceHeight == mVideoHeight) {
                     // We didn't actually change the size (it was
@@ -362,16 +366,6 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
         }
     };
 
-//    protected IMediaPlayer.OnBufferingUpdateListener mBufferingUpdateListener =
-//            new IMediaPlayer.OnBufferingUpdateListener() {
-//                public void onBufferingUpdate(IMediaPlayer mp, int percent) {
-//                    mCurrentBufferPercentage = percent;
-//                    if (mOnBufferingUpdateListener != null) {
-//                        mOnBufferingUpdateListener.onBufferingUpdate(mp,
-//                                percent);
-//                    }
-//                }
-//            };
 
     protected IMediaPlayer.OnSeekCompleteListener mSeekCompleteListener =
             new IMediaPlayer.OnSeekCompleteListener() {
@@ -381,13 +375,13 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                     if(!mHasFistrPic) {
                         Log.d(TAG, "onSeekComplete 2");
                         //TODO:
-//                        if (BaseVideoView.this instanceof AndroidVideoSurfaceView) {
-//                            Log.d(TAG, "onSeekComplete 3");
-//                            if (mOnInfoListener != null) {
-//                                Log.d(TAG, "onSeekComplete 4");
-//                                mOnInfoListener.onInfo(mMediaPlayer, IMediaPlayer.MEDIA_INFO_FIRST_SHOW_PIC, 0);
-//                            }
-//                        }
+                        if (BaseVideoView.this instanceof VideoViewAndroid) {
+                            Log.d(TAG, "onSeekComplete 3");
+                            if (mOnInfoListener != null) {
+                                Log.d(TAG, "onSeekComplete 4");
+                                mOnInfoListener.onInfo(mMediaPlayer, IMediaPlayer.MEDIA_INFO_FIRST_SHOW_PIC, 0);
+                            }
+                        }
                         mHasFistrPic = true;
                     }
 
@@ -418,8 +412,8 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                     if (mVideoWidth != 0 && mVideoHeight != 0) {
                         setVideoLayout(mVideoLayout);
 
-//                        getHolder().setFixedSize(mVideoWidth, mVideoHeight);
-//                        requestLayout();
+                        getHolder().setFixedSize(mVideoWidth, mVideoHeight);
+                        requestLayout();
                     }
                 }
             };
@@ -558,17 +552,21 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
         }
     }
 
+    /**
+     * Start To Play
+     * Change State into Buffering State.
+     */
     @Override
-    public void start() {
-//        try {
-//            if (isInPlaybackState()) {
-//                mMediaPlayer.start();
-//                mCurrentState = STATE_PLAYING;
-//            }
-//            mTargetState = STATE_PLAYING;
-//        } catch (Exception e) {
-//
-//        }
+    public void start() throws IllegalStateException {
+        try {
+            if (isInPlaybackState()) {
+                mMediaPlayer.start();
+                mCurrentState = STATE_PLAYING;
+            }
+            mTargetState = STATE_PLAYING;
+        } catch (Exception e) {
+
+        }
     }
 
     @Override

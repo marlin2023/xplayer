@@ -41,11 +41,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         initView();
     }
 
-    @Override
-    public View getView(){
-        return this;
-    }
-
     protected void initView(){
         Log.i(TAG, "VideoSurfaceView Construct...");
 
@@ -129,22 +124,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         mMediaPlayer.prepareAsync();
     }
 
-    /**
-     * Start To Play
-     * Change State into Buffering State.
-     */
-    @Override
-    public void start() throws IllegalStateException {
-        try {
-            if (isInPlaybackState()) {
-                mMediaPlayer.start();
-                mCurrentState = STATE_PLAYING;
-            }
-            mTargetState = STATE_PLAYING;
-        } catch (Exception e) {
-
-        }
-    }
 
     public void play(){
         mMediaPlayer.playInterface();

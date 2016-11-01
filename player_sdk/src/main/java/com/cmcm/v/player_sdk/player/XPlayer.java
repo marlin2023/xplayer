@@ -1,12 +1,10 @@
 package com.cmcm.v.player_sdk.player;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import java.lang.ref.WeakReference;
@@ -22,7 +20,7 @@ import java.lang.ref.WeakReference;
  *      postEventFromNative(): 传递来自Native的事件
  *      // MediaPlayer postEventFromNative
  */
-public class XPlayer implements IMediaPlayer {
+public class XPlayer extends SimpleMediaPlayer {
 
     public static String TAG = "XPlayer";
 
@@ -31,21 +29,6 @@ public class XPlayer implements IMediaPlayer {
      * Event Handle for event from native.
      */
     EventHandler mEventHandler;
-
-    /**
-     * OnPreparedListener for XPlayer
-     */
-    private IMediaPlayer.OnPreparedListener mOnPreparedListener;
-
-    /**
-     * OnBufferingUpdateListener for XPlayer
-     */
-    private IMediaPlayer.OnBufferingUpdateListener mOnBufferingUpdateListener;
-
-    /**
-     * OnCompletionListener for XPlayer
-     */
-    private IMediaPlayer.OnCompletionListener mOnCompletionListener;
 
     static {
         try {
@@ -71,10 +54,6 @@ public class XPlayer implements IMediaPlayer {
             mEventHandler = null;
         }
 
-        mOnPreparedListener = null;
-
-
-        //native_setup();
         _native_setup(new WeakReference<XPlayer>(this));
     }
 
@@ -167,100 +146,12 @@ public class XPlayer implements IMediaPlayer {
 
     }
 
-//    @Override
-//    public int getAudioSessionId() {
-//        return 0;
-//    }
-
-    @Override
-    public void setLogEnabled(boolean enable) {
-
-    }
 
     @Override
     public boolean isPlayable() {
         return false;
     }
 
-    @Override
-    public void setOnPreparedListener(OnPreparedListener listener) {
-        mOnPreparedListener = listener;
-    }
-
-    @Override
-    public void setOnCompletionListener(OnCompletionListener listener) {
-        mOnCompletionListener = listener;
-    }
-
-    @Override
-    public void setOnBufferingUpdateListener(OnBufferingUpdateListener listener) {
-        mOnBufferingUpdateListener = listener;
-    }
-
-    @Override
-    public void setOnSeekCompleteListener(OnSeekCompleteListener listener) {
-
-    }
-
-    @Override
-    public void setOnVideoSizeChangedListener(OnVideoSizeChangedListener listener) {
-
-    }
-
-    @Override
-    public void setOnErrorListener(OnErrorListener listener) {
-
-    }
-
-    @Override
-    public void setOnInfoListener(OnInfoListener listener) {
-
-    }
-
-    @Override
-    public void resetListeners() {
-
-    }
-
-    @Override
-    public void setAudioStreamType(int streamtype) {
-
-    }
-
-//    @Override
-//    public void setKeepInBackground(boolean keepInBackground) {
-//
-//    }
-
-    @Override
-    public int getVideoSarNum() {
-        return 0;
-    }
-
-    @Override
-    public int getVideoSarDen() {
-        return 0;
-    }
-
-    @Override
-    public void setWakeMode(Context context, int mode) {
-
-    }
-
-    @Override
-    public void setSurface(Surface surface) {
-
-    }
-
-//    @Override
-//    public void setLooping(boolean looping) {
-//
-//    }
-//
-//    @Override
-//    public boolean isLooping() {
-//        return false;
-//    }
 
     @Override
     public int getIsLiveVideo() throws IllegalStateException {
