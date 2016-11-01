@@ -296,10 +296,12 @@ public class XPlayer implements IMediaPlayer{
 
     private static final int MEDIA_NOP = 0; // interface test message
     private static final int MEDIA_PREPARED = 1;
-    private static final int MEDIA_PLAYBACK_COMPLETE = 2;
+
     private static final int MEDIA_BUFFERING_UPDATE = 3;
     private static final int MEDIA_SEEK_COMPLETE = 4;
     private static final int MEDIA_SET_VIDEO_SIZE = 5;
+    private static final int MEDIA_END_OF_FILE = 6;
+    private static final int MEDIA_PLAYBACK_COMPLETE = 7;
     private static final int MEDIA_ERROR = 100;
     private static final int MEDIA_INFO = 200;
 
@@ -337,6 +339,7 @@ public class XPlayer implements IMediaPlayer{
                     return;
 
                 case MEDIA_PLAYBACK_COMPLETE:
+                    Log.e(TAG ,"====>on ...MEDIA_PLAYBACK_COMPLETE");
 //                    if (mOnCompletionListener != null)
 //                        mOnCompletionListener.onCompletion(mMediaPlayer);
 //                    stayAwake(false);

@@ -70,14 +70,18 @@ typedef enum av_support_type_e_
 typedef enum listen_event_type_e_
 {
     MEDIA_NOP               = 0, // interface test message
-    MEDIA_PREPARED          = 1,
+    MEDIA_PREPARED          = 1,        // Prepared
 
-    MEDIA_PLAYBACK_COMPLETE = 2,
-    MEDIA_BUFFERING_UPDATE  = 3,
+
+    MEDIA_BUFFERING_UPDATE  = 3,        // BUFFERING
 
     MEDIA_SEEK_COMPLETE     = 4,
     MEDIA_SET_VIDEO_SIZE    = 5,
-    MEDIA_ERROR             = 100,
+
+    MEDIA_END_OF_FILE       = 6,        // END_OF_FILE
+    MEDIA_PLAYBACK_COMPLETE = 7,        // PLAYBACK_COMPLETED
+
+    MEDIA_ERROR             = 100,      // FAILED
     MEDIA_INFO              = 200,
 } listen_event_type_e;
 

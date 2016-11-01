@@ -30,9 +30,9 @@ PacketQueue::~PacketQueue()
 
 int PacketQueue::size()
 {
-    pthread_mutex_lock(&mutex);
+    //pthread_mutex_lock(&mutex);
     int nb_pkt = nb_packets;
-    pthread_mutex_unlock(&mutex);
+    //pthread_mutex_unlock(&mutex);
 
     return nb_pkt;
 }

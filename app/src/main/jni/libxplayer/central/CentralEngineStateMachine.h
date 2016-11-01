@@ -107,6 +107,17 @@ private:
     void central_engine_do_process_playing(player_event_e evt);
 
     /**
+     * demux file end  state processing work
+     */
+    void central_engine_do_process_play_file_end(player_event_e evt);
+
+    /**
+     * play complete state processing work.
+     */
+    void central_engine_do_process_play_complete(player_event_e evt);
+
+
+    /**
      * av_read_frame- retry count
      */
     int read_retry_count;

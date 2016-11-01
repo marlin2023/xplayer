@@ -132,9 +132,9 @@ int FrameQueue::get(AVFrame *frame)
 
 int FrameQueue::size()
 {
-    pthread_mutex_lock(&mutex);
+    //pthread_mutex_lock(&mutex);
     int nb_frame = node_count;
-    pthread_mutex_unlock(&mutex);
+    //pthread_mutex_unlock(&mutex);
 
     return nb_frame;
 }

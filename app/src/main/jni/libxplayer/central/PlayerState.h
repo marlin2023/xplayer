@@ -19,6 +19,7 @@ typedef enum _player_state_e_
     STATE_PLAY_PLAYING,
     STATE_PLAY_PAUSED,
     STATE_PLAY_COMPLETE,
+    STATE_PLAY_FILE_END ,
     STATE_STOPPED,
 
     /* state below is used for decoding state machine*/

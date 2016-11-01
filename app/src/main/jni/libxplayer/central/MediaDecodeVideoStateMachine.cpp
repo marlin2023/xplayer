@@ -169,6 +169,15 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
 
             return;
         }
+        case EVT_STOP:
+        {
+
+            this->state_machine_change_state(STATE_DECODER_START);  // change state.
+
+            // TODO set mark
+
+            return;
+        }
         default:
         {
             return;

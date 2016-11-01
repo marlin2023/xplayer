@@ -84,6 +84,14 @@ Such as Video Decoder State Machine has state :
     -- Notify GLSurfaceView Render Thread to change render mode from  RENDERMODE_WHEN_DIRTY to RENDERMODE_CONTINUOUSLY.
 
 -
+-
+- Demux Thread change state from PLAYING to PLAY_END_OF_FILE .
+        - this time the audio_packet_q video_packet_q audio_frame_q video_frame_q may be not null ,what should I do Under this condition.
+
+
+
+
+
 
 
 

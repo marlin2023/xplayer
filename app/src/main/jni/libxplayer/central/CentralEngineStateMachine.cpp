@@ -169,12 +169,18 @@ void CentralEngineStateMachine::central_engine_state_machine_process_event(playe
             central_engine_do_process_play_wait(evt);
             return;
         }
-
         case STATE_PLAY_PLAYING:
         {
             central_engine_do_process_playing(evt);
             return;
         }
+
+        case STATE_PLAY_FILE_END:
+        {
+            central_engine_do_process_play_file_end(evt);
+            return;
+        }
+
         case STATE_PLAY_PAUSED:
         {
             //el_demux_file_do_process_playing(evt);
@@ -182,7 +188,8 @@ void CentralEngineStateMachine::central_engine_state_machine_process_event(playe
         }
         case STATE_PLAY_COMPLETE:
         {
-            //el_demux_file_do_process_play_file_end(evt);
+            central_engine_do_process_play_complete(evt);
+            //el_demux_file_do_process_play_complete(evt);
             return;
         }
         case STATE_STOPPED:
@@ -360,6 +367,12 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
                         mediaFileHandle->video_queue->size(),
                         mediaFileHandle->audio_queue->size());
 
+                //is_file_eof = EL_TRUE;
+                // TODO
+                this->state_machine_change_state(STATE_PLAY_FILE_END);
+                // send message
+                this->message_queue->push(EVT_GO_ON);
+                //
                 return;
             }
 
@@ -385,6 +398,45 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
 
             //
             this->message_queue->push(EVT_GO_ON);
+            return;
+        }
+    }
+    return;
+
+}
+
+void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_GO_ON:
+        {
+            // notify TODO
+            if( (mediaFileHandle->video_queue->size() == 0) &&
+                (mediaFileHandle->audio_queue->size() == 0) &&
+                (mediaFileHandle->video_frame_queue->size() == 0) &&
+                (mediaFileHandle->audio_frame_queue->size() == 0)){
+
+                XLog::e(TAG ,"====>state_machine: notify eof and should quit ...\n");
+                this->mediaFileHandle->notify(MEDIA_PLAYBACK_COMPLETE ,0 ,0);
+            }else{
+                usleep(50000);
+                this->message_queue->push(EVT_GO_ON);
+            }
+            return;
+        }
+    }
+    return;
+
+}
+
+void CentralEngineStateMachine::central_engine_do_process_play_complete(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_GO_ON:
+        {
+
             return;
         }
     }
