@@ -54,7 +54,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         // bind the render to the surfaceivew
         setRenderer(this);
         setRenderMode(RENDERMODE_WHEN_DIRTY);           // set render mode
-        setZOrderOnTop(true);
+//        setZOrderOnTop(true);
         Log.i(TAG, "VideoSurfaceView Construct ok...");
     }
 

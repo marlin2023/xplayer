@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.widget.MediaController;
@@ -323,11 +324,11 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                 seekTo(seekToPosition);
             }else{
                 if(!mHasFistrPic) {
-                    if (BaseVideoView.this instanceof VideoViewAndroid) {
+                    //if (BaseVideoView.this instanceof VideoViewAndroid) {
                         if (mOnInfoListener != null) {
                             mOnInfoListener.onInfo(mMediaPlayer, IMediaPlayer.MEDIA_INFO_FIRST_SHOW_PIC, 0);
                         }
-                    }
+                    //}
                     mHasFistrPic = true;
                 }
             }
@@ -375,13 +376,13 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                     if(!mHasFistrPic) {
                         Log.d(TAG, "onSeekComplete 2");
                         //TODO:
-                        if (BaseVideoView.this instanceof VideoViewAndroid) {
+                        //if (BaseVideoView.this instanceof VideoViewAndroid) {
                             Log.d(TAG, "onSeekComplete 3");
                             if (mOnInfoListener != null) {
                                 Log.d(TAG, "onSeekComplete 4");
                                 mOnInfoListener.onInfo(mMediaPlayer, IMediaPlayer.MEDIA_INFO_FIRST_SHOW_PIC, 0);
                             }
-                        }
+                        //}
                         mHasFistrPic = true;
                     }
 
@@ -633,6 +634,15 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                 mCurrentState != STATE_ERROR &&
                 mCurrentState != STATE_IDLE &&
                 mCurrentState != STATE_PREPARING);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent ev) {
+        if (isInPlaybackState() && mMediaController != null) {
+            toggleMediaControlsVisibility();
+        }
+
+        return false;
     }
 
     @Override
