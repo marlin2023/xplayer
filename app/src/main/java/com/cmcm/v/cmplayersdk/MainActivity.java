@@ -1,9 +1,13 @@
 package com.cmcm.v.cmplayersdk;
 
+import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
+
+import com.cmcm.v.player_sdk.player.IMediaPlayer;
+import com.cmcm.v.player_sdk.view.VideoSurfaceView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
         surfaceView.setOnCompletionListener(mOnCompletionListener);
 
         surfaceView.init(); //will not create opengl program.
-        surfaceView.setDataSource("/sdcard/hh.mp4");
+        surfaceView.setVideoPath("/sdcard/hh.mp4");
         surfaceView.prepareAsync();
 
     }

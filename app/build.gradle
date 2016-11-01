@@ -11,13 +11,13 @@ android {
         versionCode 1
         versionName "1.0"
 
-        externalNativeBuild {
-            ndkBuild {
-                arguments "NDK_APPLICATION_MK:=src/main/jni/Application.mk"
-
-                abiFilters "armeabi-v7a"
-            }
-        }
+//        externalNativeBuild {
+//            ndkBuild {
+//                arguments "NDK_APPLICATION_MK:=src/main/jni/Application.mk"
+//
+//                abiFilters "armeabi-v7a"
+//            }
+//        }
     }
 
     buildTypes {
@@ -30,12 +30,12 @@ android {
         }
     }
 
-    // path used to specify the Android.mk file.
-    externalNativeBuild {
-        ndkBuild {
-            path 'src/main/jni/libxplayer/Android.mk'
-        }
-    }
+//    // path used to specify the Android.mk file.
+//    externalNativeBuild {
+//        ndkBuild {
+//            path 'src/main/jni/libxplayer/Android.mk'
+//        }
+//    }
 }
 
 dependencies {
@@ -43,4 +43,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.4.0'
     compile 'org.greenrobot:eventbus:3.0.0'
+    compile project(':player_sdk')
 }

@@ -1,0 +1,6 @@
+/third-party/build
+*.[d]
+*.pc
+.config
+*.version
+*config.*
