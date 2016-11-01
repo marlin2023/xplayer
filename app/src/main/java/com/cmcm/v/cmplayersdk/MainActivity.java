@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
 import com.cmcm.v.player_sdk.player.IMediaPlayer;
@@ -23,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
 
         isCalledPlay = 0;   // TODO
         // 取得LinearLayout 物件
-        LinearLayout ll = (LinearLayout)findViewById(R.id.viewObj);
+        FrameLayout ll = (FrameLayout)findViewById(R.id.viewObj);
 
         surfaceView = new VideoSurfaceView(this, null);
         ll.addView(surfaceView);

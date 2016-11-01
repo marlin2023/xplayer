@@ -159,6 +159,22 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
 
             return;
         }
+        case EVT_PAUSE:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"decoder:mac = %d,audio decode paused!\n");
+            this->state_machine_change_state(STATE_DECODER_WAIT);
+
+            //el_state_machine_change_state(mac,EL_ENGINE_DECODE_STATE_WAIT);
+            return;
+        }
+
+        case EVT_STOP:
+        {
+            this->state_machine_change_state(STATE_DECODER_START);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>decoder:decode stoped!\n");
+            return;
+        }
+
         default:
         {
             return;

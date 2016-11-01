@@ -15,12 +15,12 @@ typedef enum _player_state_e_
     STATE_INITIALIZED ,
     STATE_PREPARED ,
     STATE_BUFFERING,
-    STATE_PLAY_WAIT,    // Buffering End then go into PLAY_WAIT.
+    STATE_PLAY_WAIT,                // Buffering End then go into PLAY_WAIT.
     STATE_PLAY_PLAYING,
     STATE_PLAY_PAUSED,
-    STATE_PLAY_COMPLETE,
     STATE_PLAY_FILE_END ,
-    STATE_STOPPED,
+    STATE_PLAY_COMPLETE,
+    STATE_STOPPED,                  // STOPPED
 
     /* state below is used for decoding state machine*/
     STATE_DECODER_START,

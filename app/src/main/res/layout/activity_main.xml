@@ -9,11 +9,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.cmcm.v.cmplayersdk.MainActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:id="@+id/viewObj"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        />
+        android:layout_alignParentTop="true"/>
 
 </RelativeLayout>
