@@ -146,6 +146,10 @@ public class VideoSurfaceView extends GLSurfaceView implements GLSurfaceView.Ren
         xPlayer.setOnBufferingUpdateListener(listener);
     }
 
+    public void setOnCompletionListener(IMediaPlayer.OnCompletionListener listener) {
+        xPlayer.setOnCompletionListener(listener);
+    }
+
 
     // =================set listener end=======
 }

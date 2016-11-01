@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
 
         surfaceView.setOnPreparedListener(mOnPreparedListener);
         surfaceView.setOnBufferingUpdateListener(mOnBufferingUpdateListener);
+        surfaceView.setOnCompletionListener(mOnCompletionListener);
 
         surfaceView.init(); //will not create opengl program.
         surfaceView.setDataSource("/sdcard/hh.mp4");
@@ -60,7 +61,15 @@ public class MainActivity extends AppCompatActivity {
                 }
             };
 
+    private IMediaPlayer.OnCompletionListener mOnCompletionListener =
+            new IMediaPlayer.OnCompletionListener(){
 
+                @Override
+                public void onCompletion(IMediaPlayer mp) {
+                    // TODO
+
+                }
+            };
 
 }
 

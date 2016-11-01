@@ -42,6 +42,10 @@ public class XPlayer implements IMediaPlayer{
      */
     private IMediaPlayer.OnBufferingUpdateListener mOnBufferingUpdateListener;
 
+    /**
+     * OnCompletionListener for XPlayer
+     */
+    private IMediaPlayer.OnCompletionListener mOnCompletionListener;
 
     static {
         try {
@@ -185,7 +189,7 @@ public class XPlayer implements IMediaPlayer{
 
     @Override
     public void setOnCompletionListener(OnCompletionListener listener) {
-
+        mOnCompletionListener = listener;
     }
 
     @Override
@@ -340,9 +344,9 @@ public class XPlayer implements IMediaPlayer{
 
                 case MEDIA_PLAYBACK_COMPLETE:
                     Log.e(TAG ,"====>on ...MEDIA_PLAYBACK_COMPLETE");
-//                    if (mOnCompletionListener != null)
-//                        mOnCompletionListener.onCompletion(mMediaPlayer);
-//                    stayAwake(false);
+                    if (mOnCompletionListener != null){
+                        mOnCompletionListener.onCompletion(mMediaPlayer);
+                    }
                     return;
 
                 case MEDIA_SEEK_COMPLETE:
