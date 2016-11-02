@@ -116,6 +116,10 @@ private:
      */
     void central_engine_do_process_play_complete(player_event_e evt);
 
+    /**
+     * play paused state processing work.
+     */
+    void central_engine_do_process_play_paused(player_event_e evt);
 
     /**
      * av_read_frame- retry count

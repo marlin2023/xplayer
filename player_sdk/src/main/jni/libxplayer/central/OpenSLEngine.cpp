@@ -83,6 +83,7 @@ void OpenSLEngine::play()
     }
     XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in play function start===============>\n");
     SLresult result;
+    m_paused = false;
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);   // start play.
     assert(SL_RESULT_SUCCESS == result);
     XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in play function end===============>\n");

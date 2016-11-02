@@ -229,6 +229,34 @@ static void native_play(JNIEnv *env, jobject thiz)
 
 }
 
+static void native_pause(JNIEnv *env, jobject thiz)
+{
+    // playerInner->player_engine_prepare();
+    // playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_START);
+
+    // audio opensl es
+    playerInner->audioRender->pause();
+
+    // process state
+    playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_PAUSE);
+    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_PAUSE);
+    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_PAUSE);
+
+}
+
+static void native_resume(JNIEnv *env, jobject thiz)
+{
+    // audio opensl es
+    playerInner->audioRender->resume();
+
+    // process state
+    playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_RESUME);
+    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_RESUME);
+    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_RESUME);
+
+}
+
+
 static void native_renderFrame(JNIEnv *env, jobject thiz)
 {
 
@@ -252,6 +280,8 @@ static JNINativeMethod methods[] =
 
     {"_start",           "()V",                                      (void*)native_start},
     {"_play",            "()V",                                      (void*)native_play},
+    {"_pause",            "()V",                                      (void*)native_pause},
+    {"_resume",            "()V",                                      (void*)native_resume},
 
     {"_renderFrame",     "()V",                                      (void*)native_renderFrame},  // render frame.
 

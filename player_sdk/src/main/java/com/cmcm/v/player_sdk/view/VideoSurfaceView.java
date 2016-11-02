@@ -128,15 +128,21 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         setRenderMode(RENDERMODE_CONTINUOUSLY); // set render mode RENDERMODE_CONTINUOUSLY
     }
 
-    // =================set listener=======
-//    public void setOnPreparedListener(IMediaPlayer.OnPreparedListener listener) {
-//        mMediaPlayer.setOnPreparedListener(listener);
-//    }
-//
-//    public void setOnBufferingUpdateListener(IMediaPlayer.OnBufferingUpdateListener listener) {
-//        mMediaPlayer.setOnBufferingUpdateListener(listener);
-//    }
+    @Override
+    public void pause() {
+        try {
+            if (isInPlaybackState()) {
+                if (mMediaPlayer.isPlaying()) {
+                    setRenderMode(RENDERMODE_WHEN_DIRTY); // set render mode RENDERMODE_WHEN_DIRTY
+                    mMediaPlayer.pause();
+                    mCurrentState = STATE_PAUSED;
+                }
+            }
+            mTargetState = STATE_PAUSED;
+        } catch (Exception e) {
 
+        }
+    }
 
 
     @Override

@@ -18,8 +18,9 @@ typedef enum _player_event_e_
     EVT_OPEN ,
     EVT_CLOSE,
     EVT_START,
+    EVT_PLAY ,                  // play
     EVT_PAUSE,
-    EVT_PLAY ,
+    EVT_RESUME ,                  // resume after pause
     EVT_SEEK_PAUSE,
     EVT_SEEK,
     EVT_READY_TO_SEEK,

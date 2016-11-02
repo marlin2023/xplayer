@@ -56,6 +56,11 @@ public :
 private:
 
     /**
+     * decode wait state processing work
+     */
+    void do_process_audio_decode_wait(player_event_e evt);
+
+    /**
      * decode start state processing work
      */
     void do_process_audio_decode_start(player_event_e evt);

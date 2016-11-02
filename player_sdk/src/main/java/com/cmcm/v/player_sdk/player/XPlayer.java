@@ -131,8 +131,13 @@ public class XPlayer extends SimpleMediaPlayer {
 
     @Override
     public void pause() throws IllegalStateException {
-
+        _pause();
     }
+
+    private native void _pause() throws IllegalStateException;
+
+    private native void _resume();
+
 
     @Override
     public void setScreenOnWhilePlaying(boolean screenOn) {
@@ -143,6 +148,8 @@ public class XPlayer extends SimpleMediaPlayer {
     public boolean isPlaying() {
         return false;
     }
+
+
 
     @Override
     public void seekTo(long msec) throws IllegalStateException {
@@ -158,6 +165,7 @@ public class XPlayer extends SimpleMediaPlayer {
     public long getDuration() {
         return 0;
     }
+
 
     @Override
     public void release() {
@@ -226,7 +234,7 @@ public class XPlayer extends SimpleMediaPlayer {
         }
         if (mp.mEventHandler != null)
         {
-            //Log.e(TAG ,"===>in postEventFromNative 2.what =" +what + ",arg1="+ arg1);
+            Log.e(TAG ,"===>in postEventFromNative 2.what =" +what + ",arg1="+ arg1);
             Message m = mp.mEventHandler.obtainMessage(what, arg1, arg2, obj);
             mp.mEventHandler.sendMessage(m);
         }

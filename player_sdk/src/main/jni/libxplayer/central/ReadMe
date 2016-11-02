@@ -88,6 +88,13 @@ Such as Video Decoder State Machine has state :
 - Demux Thread change state from PLAYING to PLAY_END_OF_FILE .
         - this time the audio_packet_q video_packet_q audio_frame_q video_frame_q may be not null ,what should I do Under this condition.
 
+-
+-
+- Pause().
+    - GLSurfaceView setRenderMode(RENDERMODE_WHEN_DIRTY)
+    - opensl es audio engine SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PAUSED)
+    -
+    - audio & video decoder change_state(DECODE_STATE_WAIT) ,not decode media data.
 
 
 

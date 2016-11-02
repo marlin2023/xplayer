@@ -89,12 +89,16 @@ void * MediaDecodeAudioStateMachine::audio_decode_thread()
     }
 }
 
-// TODO
+// central engine
 void MediaDecodeAudioStateMachine::audio_decode_state_machine_process_event(player_event_e evt)
 {
     switch(this->state)
     {
-
+        case STATE_DECODER_WAIT:
+        {
+            do_process_audio_decode_wait(evt);
+            return;
+        }
         case STATE_DECODER_START:
         {
             do_process_audio_decode_start(evt);
@@ -105,6 +109,7 @@ void MediaDecodeAudioStateMachine::audio_decode_state_machine_process_event(play
             do_process_audio_decode_work(evt);
             return;
         }
+
         default:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeAudioStateMachine Invalid state!\n");
@@ -112,6 +117,38 @@ void MediaDecodeAudioStateMachine::audio_decode_state_machine_process_event(play
         }
     }
 }
+
+void MediaDecodeAudioStateMachine::do_process_audio_decode_wait(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_STOP_DECODE_WAIT:
+        {
+            return;
+        }
+        case EVT_PLAY:
+        {
+            return;
+        }
+
+        case EVT_RESUME:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeAudioStateMachine thread recv resume evt!!\n");
+            this->state_machine_change_state(STATE_DECODER_WORK);
+
+            // step into decode loop logic, to make it loops, we send message selfly
+            this->message_queue->push(EVT_DECODE_GO_ON);
+            return;
+        }
+
+        default:
+        {
+            return;
+        }
+    }
+
+}
+
 
 void MediaDecodeAudioStateMachine::do_process_audio_decode_start(player_event_e evt)
 {
@@ -164,7 +201,6 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
             XLog::d(ANDROID_LOG_INFO ,TAG ,"decoder:mac = %d,audio decode paused!\n");
             this->state_machine_change_state(STATE_DECODER_WAIT);
 
-            //el_state_machine_change_state(mac,EL_ENGINE_DECODE_STATE_WAIT);
             return;
         }
 

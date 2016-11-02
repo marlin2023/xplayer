@@ -99,11 +99,16 @@ void * MediaDecodeVideoStateMachine::video_decode_thread(MediaFile *mediaFile)
 
 }
 
-// TODO
+// central engine .
 void MediaDecodeVideoStateMachine::video_decode_state_machine_process_event(player_event_e evt)
 {
     switch(this->state)
     {
+        case STATE_DECODER_WAIT:
+        {
+            do_process_video_decode_wait(evt);
+            return;
+        }
 
         case STATE_DECODER_START:
         {
@@ -121,6 +126,37 @@ void MediaDecodeVideoStateMachine::video_decode_state_machine_process_event(play
             return;
         }
     }
+}
+
+void MediaDecodeVideoStateMachine::do_process_video_decode_wait(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_STOP_DECODE_WAIT:
+        {
+            return;
+        }
+        case EVT_PLAY:
+        {
+            return;
+        }
+
+        case EVT_RESUME:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread recv resume evt!!\n");
+            this->state_machine_change_state(STATE_DECODER_WORK);
+
+            // step into decode loop logic, to make it loops, we send message selfly
+            this->message_queue->push(EVT_DECODE_GO_ON);
+            return;
+        }
+
+        default:
+        {
+            return;
+        }
+    }
+
 }
 
 void MediaDecodeVideoStateMachine::do_process_video_decode_start(player_event_e evt)
@@ -169,6 +205,15 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
 
             return;
         }
+
+        case EVT_PAUSE:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"decoder:mac = %d,video decode paused!\n");
+            this->state_machine_change_state(STATE_DECODER_WAIT);
+
+            return;
+        }
+
         case EVT_STOP:
         {
 

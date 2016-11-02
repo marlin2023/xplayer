@@ -17,7 +17,7 @@ typedef enum _player_state_e_
     STATE_BUFFERING,
     STATE_PLAY_WAIT,                // Buffering End then go into PLAY_WAIT.
     STATE_PLAY_PLAYING,
-    STATE_PLAY_PAUSED,
+    STATE_PLAY_PAUSED,              // puased
     STATE_PLAY_FILE_END ,
     STATE_PLAY_COMPLETE,
     STATE_STOPPED,                  // STOPPED

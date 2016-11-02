@@ -183,7 +183,7 @@ void CentralEngineStateMachine::central_engine_state_machine_process_event(playe
 
         case STATE_PLAY_PAUSED:
         {
-            //el_demux_file_do_process_playing(evt);
+            central_engine_do_process_play_paused(evt);
             return;
         }
         case STATE_PLAY_COMPLETE:
@@ -408,6 +408,17 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
             this->message_queue->push(EVT_GO_ON);
             return;
         }
+        case EVT_PAUSE:
+        {
+            this->state_machine_change_state(STATE_PLAY_PAUSED);
+            return;
+        }
+        default:
+        {
+            return;
+        }
+
+
     }
     return;
 
@@ -433,6 +444,13 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
                 usleep(50000);
                 this->message_queue->push(EVT_GO_ON);
             }
+            return;
+        }
+
+        case EVT_PAUSE:
+        {
+            XLog::e(TAG ,"====>state_machine: pause in play file end ...\n");
+            this->state_machine_change_state(STATE_PLAY_PAUSED);
             return;
         }
     }
@@ -467,3 +485,34 @@ void CentralEngineStateMachine::central_engine_do_process_play_complete(player_e
     return;
 
 }
+
+void CentralEngineStateMachine::central_engine_do_process_play_paused(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_RESUME:
+        {
+            this->state_machine_change_state(STATE_PLAY_PLAYING);
+            // send read next packet message
+            this->message_queue->push(EVT_GO_ON);
+            return;
+        }
+        case EVT_STOP:
+        {
+            // do stop actions
+            //el_do_stop_central_engine();
+            this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_STOP);
+            this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_STOP);
+            //
+            //q_all_destruction(EL_VOID)
+            //
+            this->state_machine_change_state(STATE_STOPPED);
+
+            return;
+        }
+
+    }
+    return;
+
+}
+
