@@ -175,11 +175,18 @@ CM_BOOL MediaFile::open()
         }
     }
 
+
     XLog::d(ANDROID_LOG_INFO ,TAG ," ==> after open_decoder, stream_index[video] = %d,stream_index[audio] =%d ,av_support =%d\n",
         stream_index[AVMEDIA_TYPE_VIDEO],
         stream_index[AVMEDIA_TYPE_AUDIO],
         av_support);
 
+    if(this->video_stream  && this->video_stream->codecpar){
+        AVCodecParameters *codecpar = this->video_stream->codecpar;
+        // notify
+        //this->notify(MEDIA_SET_VIDEO_SIZE ,codecpar->width, codecpar->height);
+        //this->notify(MEDIA_SET_VIDEO_SAR ,codecpar->sample_aspect_ratio.num, codecpar->sample_aspect_ratio.den);
+    }
 
     if(!av_support)
     {
@@ -354,7 +361,7 @@ is_full:
 
 is_not_full:
 
-    //XLog::d(ANDROID_LOG_WARN ,TAG  ,"buffering is not full, buffering_percent = %f%%, max_buffer_ts = %lld", buffering_percent * 100, max_buffer_ts);
+    XLog::d(ANDROID_LOG_WARN ,TAG  ,"buffering is not full, buffering_percent = %f%%, max_buffer_ts = %lld", buffering_percent * 100, max_buffer_ts);
     // TODO notify buffering percent to upper layer.
     if((int)(buffering_percent* 100) == 100){
         buffering_percent = 99;

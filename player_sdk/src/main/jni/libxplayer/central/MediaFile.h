@@ -71,7 +71,7 @@ typedef enum listen_event_type_e_
 {
     MEDIA_NOP               = 0, // interface test message
     MEDIA_PREPARED          = 1,        // Prepared
-
+    MEDIA_PLAYBACK_COMPLETE = 2,        // PLAYBACK_COMPLETED
 
     MEDIA_BUFFERING_UPDATE  = 3,        // BUFFERING
 
@@ -79,10 +79,12 @@ typedef enum listen_event_type_e_
     MEDIA_SET_VIDEO_SIZE    = 5,
 
     MEDIA_END_OF_FILE       = 6,        // END_OF_FILE
-    MEDIA_PLAYBACK_COMPLETE = 7,        // PLAYBACK_COMPLETED
+
 
     MEDIA_ERROR             = 100,      // FAILED
     MEDIA_INFO              = 200,
+
+    MEDIA_SET_VIDEO_SAR     = 10001,    // arg1 = sar.num, arg2 = sar.den
 } listen_event_type_e;
 
 

@@ -219,6 +219,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 //                    }
                     if((percent == 100) && (isCalledPlay == 0)){
                         isCalledPlay = 1;
+                        Log.i("chris" ,"=====>call play function ");
                         play();
                     }
                 }

@@ -24,6 +24,23 @@ public class XPlayer extends SimpleMediaPlayer {
 
     public static String TAG = "XPlayer";
 
+    // video width
+    private int mVideoWidth;
+
+    // video height
+    private int mVideoHeight;
+
+    /**
+     * sample aspect ratio (sar)
+     * That is the width of a pixel divided by the height of the pixel.
+     * Numerator(num) and denominator(den) must be relatively prime and
+     * smaller than 256 for some video standards. 0 stands for unknown.
+     * The numerator and denominator will be obtained during opening the
+     * video stream.
+     */
+    private int mVideoSarNum;
+    private int mVideoSarDen;
+
 
     /**
      * Event Handle for event from native.
@@ -55,6 +72,27 @@ public class XPlayer extends SimpleMediaPlayer {
         }
 
         _native_setup(new WeakReference<XPlayer>(this));
+    }
+
+
+    @Override
+    public int getVideoWidth() {
+        return mVideoWidth;
+    }
+
+    @Override
+    public int getVideoHeight() {
+        return mVideoHeight;
+    }
+
+    @Override
+    public int getVideoSarNum() {
+        return mVideoSarNum;
+    }
+
+    @Override
+    public int getVideoSarDen() {
+        return mVideoSarDen;
     }
 
     @Override
@@ -102,16 +140,6 @@ public class XPlayer extends SimpleMediaPlayer {
     }
 
     @Override
-    public int getVideoWidth() {
-        return 0;
-    }
-
-    @Override
-    public int getVideoHeight() {
-        return 0;
-    }
-
-    @Override
     public boolean isPlaying() {
         return false;
     }
@@ -152,6 +180,17 @@ public class XPlayer extends SimpleMediaPlayer {
         return false;
     }
 
+
+
+    @Override
+    public void resetListeners() {
+
+    }
+
+    @Override
+    public void setAudioStreamType(int streamtype) {
+
+    }
 
     @Override
     public int getIsLiveVideo() throws IllegalStateException {
@@ -196,14 +235,14 @@ public class XPlayer extends SimpleMediaPlayer {
 
     private static final int MEDIA_NOP = 0; // interface test message
     private static final int MEDIA_PREPARED = 1;
-
+    private static final int MEDIA_PLAYBACK_COMPLETE = 2;
     private static final int MEDIA_BUFFERING_UPDATE = 3;
     private static final int MEDIA_SEEK_COMPLETE = 4;
     private static final int MEDIA_SET_VIDEO_SIZE = 5;
-    private static final int MEDIA_END_OF_FILE = 6;
-    private static final int MEDIA_PLAYBACK_COMPLETE = 7;
     private static final int MEDIA_ERROR = 100;
     private static final int MEDIA_INFO = 200;
+
+    protected static final int MEDIA_SET_VIDEO_SAR = 10001;
 
     private class EventHandler extends Handler
     {
@@ -222,17 +261,22 @@ public class XPlayer extends SimpleMediaPlayer {
             {
                // return;
             }
-
+            Log.e(TAG ,"====>on ...===>msg.what" + msg.what);
             switch (msg.what)
             {
                 case MEDIA_PREPARED:
+
                     Log.e(TAG ,"====>on ...MEDIA_PREPARED");
                     if (mOnPreparedListener != null){
+                        Log.e(TAG ,"====>on ...MEDIA_PREPARED ,is not null");
                         mOnPreparedListener.onPrepared(mMediaPlayer); // TODO call player start function ,on jni start function will send according to EVT message.
+                    }else{
+                        Log.e(TAG ,"====>on ...MEDIA_PREPARED ,is null");
                     }
                     return;
 
                 case MEDIA_BUFFERING_UPDATE:
+                    Log.e(TAG ,"====>on ...MEDIA_BUFFERING_UPDATE :" + msg.arg1);
                     if (mOnBufferingUpdateListener != null){
                         mOnBufferingUpdateListener.onBufferingUpdate(mMediaPlayer, msg.arg1);
                     }
@@ -249,6 +293,19 @@ public class XPlayer extends SimpleMediaPlayer {
                     return;
 
                 case MEDIA_SET_VIDEO_SIZE:
+                    mMediaPlayer.mVideoWidth = msg.arg1;
+                    mMediaPlayer.mVideoHeight = msg.arg2;
+                    if (mOnVideoSizeChangedListener != null){
+                        mOnVideoSizeChangedListener.onVideoSizeChanged( mMediaPlayer ,mMediaPlayer.mVideoWidth, mMediaPlayer.mVideoHeight, mMediaPlayer.mVideoSarNum, mMediaPlayer.mVideoSarDen);
+                    }
+                    return;
+
+                case MEDIA_SET_VIDEO_SAR:
+                    mMediaPlayer.mVideoSarNum = msg.arg1;
+                    mMediaPlayer.mVideoSarDen = msg.arg2;
+                    if (mOnVideoSizeChangedListener != null){
+                        mOnVideoSizeChangedListener.onVideoSizeChanged( mMediaPlayer ,mMediaPlayer.mVideoWidth, mMediaPlayer.mVideoHeight, mMediaPlayer.mVideoSarNum, mMediaPlayer.mVideoSarDen);
+                    }
                     return;
 
                 case MEDIA_ERROR:

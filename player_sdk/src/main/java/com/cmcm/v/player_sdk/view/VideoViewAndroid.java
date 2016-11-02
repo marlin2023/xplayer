@@ -126,6 +126,7 @@ public class VideoViewAndroid extends BaseVideoView {
 
     }
 
+    @Override
     public void surfaceChanged(SurfaceHolder holder,
                                int format,
                                int w,
