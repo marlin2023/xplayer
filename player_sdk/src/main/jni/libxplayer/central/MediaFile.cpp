@@ -181,12 +181,6 @@ CM_BOOL MediaFile::open()
         stream_index[AVMEDIA_TYPE_AUDIO],
         av_support);
 
-    if(this->video_stream  && this->video_stream->codecpar){
-        AVCodecParameters *codecpar = this->video_stream->codecpar;
-        // notify
-        //this->notify(MEDIA_SET_VIDEO_SIZE ,codecpar->width, codecpar->height);
-        //this->notify(MEDIA_SET_VIDEO_SAR ,codecpar->sample_aspect_ratio.num, codecpar->sample_aspect_ratio.den);
-    }
 
     if(!av_support)
     {

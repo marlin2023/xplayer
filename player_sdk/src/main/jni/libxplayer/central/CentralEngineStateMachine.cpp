@@ -239,6 +239,14 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
 
             if(mediaFileHandle->open())
             {
+
+                if(this->mediaFileHandle->video_stream  && this->mediaFileHandle->video_stream->codecpar){
+                    AVCodecParameters *codecpar = this->mediaFileHandle->video_stream->codecpar;
+                    // notify
+                    this->mediaFileHandle->notify(MEDIA_SET_VIDEO_SIZE ,codecpar->width, codecpar->height);
+                    this->mediaFileHandle->notify(MEDIA_SET_VIDEO_SAR ,codecpar->sample_aspect_ratio.num, codecpar->sample_aspect_ratio.den);
+                }
+
                 // open success.
                 this->state_machine_change_state(STATE_PREPARED);
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: open file:-%s- success !!!\n" ,mediaFileHandle->getSourceUrl());

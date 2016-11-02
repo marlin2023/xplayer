@@ -72,6 +72,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
+        Log.e(TAG, "=====>on GLSurfaceView onSurfaceChanged.function.........");
 
     }
 
