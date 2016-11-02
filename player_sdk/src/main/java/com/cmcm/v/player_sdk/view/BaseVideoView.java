@@ -406,8 +406,6 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                     }
                     mVideoWidth = mp.getVideoWidth();
                     mVideoHeight = mp.getVideoHeight();
-//                    mVideoSarNum = mp.getVideoSarNum();
-//                    mVideoSarDen = mp.getVideoSarDen();
                     mVideoSarNum = sarNum;
                     mVideoSarDen = sarDen;
                     if (mVideoWidth != 0 && mVideoHeight != 0) {

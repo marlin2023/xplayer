@@ -175,6 +175,12 @@ CM_BOOL MediaFile::open()
         }
     }
 
+    if(this->video_stream  && this->video_stream->codecpar){
+        AVCodecParameters *codecpar = this->video_stream->codecpar;
+        // notify
+        this->notify(MEDIA_SET_VIDEO_SIZE ,codecpar->width, codecpar->height);
+        this->notify(MEDIA_SET_VIDEO_SAR ,codecpar->sample_aspect_ratio.num, codecpar->sample_aspect_ratio.den);
+    }
 
     XLog::d(ANDROID_LOG_INFO ,TAG ," ==> after open_decoder, stream_index[video] = %d,stream_index[audio] =%d ,av_support =%d\n",
         stream_index[AVMEDIA_TYPE_VIDEO],

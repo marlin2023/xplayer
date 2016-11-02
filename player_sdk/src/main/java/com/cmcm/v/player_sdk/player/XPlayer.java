@@ -237,6 +237,8 @@ public class XPlayer extends SimpleMediaPlayer {
             Log.e(TAG ,"===>in postEventFromNative 2.what =" +what + ",arg1="+ arg1);
             Message m = mp.mEventHandler.obtainMessage(what, arg1, arg2, obj);
             mp.mEventHandler.sendMessage(m);
+//            mp.mEventHandler.dispatchMessage(m);
+            Log.e(TAG ,"===>in postEventFromNative 3.what =" +what + ",arg1="+ arg1);
         }
     }
 
@@ -269,7 +271,7 @@ public class XPlayer extends SimpleMediaPlayer {
             {
                // return;
             }
-            Log.e(TAG ,"====>on ...===>msg.what" + msg.what);
+            Log.e(TAG ,"====>on ...===>msg.what = " + msg.what);
             switch (msg.what)
             {
                 case MEDIA_PREPARED:
@@ -303,21 +305,21 @@ public class XPlayer extends SimpleMediaPlayer {
                 case MEDIA_SET_VIDEO_SIZE:
                 {
                     Log.e(TAG ,"====>on ...MEDIA_SET_VIDEO_SIZE");
-                    mMediaPlayer.mVideoWidth = msg.arg1;
-                    mMediaPlayer.mVideoHeight = msg.arg2;
-                    if (mOnVideoSizeChangedListener != null){
-                        mOnVideoSizeChangedListener.onVideoSizeChanged( mMediaPlayer ,mMediaPlayer.mVideoWidth, mMediaPlayer.mVideoHeight, mMediaPlayer.mVideoSarNum, mMediaPlayer.mVideoSarDen);
-                    }
+//                    mMediaPlayer.mVideoWidth = msg.arg1;
+//                    mMediaPlayer.mVideoHeight = msg.arg2;
+//                    if (mOnVideoSizeChangedListener != null){
+//                        mOnVideoSizeChangedListener.onVideoSizeChanged( mMediaPlayer ,mMediaPlayer.mVideoWidth, mMediaPlayer.mVideoHeight, mMediaPlayer.mVideoSarNum, mMediaPlayer.mVideoSarDen);
+//                    }
                     return;
                 }
                 case MEDIA_SET_VIDEO_SAR:
                 {
                     Log.e(TAG ,"====>on ...MEDIA_SET_VIDEO_SAR");
-                    mMediaPlayer.mVideoSarNum = msg.arg1;
-                    mMediaPlayer.mVideoSarDen = msg.arg2;
-                    if (mOnVideoSizeChangedListener != null){
-                        mOnVideoSizeChangedListener.onVideoSizeChanged( mMediaPlayer ,mMediaPlayer.mVideoWidth, mMediaPlayer.mVideoHeight, mMediaPlayer.mVideoSarNum, mMediaPlayer.mVideoSarDen);
-                    }
+//                    mMediaPlayer.mVideoSarNum = msg.arg1;
+//                    mMediaPlayer.mVideoSarDen = msg.arg2;
+//                    if (mOnVideoSizeChangedListener != null){
+//                        mOnVideoSizeChangedListener.onVideoSizeChanged( mMediaPlayer ,mMediaPlayer.mVideoWidth, mMediaPlayer.mVideoHeight, mMediaPlayer.mVideoSarNum, mMediaPlayer.mVideoSarDen);
+//                    }
                     return;
                 }
                 case MEDIA_ERROR:
