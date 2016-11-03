@@ -67,6 +67,8 @@ public interface IMediaPlayer {
 
     void pause() throws IllegalStateException;
 
+    void resume();
+
     void setScreenOnWhilePlaying(boolean screenOn);
 
     int getVideoWidth();

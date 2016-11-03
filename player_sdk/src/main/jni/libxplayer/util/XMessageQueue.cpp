@@ -120,11 +120,15 @@ player_event_e XMessageQueue::pop()
 }
 
 
-bool XMessageQueue::empty()
+bool XMessageQueue::isEmpty()
 {
     return (this->node_count_current == 0);
 }
 
+void XMessageQueue::flush()
+{
+    this->msg_queue.clear();
+}
 
 int XMessageQueue::size()
 {

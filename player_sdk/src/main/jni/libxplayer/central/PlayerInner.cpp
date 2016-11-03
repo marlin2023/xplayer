@@ -35,14 +35,7 @@ void PlayerInner::player_engine_init()
 
     int ret;
 
-    // media demux thread
-    pthread_t media_demux_tid;
 
-    // video decode thread
-    pthread_t decode_video_tid;
-
-    // audio decode thread
-    pthread_t decode_audio_tid;
 
     //1. Register all formats and codecs
     av_register_all();
@@ -98,6 +91,34 @@ CM_BOOL PlayerInner::player_start()
     audioRender->play();
     //TODO
 }
+
+bool PlayerInner::isPlaying()
+{
+    bool playerState;
+    // TODO
+    if (centralEngineStateMachineHandle->state == STATE_PLAY_PLAYING ||
+        centralEngineStateMachineHandle->state == STATE_PREPARED ||
+        centralEngineStateMachineHandle->state == STATE_PLAY_FILE_END ||
+        centralEngineStateMachineHandle->state == STATE_BUFFERING) {
+        return true;
+    }
+
+}
+
+long PlayerInner::getCurrentPosition()
+{
+    // TODO need subtract the base time
+    XLog::e(TAG ,"====>current_position_ms= %lld\n",this->mediaFileHandle->current_position_ms);
+    return this->mediaFileHandle->current_position_ms;
+}
+
+
+long PlayerInner::getDuration()
+{
+    XLog::e(TAG ,"====>current_duration_ms= %lld\n",this->mediaFileHandle->current_position_ms);
+    return this->mediaFileHandle->duration_ms;
+}
+
 
 
 //-----------*******************-------------

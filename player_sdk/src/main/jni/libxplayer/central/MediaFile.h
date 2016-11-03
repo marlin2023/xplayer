@@ -150,10 +150,7 @@ private:
      */
     char *source_url;
 
-    /**
-     * duration
-     */
-    unsigned long *duration;
+
 
 public:
     /**
@@ -239,6 +236,16 @@ public:
 
     // audio sync clock time
     double sync_audio_clock_time;
+
+    /**
+     * duration in millisecond
+     */
+    long duration_ms;
+
+    /**
+     * current position in millisecond
+     */
+    long current_position_ms;
 
 };
 

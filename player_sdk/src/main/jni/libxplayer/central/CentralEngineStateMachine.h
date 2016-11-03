@@ -122,6 +122,11 @@ private:
     void central_engine_do_process_play_paused(player_event_e evt);
 
     /**
+     * play stopped state processing work.
+     */
+    void central_engine_do_process_play_stopped(player_event_e evt);
+
+    /**
      * av_read_frame- retry count
      */
     int read_retry_count;

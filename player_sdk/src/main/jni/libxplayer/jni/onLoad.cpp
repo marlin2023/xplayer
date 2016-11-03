@@ -256,6 +256,50 @@ static void native_resume(JNIEnv *env, jobject thiz)
 
 }
 
+static void native_stop(JNIEnv *env, jobject thiz)
+{
+    // audio opensl es
+    playerInner->audioRender->pause();
+
+    // process state
+    playerInner->centralEngineStateMachineHandle->message_queue->push_front(EVT_STOP);
+    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push_front(EVT_STOP);
+    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push_front(EVT_STOP);
+
+    // clear packet&frame q
+    playerInner->mediaFileHandle->audio_queue->flush();
+    playerInner->mediaFileHandle->video_queue->flush();
+    playerInner->mediaFileHandle->audio_frame_queue->flush();
+    playerInner->mediaFileHandle->video_frame_queue->flush();
+
+}
+
+static void native_release(JNIEnv *env, jobject thiz)
+{
+    // 关闭文件之前，分别向几个队列发CLOSE消息。
+    // 这几个队列现在不处理CLOSE消息了，直接退出线程
+
+    playerInner->centralEngineStateMachineHandle->message_queue->push_front(EVT_CLOSE);
+    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push_front(EVT_CLOSE);
+    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push_front(EVT_CLOSE);
+
+    playerInner->centralEngineStateMachineHandle->message_queue->push_front(EVT_EXIT_THREAD);
+    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push_front(EVT_EXIT_THREAD);
+    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push_front(EVT_EXIT_THREAD);
+
+    pthread_join(playerInner->media_demux_tid, NULL);
+    pthread_join(playerInner->decode_video_tid, NULL);
+    pthread_join(playerInner->decode_audio_tid, NULL);
+
+    playerInner->centralEngineStateMachineHandle->message_queue->flush();
+    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->flush();
+    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->flush();
+
+    // TODO
+    // Release ffmpeg resources
+
+}
+
 
 static void native_renderFrame(JNIEnv *env, jobject thiz)
 {
@@ -264,6 +308,32 @@ static void native_renderFrame(JNIEnv *env, jobject thiz)
     yuvGLRender->render_frame();
 
 }
+
+static jboolean native_isPlaying(JNIEnv *env, jobject thiz)
+{
+
+    jboolean retval = JNI_FALSE;
+    retval = playerInner->isPlaying();
+    return retval;
+
+}
+
+static jlong native_getCurrentPosition(JNIEnv *env, jobject thiz)
+{
+     jlong retval = 0;
+     retval = playerInner->getCurrentPosition();
+     return retval;
+
+}
+
+static jlong native_getDuration(JNIEnv *env, jobject thiz)
+{
+     jlong retval = 0;
+     retval = playerInner->getDuration();
+     return retval;
+}
+
+
 
 // define the native method mapping .
 static JNINativeMethod methods[] =
@@ -280,8 +350,16 @@ static JNINativeMethod methods[] =
 
     {"_start",           "()V",                                      (void*)native_start},
     {"_play",            "()V",                                      (void*)native_play},
-    {"_pause",            "()V",                                      (void*)native_pause},
-    {"_resume",            "()V",                                      (void*)native_resume},
+    {"_pause",           "()V",                                      (void*)native_pause},
+    {"_resume",          "()V",                                      (void*)native_resume},
+    {"_stop",            "()V",                                      (void*)native_stop},
+    {"_release",         "()V",                                      (void*)native_release},
+
+
+    {"_isPlaying",                       "()Z",                                      (void*)native_isPlaying},
+    {"_getCurrentPosition",              "()J",                                      (void*)native_getCurrentPosition},
+    {"_getDuration",                     "()J",                                      (void*)native_getDuration},
+
 
     {"_renderFrame",     "()V",                                      (void*)native_renderFrame},  // render frame.
 

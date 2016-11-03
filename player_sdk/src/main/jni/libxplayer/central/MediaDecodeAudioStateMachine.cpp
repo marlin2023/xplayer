@@ -140,6 +140,11 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_wait(player_event_e e
             this->message_queue->push(EVT_DECODE_GO_ON);
             return;
         }
+        case EVT_STOP:
+        {
+            this->state_machine_change_state(STATE_DECODER_START);
+            return;
+        }
 
         default:
         {

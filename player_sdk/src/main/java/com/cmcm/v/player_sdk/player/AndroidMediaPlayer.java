@@ -333,4 +333,9 @@ public class AndroidMediaPlayer extends SimpleMediaPlayer {
     @Override
     public void playInterface(){
     }
+
+    @Override
+    public void resume() {
+
+    }
 }

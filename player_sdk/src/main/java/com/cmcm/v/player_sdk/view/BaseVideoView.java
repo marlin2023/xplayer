@@ -449,38 +449,7 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                         }
                     }
 
-                    /* Otherwise, pop up an error dialog so the user
-                     * knows that something bad has happened. Only try
-                     * and pop up the dialog if we're attached to a
-                     * window. When we're going away and no longer have
-                     * a window, don't bother showing the user an error.
-                     */
-//                    if (getWindowToken() != null) {
-//                        Resources r = mAppContext.getResources();
-//                        int messageId;
-//
-//                        if (framework_err == MediaPlayer.MEDIA_ERROR_NOT_VALID_FOR_PROGRESSIVE_PLAYBACK) {
-//                            messageId = R.string.VideoView_error_text_invalid_progressive_playback;
-//                        } else {
-//                            messageId = R.string.VideoView_error_text_unknown;
-//                        }
-//
-//                        new AlertDialog.Builder(getContext())
-//                                .setMessage(messageId)\
-//                                .setPositiveButton(R.string.VideoView_error_button,
-//                                        new DialogInterface.OnClickListener() {
-//                                            public void onClick(DialogInterface dialog, int whichButton) {
-//                                            /* If we get here, there is no onError listener, so
-//                                             * at least inform them that the video is over.
-//                                             */
-//                                                if (mOnCompletionListener != null) {
-//                                                    mOnCompletionListener.onCompletion(mMediaPlayer);
-//                                                }
-//                                            }
-//                                        })
-//                                .setCancelable(false)
-//                                .show();
-//                    }
+
                     return true;
                 }
             };

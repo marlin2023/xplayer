@@ -2,6 +2,7 @@ package com.cmcm.v.player_sdk.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.media.AudioManager;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -126,22 +127,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         mMediaPlayer.playInterface();
         // set GLSurfaceView.Render MODE
         setRenderMode(RENDERMODE_CONTINUOUSLY); // set render mode RENDERMODE_CONTINUOUSLY
-    }
-
-    @Override
-    public void pause() {
-        try {
-            if (isInPlaybackState()) {
-                if (mMediaPlayer.isPlaying()) {
-                    setRenderMode(RENDERMODE_WHEN_DIRTY); // set render mode RENDERMODE_WHEN_DIRTY
-                    mMediaPlayer.pause();
-                    mCurrentState = STATE_PAUSED;
-                }
-            }
-            mTargetState = STATE_PAUSED;
-        } catch (Exception e) {
-
-        }
     }
 
 
@@ -307,5 +292,57 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         return null;
     }
 
-    // =================set listener end=======
+    @Override
+    public void start() throws IllegalStateException {
+        try {
+            if (isInPlaybackState()) {
+                if(mCurrentState == STATE_PAUSED){
+                    setRenderMode(RENDERMODE_CONTINUOUSLY); // set render mode RENDERMODE_CONTINUOUSLY
+                    mMediaPlayer.resume();
+                }else{
+                    mMediaPlayer.start();
+                }
+                mCurrentState = STATE_PLAYING;
+            }
+            mTargetState = STATE_PLAYING;
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Override
+    public void pause() {
+        try {
+            if (isInPlaybackState()) {
+                if (mMediaPlayer.isPlaying()) {
+                    setRenderMode(RENDERMODE_WHEN_DIRTY); // set render mode RENDERMODE_WHEN_DIRTY
+                    mMediaPlayer.pause();
+                    mCurrentState = STATE_PAUSED;
+                }
+            }
+            mTargetState = STATE_PAUSED;
+        } catch (Exception e) {
+
+        }
+    }
+
+    @Override
+    public void stopPlayback() {
+        Log.i("chenyg", "stopPlayback()");
+        if (mMediaPlayer != null) {
+            mDuration = -1;
+            mLastPositionOnCompletion = 0;
+
+            setRenderMode(RENDERMODE_WHEN_DIRTY);   // set render mode
+            mMediaPlayer.stop();
+            mMediaPlayer.release();
+            mMediaPlayer = null;
+            mCurrentState = STATE_IDLE;
+            mTargetState = STATE_IDLE;
+//            AudioManager am = (AudioManager) mAppContext.getSystemService(
+//                    Context.AUDIO_SERVICE);
+//            am.abandonAudioFocus(null);
+        }
+    }
+
 }

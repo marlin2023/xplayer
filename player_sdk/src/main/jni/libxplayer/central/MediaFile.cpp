@@ -46,6 +46,10 @@ MediaFile::MediaFile()
 
 
     sync_audio_clock_time = 0.f;
+
+    duration_ms = 0;
+    current_position_ms = 0;
+
 }
 
 
@@ -104,6 +108,19 @@ CM_BOOL MediaFile::open()
     }
 
     XLog::d(ANDROID_LOG_INFO ,TAG ,"==>state_machine:av_find_stream_info called!\n");
+    // set duration
+    if(format_context->duration != AV_NOPTS_VALUE)
+    {
+        int64_t secs, us;
+        secs = format_context->duration / AV_TIME_BASE;
+        us = format_context->duration % AV_TIME_BASE;
+        duration_ms = secs * 1000 + us / 1000;      // ms
+    }
+    else
+    {
+        duration_ms = 0;
+    }
+
     av_dump_format(format_context, 0, (const char *)source_url, 0);
 
     // Default no subtitles

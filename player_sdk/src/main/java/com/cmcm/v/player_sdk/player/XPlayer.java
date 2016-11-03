@@ -126,8 +126,10 @@ public class XPlayer extends SimpleMediaPlayer {
 
     @Override
     public void stop() throws IllegalStateException {
-
+        _stop();
     }
+
+    private native void _stop() throws IllegalStateException;
 
     @Override
     public void pause() throws IllegalStateException {
@@ -136,6 +138,9 @@ public class XPlayer extends SimpleMediaPlayer {
 
     private native void _pause() throws IllegalStateException;
 
+    public void resume() {
+        _resume();
+    }
     private native void _resume();
 
 
@@ -146,10 +151,9 @@ public class XPlayer extends SimpleMediaPlayer {
 
     @Override
     public boolean isPlaying() {
-        return false;
+        return _isPlaying();
     }
-
-
+    public native boolean _isPlaying();
 
     @Override
     public void seekTo(long msec) throws IllegalStateException {
@@ -158,19 +162,24 @@ public class XPlayer extends SimpleMediaPlayer {
 
     @Override
     public long getCurrentPosition() {
-        return 0;
+        return _getCurrentPosition();
     }
+    public native long _getCurrentPosition();
 
     @Override
     public long getDuration() {
-        return 0;
+        return _getDuration();
     }
+
+    public native long _getDuration();
 
 
     @Override
     public void release() {
-
+        _release();
     }
+
+    private native void _release() throws IllegalStateException;
 
     @Override
     public void reset() {
@@ -236,8 +245,8 @@ public class XPlayer extends SimpleMediaPlayer {
         {
             Log.e(TAG ,"===>in postEventFromNative 2.what =" +what + ",arg1="+ arg1);
             Message m = mp.mEventHandler.obtainMessage(what, arg1, arg2, obj);
+            //mp.mEventHandler.dispatchMessage(m);
             mp.mEventHandler.sendMessage(m);
-//            mp.mEventHandler.dispatchMessage(m);
             Log.e(TAG ,"===>in postEventFromNative 3.what =" +what + ",arg1="+ arg1);
         }
     }
@@ -267,44 +276,44 @@ public class XPlayer extends SimpleMediaPlayer {
         @Override
         public void handleMessage(Message msg)
         {
-            //if (mMediaPlayer.mNativeContext == 0)
-            {
-               // return;
-            }
+
             Log.e(TAG ,"====>on ...===>msg.what = " + msg.what);
-            switch (msg.what)
-            {
+            switch (msg.what) {
                 case MEDIA_PREPARED:
-
-                    Log.e(TAG ,"====>on ...MEDIA_PREPARED");
-                    if (mOnPreparedListener != null){
-                        Log.e(TAG ,"====>on ...MEDIA_PREPARED ,is not null");
+                {
+                    Log.e(TAG, "====>on ...MEDIA_PREPARED");
+                    if (mOnPreparedListener != null) {
+                        Log.e(TAG, "====>on ...MEDIA_PREPARED ,is not null");
                         mOnPreparedListener.onPrepared(mMediaPlayer); // TODO call player start function ,on jni start function will send according to EVT message.
-                    }else{
-                        Log.e(TAG ,"====>on ...MEDIA_PREPARED ,is null");
+                    } else {
+                        Log.e(TAG, "====>on ...MEDIA_PREPARED ,is null");
                     }
+                    Log.e(TAG, "====>on ...MEDIA_PREPARED 2");
                     return;
-
-                case MEDIA_BUFFERING_UPDATE:
-                    Log.e(TAG ,"====>on ...MEDIA_BUFFERING_UPDATE :" + msg.arg1);
-                    if (mOnBufferingUpdateListener != null){
+                }
+                case MEDIA_BUFFERING_UPDATE: {
+                    Log.e(TAG, "====>on ...MEDIA_BUFFERING_UPDATE :" + msg.arg1);
+                    if (mOnBufferingUpdateListener != null) {
                         mOnBufferingUpdateListener.onBufferingUpdate(mMediaPlayer, msg.arg1);
                     }
                     return;
-
+                }
                 case MEDIA_PLAYBACK_COMPLETE:
+                {
                     Log.e(TAG ,"====>on ...MEDIA_PLAYBACK_COMPLETE");
                     if (mOnCompletionListener != null){
                         mOnCompletionListener.onCompletion(mMediaPlayer);
                     }
                     return;
-
+                }
                 case MEDIA_SEEK_COMPLETE:
                     return;
 
                 case MEDIA_SET_VIDEO_SIZE:
                 {
                     Log.e(TAG ,"====>on ...MEDIA_SET_VIDEO_SIZE");
+                    // TODO ???set videowidth !!!!
+                    // 会导致主线程哪里阻塞？？？？
 //                    mMediaPlayer.mVideoWidth = msg.arg1;
 //                    mMediaPlayer.mVideoHeight = msg.arg2;
 //                    if (mOnVideoSizeChangedListener != null){
@@ -326,8 +335,9 @@ public class XPlayer extends SimpleMediaPlayer {
                     Log.e(TAG, "Error (" + msg.arg1 + "," + msg.arg2 + ")");
                     return;
 
-                case MEDIA_INFO:
+                case MEDIA_INFO:    // import
                     Log.i(TAG, "Info (" + msg.arg1 + "," + msg.arg2 + ")");
+                    mMediaPlayer.notifyOnInfo(msg.arg1, msg.arg2);
                     return;
 
                 case MEDIA_NOP: // interface test message - ignore

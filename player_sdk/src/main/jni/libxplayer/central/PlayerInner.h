@@ -72,9 +72,36 @@ public:
      */
     CM_BOOL player_start();
 
+    /**
+     * player is in playing state or not
+     */
+    bool isPlaying();
+
+    /**
+     * player start play.
+     */
+    long getCurrentPosition();
+
+    /**
+     * player start play.
+     */
+    long getDuration();
+
+
+
+
     //-----------*******************-------------
     //          public member variable
     //-----------*******************-------------
+
+    // media demux thread
+    pthread_t media_demux_tid;
+
+    // video decode thread
+    pthread_t decode_video_tid;
+
+    // audio decode thread
+    pthread_t decode_audio_tid;
 
     /**
      * Media File Handler contain file all information.

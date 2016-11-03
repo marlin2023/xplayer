@@ -10,6 +10,7 @@
 
 #include "CentralEngineStateMachine.h"
 #include "PlayerState.h"
+#include "xplayer_android_def.h"
 
 #include "util/XLog.h"
 #include "util/XMessageType.h"
@@ -289,6 +290,14 @@ void CentralEngineStateMachine::central_engine_do_process_prepared(player_event_
 
             return;
         }
+
+        case EVT_STOP:
+        {
+            // do stop actions
+            this->state_machine_change_state(STATE_STOPPED);
+            return;
+        }
+
         default:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PREPARED receive others EVT.\n");
@@ -321,11 +330,21 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                 this->state_machine_change_state(STATE_PLAY_WAIT);
                 this->mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
 
+                // TODO
+                this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
+
                 return;
             }
             this->message_queue->push(EVT_GO_ON);
             return;
         }
+
+        case EVT_STOP:
+        {
+            this->state_machine_change_state(STATE_STOPPED);
+            return;
+        }
+
         default:
         {
             XLog::e(TAG ,"===>STATE_BUFFERING receive others EVT:%d\n" ,evt);
@@ -346,6 +365,12 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
             XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_PLAY Event.\n");
             this->state_machine_change_state(STATE_PLAY_PLAYING);
             this->message_queue->push(EVT_GO_ON);
+            return;
+        }
+
+        case EVT_STOP:
+        {
+            this->state_machine_change_state(STATE_STOPPED);
             return;
         }
 
@@ -408,12 +433,17 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
             this->state_machine_change_state(STATE_PLAY_PAUSED);
             return;
         }
+
+        case EVT_STOP:
+        {
+            this->state_machine_change_state(STATE_STOPPED);
+            return;
+        }
+
         default:
         {
             return;
         }
-
-
     }
     return;
 
@@ -448,6 +478,13 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
             this->state_machine_change_state(STATE_PLAY_PAUSED);
             return;
         }
+
+        case EVT_STOP:
+        {
+            this->state_machine_change_state(STATE_STOPPED);
+            return;
+        }
+
     }
     return;
 
@@ -464,15 +501,7 @@ void CentralEngineStateMachine::central_engine_do_process_play_complete(player_e
         }
         case EVT_STOP:
         {
-            // do stop actions
-            //el_do_stop_central_engine();
-            this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_STOP);
-            this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_STOP);
-            //
-            //q_all_destruction(EL_VOID)
-            //
             this->state_machine_change_state(STATE_STOPPED);
-
             return;
         }
 
@@ -494,15 +523,7 @@ void CentralEngineStateMachine::central_engine_do_process_play_paused(player_eve
         }
         case EVT_STOP:
         {
-            // do stop actions
-            //el_do_stop_central_engine();
-            this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_STOP);
-            this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_STOP);
-            //
-            //q_all_destruction(EL_VOID)
-            //
             this->state_machine_change_state(STATE_STOPPED);
-
             return;
         }
 
@@ -511,3 +532,17 @@ void CentralEngineStateMachine::central_engine_do_process_play_paused(player_eve
 
 }
 
+void CentralEngineStateMachine::central_engine_do_process_play_stopped(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_CLOSE:
+        {
+            this->state_machine_change_state(STATE_IDLE);
+            return;
+        }
+
+    }
+    return;
+
+}

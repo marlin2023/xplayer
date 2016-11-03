@@ -90,13 +90,17 @@ public:
     /**
      * if the queue has no element return true.
      */
-    bool empty();
+    bool isEmpty();
 
     /**
      * return the element number in the queue.
      */
     int size();
 
+    /**
+     * flush the msg q.
+     */
+    void flush();
 
 private:
 

@@ -81,7 +81,6 @@ void * MediaDecodeVideoStateMachine::video_decode_thread(MediaFile *mediaFile)
 
 
     player_event_e evt;
-    sleep(1);
     while(1){
         evt = this->message_queue->pop();
         //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine msq evt = %d\n" ,evt);
@@ -150,7 +149,11 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_wait(player_event_e e
             this->message_queue->push(EVT_DECODE_GO_ON);
             return;
         }
-
+        case EVT_STOP:
+        {
+            this->state_machine_change_state(STATE_DECODER_START);
+            return;
+        }
         default:
         {
             return;
