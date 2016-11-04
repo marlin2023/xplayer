@@ -262,9 +262,19 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
     // set codec context.
     if (codec_context->codec_type == AVMEDIA_TYPE_AUDIO){
         audio_codec_context = codec_context;
+        if(this->audio_stream->start_time != AV_NOPTS_VALUE)
+        {
+            this->beginning_audio_pts = (int64_t)(this->audio_stream->start_time * av_q2d(this->audio_stream->time_base)*1000);
+            XLog::e(TAG ,"set audio begin pts = %lld\n",this->beginning_audio_pts);
+        }
 
     }else if(codec_context->codec_type == AVMEDIA_TYPE_VIDEO){
         video_codec_context = codec_context;
+        if(this->video_stream->start_time != AV_NOPTS_VALUE)
+        {
+            this->beginning_video_pts = (int64_t)(this->video_stream->start_time * av_q2d(this->video_stream->time_base)*1000);
+            XLog::e(TAG ,"set video begin pts = %lld\n",this->beginning_video_pts);
+        }
     }
 
     ic->streams[stream_index]->discard = AVDISCARD_DEFAULT;

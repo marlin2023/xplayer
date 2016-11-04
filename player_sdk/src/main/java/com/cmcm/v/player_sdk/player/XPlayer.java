@@ -157,8 +157,10 @@ public class XPlayer extends SimpleMediaPlayer {
 
     @Override
     public void seekTo(long msec) throws IllegalStateException {
-
+        _seekTo(msec);
     }
+
+    public native void _seekTo(long msec) throws IllegalStateException;
 
     @Override
     public long getCurrentPosition() {

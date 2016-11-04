@@ -120,6 +120,18 @@ long PlayerInner::getDuration()
 }
 
 
+void PlayerInner::seekTo(long msec)
+{
+    XLog::e(TAG ,"====>seekTo position = %ld\n",msec);
+    this->mediaFileHandle->seekpos = msec;
+    //
+    av_read_pause(this->mediaFileHandle->format_context);
+    centralEngineStateMachineHandle->message_queue->push(EVT_SEEK);
+    mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_SEEK);
+    mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_SEEK);
+
+}
+
 
 //-----------*******************-------------
 //          Thread according to function

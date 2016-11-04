@@ -333,6 +333,14 @@ static jlong native_getDuration(JNIEnv *env, jobject thiz)
      return retval;
 }
 
+static void native_seekTo(JNIEnv *env, jobject thiz ,jlong seekedPositionMsec )
+{
+    long seek_time = seekedPositionMsec;
+    XLog::e(TAG ,"======>native_seekTo :%ld" ,seek_time);
+    playerInner->seekTo(seek_time);
+}
+
+
 
 
 // define the native method mapping .
@@ -360,6 +368,7 @@ static JNINativeMethod methods[] =
     {"_getCurrentPosition",              "()J",                                      (void*)native_getCurrentPosition},
     {"_getDuration",                     "()J",                                      (void*)native_getDuration},
 
+    {"_seekTo",                          "(J)V",                                     (void*)native_seekTo},
 
     {"_renderFrame",     "()V",                                      (void*)native_renderFrame},  // render frame.
 

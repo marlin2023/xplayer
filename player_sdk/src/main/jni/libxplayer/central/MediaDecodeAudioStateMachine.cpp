@@ -109,7 +109,11 @@ void MediaDecodeAudioStateMachine::audio_decode_state_machine_process_event(play
             do_process_audio_decode_work(evt);
             return;
         }
-
+        case STATE_DECODE_SEEK_WAIT:
+        {
+            do_process_audio_decode_seek_wait(evt);
+            return;
+        }
         default:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeAudioStateMachine Invalid state!\n");
@@ -127,9 +131,9 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_wait(player_event_e e
             return;
         }
         case EVT_PLAY:
-        {
-            return;
-        }
+        //{
+        //    return;
+        //}
 
         case EVT_RESUME:
         {
@@ -213,6 +217,37 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
         {
             this->state_machine_change_state(STATE_DECODER_START);
             XLog::d(ANDROID_LOG_INFO ,TAG ,"===>decoder:decode stoped!\n");
+            return;
+        }
+
+        case EVT_SEEK:
+        {
+
+            this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
+            return;
+        }
+        default:
+        {
+            return;
+        }
+    }
+
+}
+
+void MediaDecodeAudioStateMachine::do_process_audio_decode_seek_wait(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_SEEK_DONE:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_SEEK_DONE!\n");
+            this->state_machine_change_state(STATE_DECODER_WAIT);
+            return;
+        }
+        case EVT_SEEK_PAUSE:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_SEEK_PAUSE!\n");
+
             return;
         }
 

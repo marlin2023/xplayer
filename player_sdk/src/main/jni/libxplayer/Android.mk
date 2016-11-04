@@ -28,7 +28,7 @@ LOCAL_SRC_FILES := jni/onLoad.cpp   \
                 central/PlayerInner.cpp
 
 # compile flags
-LOCAL_CFLAGS := -D__STDC_CONSTANT_MACROS
+LOCAL_CFLAGS := -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS
 
 # linked library
 LOCAL_LDLIBS :=  -llog -lffmpeg -lGLESv2 -lOpenSLES

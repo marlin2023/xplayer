@@ -87,6 +87,10 @@ public:
      */
     long getDuration();
 
+    /**
+     * player seekTo .
+     */
+    void seekTo(long msec);
 
 
 

@@ -127,6 +127,15 @@ private:
     void central_engine_do_process_play_stopped(player_event_e evt);
 
     /**
+     * seek wait state processing work.
+     */
+    void central_engine_do_process_seek_wait(player_event_e evt);
+
+
+
+    void ffmpeg_do_seek();
+
+    /**
      * av_read_frame- retry count
      */
     int read_retry_count;

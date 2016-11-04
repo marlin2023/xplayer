@@ -247,6 +247,24 @@ public:
      */
     long current_position_ms;
 
+    /**
+     * seek position (in millisecond)
+     */
+    int64_t     seekpos;
+
+    /**
+     * the first video packet in the video stream
+     * some video the first packet pts is not start from 0.
+     *  (in millisecond)
+     */
+    int64_t                 beginning_video_pts;
+
+    /**
+     * the first audio packet in the video stream
+     */
+    int64_t                 beginning_audio_pts;
+
+
 };
 
 #endif //XPLAYER_MEDIAFILE_H

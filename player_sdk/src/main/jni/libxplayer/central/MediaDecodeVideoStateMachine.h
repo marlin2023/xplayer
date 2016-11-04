@@ -68,6 +68,11 @@ private:
     void do_process_video_decode_work(player_event_e evt);
 
     /**
+     * decode seek wait state processing work
+     */
+    void do_process_video_decode_seek_wait(player_event_e evt);
+
+    /**
      * media file handle
      */
     MediaFile *mediaFileHandle;

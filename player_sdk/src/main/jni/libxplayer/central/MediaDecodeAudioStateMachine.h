@@ -70,6 +70,10 @@ private:
      */
     void do_process_audio_decode_work(player_event_e evt);
 
+    /**
+     * decode seek wait state processing work
+     */
+    void do_process_audio_decode_seek_wait(player_event_e evt);
 
     /**
      * media file handle

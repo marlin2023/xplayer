@@ -119,6 +119,12 @@ void MediaDecodeVideoStateMachine::video_decode_state_machine_process_event(play
             do_process_video_decode_work(evt);
             return;
         }
+
+        case STATE_DECODE_SEEK_WAIT:
+        {
+            do_process_video_decode_seek_wait(evt);
+            return;
+        }
         default:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine Invalid state!\n");
@@ -136,9 +142,9 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_wait(player_event_e e
             return;
         }
         case EVT_PLAY:
-        {
-            return;
-        }
+        //{
+        //    return;
+        //}
 
         case EVT_RESUME:
         {
@@ -226,6 +232,37 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
 
             return;
         }
+        case EVT_SEEK:
+        {
+
+            this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
+            return;
+        }
+        default:
+        {
+            return;
+        }
+    }
+
+}
+
+void MediaDecodeVideoStateMachine::do_process_video_decode_seek_wait(player_event_e evt)
+{
+    switch(evt)
+    {
+        case EVT_SEEK_DONE:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_SEEK_DONE!\n");
+            this->state_machine_change_state(STATE_DECODER_WAIT);
+            return;
+        }
+        case EVT_SEEK_PAUSE:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_SEEK_PAUSE!\n");
+
+            return;
+        }
+
         default:
         {
             return;
