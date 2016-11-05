@@ -123,6 +123,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
     }
 
 
+
     public void play(){
         mMediaPlayer.playInterface();
         // set GLSurfaceView.Render MODE
@@ -345,4 +346,14 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         }
     }
 
+    @Override
+    public void seekTo(int msec) {
+        if (isInPlaybackState()) {
+            setRenderMode(RENDERMODE_WHEN_DIRTY);   // set render mode
+            mMediaPlayer.seekTo(msec);
+            mSeekWhenPrepared = 0;
+        } else {
+            mSeekWhenPrepared = msec;
+        }
+    }
 }

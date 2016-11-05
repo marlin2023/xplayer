@@ -265,7 +265,7 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
         if(this->audio_stream->start_time != AV_NOPTS_VALUE)
         {
             this->beginning_audio_pts = (int64_t)(this->audio_stream->start_time * av_q2d(this->audio_stream->time_base)*1000);
-            XLog::e(TAG ,"set audio begin pts = %lld\n",this->beginning_audio_pts);
+            XLog::e(TAG ,"==beginning_audio_pts ,set audio begin pts = %lld\n",this->beginning_audio_pts);
         }
 
     }else if(codec_context->codec_type == AVMEDIA_TYPE_VIDEO){
@@ -273,7 +273,7 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
         if(this->video_stream->start_time != AV_NOPTS_VALUE)
         {
             this->beginning_video_pts = (int64_t)(this->video_stream->start_time * av_q2d(this->video_stream->time_base)*1000);
-            XLog::e(TAG ,"set video begin pts = %lld\n",this->beginning_video_pts);
+            XLog::e(TAG ,"==beginning_video_pts ,set video begin pts = %lld\n",this->beginning_video_pts);
         }
     }
 
