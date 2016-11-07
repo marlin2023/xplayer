@@ -159,6 +159,7 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_wait(player_event_e e
 
         default:
         {
+            XLog::e(TAG ,"===>AUDIO_DECODE_WAIT receive others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -179,6 +180,7 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_start(player_event_e 
         }
         default:
         {
+            XLog::e(TAG ,"===>AUDIO_DECODE_START receive others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -235,6 +237,7 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
         }
         default:
         {
+            XLog::e(TAG ,"===>AUDIO_DECODE_WORK receive others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -260,6 +263,7 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_seek_wait(player_even
 
         default:
         {
+            XLog::e(TAG ,"===>AUDIO_DECODE_SEEK_WAIT receive others EVT:%d\n" ,evt);
             return;
         }
     }

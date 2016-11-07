@@ -337,14 +337,15 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                     //STATE_SEEK_WAIT
                     // after seek, discard packet that comes from last play
                     XLog::e(TAG ,"===>state_machine: sending seek done evt to decoder!\n");
+                    this->state_machine_change_state(STATE_PLAY_WAIT);
+                    this->mediaFileHandle->notify(MEDIA_SEEK_COMPLETE ,0 ,0);
+
                     // Notify decoder thread
                     this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_SEEK_DONE);
                     this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_SEEK_DONE);
                     this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_PLAY);
                     this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_PLAY);
 
-                    this->state_machine_change_state(STATE_PLAY_WAIT);
-                    this->mediaFileHandle->notify(MEDIA_SEEK_COMPLETE ,0 ,0);
                     return;
                 }
 
@@ -389,7 +390,8 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
     switch(evt)
     {
         case EVT_START: // TODO
-
+        case EVT_RESUME:    // after seek
+        {XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_RESUME Event.\n");}
         case EVT_PLAY:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_PLAY Event.\n");
@@ -633,14 +635,14 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
 
             // Notify UI and engine to send buffering start message
             this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
-
+            this->state_machine_change_state(STATE_BUFFERING);
             // Note that this event is sent by decode thread when it is in its wait state
             ffmpeg_do_seek();
 
             // do resume actions
             av_read_play(fc);
 
-            this->state_machine_change_state(STATE_BUFFERING);
+            //this->state_machine_change_state(STATE_BUFFERING);
             // send read next packet message
             this->message_queue->push(EVT_GO_ON);
 

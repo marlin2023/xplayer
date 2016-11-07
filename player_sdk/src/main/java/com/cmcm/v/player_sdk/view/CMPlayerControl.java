@@ -22,6 +22,7 @@ public interface CMPlayerControl extends MediaController.MediaPlayerControl {
     int STATE_PLAYING = 3;
     int STATE_PAUSED = 4;
     int STATE_PLAYBACK_COMPLETED = 5;
+    int STATE_SEEKING = 6;
 
     // video view layout types
     int VIDEO_LAYOUT_FIT_PARENT = 0;

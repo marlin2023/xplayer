@@ -297,6 +297,8 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
     @Override
     public void start() throws IllegalStateException {
         try {
+            if(mCurrentState == STATE_SEEKING){return;} // add for soft decoder.
+
             if (isInPlaybackState()) {
                 if(mCurrentState == STATE_PAUSED){
                     mMediaPlayer.resume();
@@ -352,6 +354,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         if (isInPlaybackState()) {
             setRenderMode(RENDERMODE_WHEN_DIRTY);   // set render mode
             mMediaPlayer.seekTo(msec);
+            mCurrentState = STATE_SEEKING;
             mSeekWhenPrepared = 0;
         } else {
             mSeekWhenPrepared = msec;

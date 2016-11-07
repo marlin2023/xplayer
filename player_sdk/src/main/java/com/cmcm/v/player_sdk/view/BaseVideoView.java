@@ -387,6 +387,7 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                         mHasFistrPic = true;
                     }
 
+                    mCurrentState = STATE_PAUSED ; // set by yanlong
                     Log.d(TAG, "onSeekComplete");
                     if (mOnSeekCompleteListener != null) {
                         mOnSeekCompleteListener.onSeekComplete(mp);

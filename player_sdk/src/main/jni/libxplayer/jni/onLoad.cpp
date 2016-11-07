@@ -342,7 +342,10 @@ static void native_seekTo(JNIEnv *env, jobject thiz ,jlong seekedPositionMsec )
 {
     long seek_time = seekedPositionMsec;
     XLog::e(TAG ,"======>native_seekTo :%ld" ,seek_time);
+    // set current_position_ms
+    playerInner->mediaFileHandle->current_position_ms = seekedPositionMsec;
     playerInner->seekTo(seek_time);
+
 }
 
 

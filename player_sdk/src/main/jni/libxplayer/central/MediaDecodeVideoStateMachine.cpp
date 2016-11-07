@@ -170,6 +170,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_wait(player_event_e e
 
         default:
         {
+            XLog::e(TAG ,"===>VIDEO_DECODE_WAIT receive others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -189,6 +190,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_start(player_event_e 
         }
         default:
         {
+            XLog::e(TAG ,"===>VIDEO_DECODE_START receive others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -248,6 +250,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
         }
         default:
         {
+            XLog::e(TAG ,"===>VIDEO_DECODE_WORK receive others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -273,6 +276,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_seek_wait(player_even
 
         default:
         {
+            XLog::e(TAG ,"===>VIDEO_DECODE_SEEK_WAIT receive others EVT:%d\n" ,evt);
             return;
         }
     }
