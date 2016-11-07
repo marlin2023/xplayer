@@ -20,12 +20,12 @@ typedef enum _player_event_e_
     EVT_START,                  // 5
     EVT_PLAY ,                  // 6 ,play
     EVT_PAUSE,
-    EVT_RESUME ,                  // resume after pause
+    EVT_RESUME ,                  // 8 resume after pause
 
     EVT_SEEK_PAUSE,
-    EVT_SEEK,                   // player want to seek trigger this msg.
+    EVT_SEEK,                   // 10 player want to seek trigger this msg.
     EVT_READY_TO_SEEK,
-    EVT_SEEK_DONE,
+    EVT_SEEK_DONE,              // 12
 
     EVT_STOP,
     EVT_BUFFERING,

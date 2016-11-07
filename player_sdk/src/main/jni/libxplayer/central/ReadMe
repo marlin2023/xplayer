@@ -125,6 +125,13 @@ Such as Video Decoder State Machine has state :
 
 
 
+-
+- 播放过程中 Loading
+    -
+    -    case HANDLER_TIME: 根据进度条来显示更新，这个需要修改。
+
+    -
+
 
 
 

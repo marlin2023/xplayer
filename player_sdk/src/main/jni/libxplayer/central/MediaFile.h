@@ -19,6 +19,7 @@ extern "C" {
 #include "PacketQueue.h"
 #include "FrameQueue.h"
 #include "MediaPlayerListener.h"
+#include "util/XMessageQueue.h"
 
 #define x_min(a,b) (((a) < (b)) ? (a):(b))
 #define x_max(a,b) (((a) > (b)) ? (a):(b))
@@ -263,6 +264,22 @@ public:
      * the first audio packet in the video stream
      */
     int64_t                 beginning_audio_pts;
+
+
+    /**
+     * message queue for CentralEngineStateMachine
+     */
+    XMessageQueue *message_queue_central_engine;
+
+    /**
+     * message queue for MediaDecodeVideoStateMachine
+     */
+    XMessageQueue *message_queue_video_decode;
+
+    /**
+     * message queue for MediaDecodeAudioStateMachine
+     */
+    XMessageQueue *message_queue_audio_decode;
 
 
 };

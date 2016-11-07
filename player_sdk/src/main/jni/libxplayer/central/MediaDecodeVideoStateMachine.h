@@ -82,7 +82,7 @@ public:
     /**
      * message queue for MediaDecodeVideoStateMachine
      */
-    XMessageQueue *message_queue;
+    //XMessageQueue *message_queue;
 
     /**
      * video decoder machine Current State

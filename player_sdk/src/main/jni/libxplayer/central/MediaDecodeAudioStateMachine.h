@@ -85,7 +85,7 @@ public:
     /**
      * message queue for MediaDecodeAudioStateMachine
      */
-    XMessageQueue *message_queue;
+    //XMessageQueue *message_queue;
 
     /**
      * audio decoder machine Current State

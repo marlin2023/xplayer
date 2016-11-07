@@ -81,8 +81,8 @@ CM_BOOL PlayerInner::player_engine_prepare()
 {
     // 1.initialize message queue for all state machines.
     // demux state machine push EVT_START
-    centralEngineStateMachineHandle->message_queue->push(EVT_OPEN);
-    XLog::e(TAG ,"create media demux thread size %d\n",centralEngineStateMachineHandle->message_queue->size());
+    mediaFileHandle->message_queue_central_engine->push(EVT_OPEN);
+    XLog::e(TAG ,"create media demux thread size %d\n",mediaFileHandle->message_queue_central_engine->size());
 }
 
 CM_BOOL PlayerInner::player_start()
@@ -126,9 +126,10 @@ void PlayerInner::seekTo(long msec)
     this->mediaFileHandle->seekpos = msec;
     //
     av_read_pause(this->mediaFileHandle->format_context);
-    centralEngineStateMachineHandle->message_queue->push(EVT_SEEK);
-    mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_SEEK);
-    mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_SEEK);
+    mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
+    mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
+
+    //mediaFileHandle->message_queue_central_engine->push(EVT_SEEK);
 
 }
 

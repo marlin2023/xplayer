@@ -17,7 +17,7 @@ MediaDecodeAudioStateMachine::MediaDecodeAudioStateMachine(MediaFile *mediaFile)
 {
     this->mediaFileHandle = mediaFile;
 
-    this->message_queue = new XMessageQueue();
+    this->mediaFileHandle->message_queue_audio_decode = new XMessageQueue();
 
     // initialize the state
     this->state = STATE_DECODER_START;
@@ -74,7 +74,7 @@ void * MediaDecodeAudioStateMachine::audio_decode_thread()
     player_event_e evt;
     while(1){
 
-        evt = this->message_queue->pop();
+        evt = this->mediaFileHandle->message_queue_audio_decode->pop();
         //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeAudioStateMachine msq evt = %d\n" ,evt);
 
         // Exit thread until receive the EXIT_THREAD EVT
@@ -141,7 +141,7 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_wait(player_event_e e
             this->state_machine_change_state(STATE_DECODER_WORK);
 
             // step into decode loop logic, to make it loops, we send message selfly
-            this->message_queue->push(EVT_DECODE_GO_ON);
+            this->mediaFileHandle->message_queue_audio_decode->push(EVT_DECODE_GO_ON);
             return;
         }
         case EVT_STOP:
@@ -171,11 +171,12 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_start(player_event_e 
 {
     switch(evt)
     {
+        case EVT_RESUME:
         case EVT_START:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeAudioStateMachine recv start event,goto work state!\n");
             this->state_machine_change_state(STATE_DECODER_WORK);
-            this->message_queue->push(EVT_DECODE_GO_ON);
+            this->mediaFileHandle->message_queue_audio_decode->push(EVT_DECODE_GO_ON);
             return;
         }
         default:
@@ -199,7 +200,7 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
             {
                 //audio_frame_q->full_func(audio_frame_q->full_parm);
                 usleep(50000);
-                this->message_queue->push(EVT_DECODE_GO_ON);
+                this->mediaFileHandle->message_queue_audio_decode->push(EVT_DECODE_GO_ON);
                 return;
             }
 
@@ -210,7 +211,7 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
             //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeAudioStateMachine ,pkt.size = %d ,rr=%d ,ret =%d\n" ,pkt.size ,rr ,ret);
 
             decode_one_audio_packet(&pkt );
-            this->message_queue->push(EVT_DECODE_GO_ON);
+            this->mediaFileHandle->message_queue_audio_decode->push(EVT_DECODE_GO_ON);
 
             return;
         }
@@ -231,7 +232,7 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
 
         case EVT_SEEK:
         {
-
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>decoder audio: receive EVT_SEEK\n");
             this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
             return;
         }

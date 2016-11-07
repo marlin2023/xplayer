@@ -54,7 +54,7 @@ public :
     /**
      * message queue for MediaDecodeVideoStateMachine
      */
-    XMessageQueue *message_queue;
+    //XMessageQueue *message_queue;
 
     /**
      * demux state machine Current State
@@ -66,6 +66,7 @@ public :
      */
     player_state_e                old_state;
 
+    bool hasShowFirstPic ;
 private:
 
     /**

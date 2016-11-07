@@ -209,20 +209,19 @@ static void native_prepareAsync(JNIEnv *env, jobject thiz)
 
 static void native_start(JNIEnv *env, jobject thiz)
 {
-    playerInner->player_engine_prepare();
-    playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_START);   //TODO here should be performed in upper layer
+    //playerInner->player_engine_prepare();
+    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_START);   //TODO here should be performed in upper layer
+    usleep(50* 1000);   // for seek
 }
 
 static void native_play(JNIEnv *env, jobject thiz)
 {
     // start audio decoder & video decoder thread.
     // TODO send EVT_START to audio decode state machine & video decode state machine should be put in el_do_start_central_engine
-    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_START);
-    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_START);
-
+    playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_START);
+    playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_START);
     // TODO
-    playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_PLAY);
-
+    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_PLAY);
     // audio render thread.
     playerInner->player_start();
     XLog::e(TAG ,"======>playerInner->player_start.SimpleBufferQueueCallback");
@@ -238,9 +237,9 @@ static void native_pause(JNIEnv *env, jobject thiz)
     playerInner->audioRender->pause();
 
     // process state
-    playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_PAUSE);
-    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_PAUSE);
-    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_PAUSE);
+    playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_PAUSE);
+    playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_PAUSE);
+    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_PAUSE);
 
 }
 
@@ -255,10 +254,9 @@ static void native_resume(JNIEnv *env, jobject thiz)
     playerInner->audioRender->resume();
 
     // process state
-    playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_RESUME);
-    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_RESUME);
-    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_RESUME);
-
+    playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_RESUME);
+    playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_RESUME);
+    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_RESUME);
 }
 
 static void native_stop(JNIEnv *env, jobject thiz)
@@ -267,9 +265,9 @@ static void native_stop(JNIEnv *env, jobject thiz)
     playerInner->audioRender->pause();
 
     // process state
-    playerInner->centralEngineStateMachineHandle->message_queue->push_front(EVT_STOP);
-    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push_front(EVT_STOP);
-    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push_front(EVT_STOP);
+    playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_STOP);
+    playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_STOP);
+    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_STOP);
 
     // clear packet&frame q
     playerInner->mediaFileHandle->audio_queue->flush();
@@ -284,21 +282,22 @@ static void native_release(JNIEnv *env, jobject thiz)
     // 关闭文件之前，分别向几个队列发CLOSE消息。
     // 这几个队列现在不处理CLOSE消息了，直接退出线程
 
-    playerInner->centralEngineStateMachineHandle->message_queue->push_front(EVT_CLOSE);
-    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push_front(EVT_CLOSE);
-    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push_front(EVT_CLOSE);
+    playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_CLOSE);
+    playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_CLOSE);
+    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_CLOSE);
 
-    playerInner->centralEngineStateMachineHandle->message_queue->push_front(EVT_EXIT_THREAD);
-    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->push_front(EVT_EXIT_THREAD);
-    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->push_front(EVT_EXIT_THREAD);
+
+    playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_EXIT_THREAD);
+    playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_EXIT_THREAD);
+    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_EXIT_THREAD);
 
     pthread_join(playerInner->media_demux_tid, NULL);
     pthread_join(playerInner->decode_video_tid, NULL);
     pthread_join(playerInner->decode_audio_tid, NULL);
 
-    playerInner->centralEngineStateMachineHandle->message_queue->flush();
-    playerInner->mediaDecodeAudioStateMachineHandle->message_queue->flush();
-    playerInner->mediaDecodeVideoStateMachineHandle->message_queue->flush();
+    playerInner->mediaFileHandle->message_queue_video_decode->flush();
+    playerInner->mediaFileHandle->message_queue_audio_decode->flush();
+    playerInner->mediaFileHandle->message_queue_central_engine->flush();
 
     // TODO
     // Release ffmpeg resources

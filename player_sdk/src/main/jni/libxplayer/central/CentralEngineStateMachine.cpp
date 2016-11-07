@@ -22,10 +22,11 @@ CentralEngineStateMachine::CentralEngineStateMachine(MediaFile *mediaFile)
     this->read_retry_count = 0;
 
     // init message queue for media demux state machine.
-    this->message_queue = new XMessageQueue();
+    this->mediaFileHandle->message_queue_central_engine = new XMessageQueue();
 
     // init the state
     this->state = STATE_IDLE;
+    this->hasShowFirstPic = false;
 }
 
 CentralEngineStateMachine::CentralEngineStateMachine(MediaFile *mediaFile ,
@@ -39,10 +40,12 @@ CentralEngineStateMachine::CentralEngineStateMachine(MediaFile *mediaFile ,
     this->read_retry_count = 0;
 
     // init message queue for media demux state machine.
-    this->message_queue = new XMessageQueue();
+    this->mediaFileHandle->message_queue_central_engine = new XMessageQueue();
 
     // init the state
     this->state = STATE_IDLE;
+
+    this->hasShowFirstPic = false;
 }
 
 CentralEngineStateMachine::~CentralEngineStateMachine()
@@ -125,7 +128,7 @@ void CentralEngineStateMachine::central_engine_thread(MediaFile *mediaFile)
 
     while(1){
 
-        evt = message_queue->pop();
+        evt = this->mediaFileHandle->message_queue_central_engine->pop();
         //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDemuxStateMachine msq evt = %d\n" ,evt);
 
         // Exit thread until receive the EXIT_THREAD EVT
@@ -286,7 +289,7 @@ void CentralEngineStateMachine::central_engine_do_process_prepared(player_event_
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PREPARED receive EVT_START.\n");
             this->state_machine_change_state(STATE_BUFFERING);
-            this->message_queue->push(EVT_GO_ON);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
 
 
             // TODO
@@ -333,38 +336,37 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"===>is_pkt_q_full break;.\n");
                 // TODO ,here should to notify upper layer
                 // TODO
-                if(this->old_state == STATE_SEEK_WAIT){
+                if( (this->old_state == STATE_SEEK_WAIT ) && (this->hasShowFirstPic == true)){
                     //STATE_SEEK_WAIT
                     // after seek, discard packet that comes from last play
-                    XLog::e(TAG ,"===>state_machine: sending seek done evt to decoder!\n");
+                    XLog::e(TAG ,"===>state_machine: sending seek done evt to decoder 00!\n");
                     this->state_machine_change_state(STATE_PLAY_WAIT);
                     this->mediaFileHandle->notify(MEDIA_SEEK_COMPLETE ,0 ,0);
 
                     // Notify decoder thread
-                    this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_SEEK_DONE);
-                    this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_SEEK_DONE);
-                    this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_PLAY);
-                    this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_PLAY);
-
+                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_SEEK_DONE);
+                    this->mediaFileHandle->message_queue_video_decode->push(EVT_SEEK_DONE);
+                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_PLAY);
+                    this->mediaFileHandle->message_queue_video_decode->push(EVT_PLAY);
                     return;
                 }
 
+                XLog::e(TAG ,"===>state_machine: show first pic 0\n");
                 this->mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
                 this->state_machine_change_state(STATE_PLAY_WAIT);
                 // TODO
                 this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
-                //this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
+                this->hasShowFirstPic = true;
 
                 return;
             }
-            this->message_queue->push(EVT_GO_ON);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             return;
         }
         case EVT_SEEK:
         {
             this->state_machine_change_state(STATE_SEEK_WAIT);
-            this->message_queue->push(EVT_READY_TO_SEEK);
-            //do_seek_pause_central_engine();
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
         }
 
@@ -398,7 +400,7 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
             this->state_machine_change_state(STATE_PLAY_PLAYING);
 
             //
-            this->message_queue->push(EVT_GO_ON);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             return;
         }
 
@@ -438,7 +440,7 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
                 // TODO
                 this->state_machine_change_state(STATE_PLAY_FILE_END);
                 // send message
-                this->message_queue->push(EVT_GO_ON);
+                this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
                 //
                 return;
             }
@@ -464,7 +466,7 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
             }
 
             //
-            this->message_queue->push(EVT_GO_ON);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             return;
         }
         case EVT_PAUSE:
@@ -482,7 +484,7 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
         case EVT_SEEK:
         {
             this->state_machine_change_state(STATE_SEEK_WAIT);
-            this->message_queue->push(EVT_READY_TO_SEEK);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             //do_seek_pause_central_engine();
             return;
         }
@@ -511,11 +513,12 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
 
                 XLog::e(TAG ,"====>state_machine: notify eof and should quit ...\n");
                 this->state_machine_change_state(STATE_PLAY_COMPLETE);
-                this->message_queue->push(EVT_STOP);    // receive stop msg
+                this->mediaFileHandle->message_queue_central_engine->push(EVT_STOP);
+                //this->message_queue->push(EVT_STOP);    // receive stop msg
                 this->mediaFileHandle->notify(MEDIA_PLAYBACK_COMPLETE ,0 ,0);
             }else{
                 usleep(50000);
-                this->message_queue->push(EVT_GO_ON);
+                this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             }
             return;
         }
@@ -577,7 +580,7 @@ void CentralEngineStateMachine::central_engine_do_process_play_paused(player_eve
         {
             this->state_machine_change_state(STATE_PLAY_PLAYING);
             // send read next packet message
-            this->message_queue->push(EVT_GO_ON);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             return;
         }
         case EVT_STOP:
@@ -589,7 +592,8 @@ void CentralEngineStateMachine::central_engine_do_process_play_paused(player_eve
         case EVT_SEEK:
         {
             this->state_machine_change_state(STATE_SEEK_WAIT);
-            this->message_queue->push(EVT_READY_TO_SEEK);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
+
             return;
         }
         default:
@@ -644,8 +648,7 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
 
             //this->state_machine_change_state(STATE_BUFFERING);
             // send read next packet message
-            this->message_queue->push(EVT_GO_ON);
-
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             // after seek, discard packet that comes from last play
             //XLog::e(TAG ,"===>state_machine: sending seek done evt to decoder!\n");
             // Notify decoder thread
