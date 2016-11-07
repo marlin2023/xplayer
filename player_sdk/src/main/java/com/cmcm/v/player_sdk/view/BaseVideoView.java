@@ -356,11 +356,7 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
             } else {
                 // We don't know the video size yet, but should start
                 // anyway. The video size might be reported to us later.
-                //TODO:
-//                if (mTargetState == STATE_PLAYING) {
-//                    start();
-//                }
-                if(true){
+                if (mTargetState == STATE_PLAYING) {
                     start();
                 }
             }
