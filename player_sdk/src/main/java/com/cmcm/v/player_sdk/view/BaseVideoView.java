@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -95,6 +96,10 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
         mVideoSarNum = 0;
         mVideoSarDen = 0;
         mHasFistrPic = false;
+
+        setFocusable(true);
+        setFocusableInTouchMode(true);
+        requestFocus();
 
         mCurrentState = STATE_IDLE;
         mTargetState = STATE_IDLE;
@@ -606,6 +611,55 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
         }
 
         return false;
+    }
+
+    @Override
+    public boolean onTrackballEvent(MotionEvent ev) {
+        if (isInPlaybackState() && mMediaController != null) {
+            toggleMediaControlsVisibility();
+        }
+        return false;
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        boolean isKeyCodeSupported = keyCode != KeyEvent.KEYCODE_BACK &&
+                keyCode != KeyEvent.KEYCODE_VOLUME_UP &&
+                keyCode != KeyEvent.KEYCODE_VOLUME_DOWN &&
+                keyCode != KeyEvent.KEYCODE_VOLUME_MUTE &&
+                keyCode != KeyEvent.KEYCODE_MENU &&
+                keyCode != KeyEvent.KEYCODE_CALL &&
+                keyCode != KeyEvent.KEYCODE_ENDCALL;
+        if (isInPlaybackState() && isKeyCodeSupported && mMediaController != null) {
+            if (keyCode == KeyEvent.KEYCODE_HEADSETHOOK ||
+                    keyCode == KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE) {
+                if (mMediaPlayer.isPlaying()) {
+                    pause();
+                    mMediaController.show();
+                } else {
+                    start();
+                    mMediaController.hide();
+                }
+                return true;
+            } else if (keyCode == KeyEvent.KEYCODE_MEDIA_PLAY) {
+                if (!mMediaPlayer.isPlaying()) {
+                    start();
+                    mMediaController.hide();
+                }
+                return true;
+            } else if (keyCode == KeyEvent.KEYCODE_MEDIA_STOP
+                    || keyCode == KeyEvent.KEYCODE_MEDIA_PAUSE) {
+                if (mMediaPlayer.isPlaying()) {
+                    pause();
+                    mMediaController.show();
+                }
+                return true;
+            } else {
+                toggleMediaControlsVisibility();
+            }
+        }
+
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
