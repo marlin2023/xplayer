@@ -149,7 +149,8 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
             mMediaPlayer.setOnPreparedListener(mPreparedListener);
             mMediaPlayer.setOnCompletionListener(mCompletionListener);
             mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
-            mMediaPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
+            //mMediaPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
+            mMediaPlayer.setOnSeekCompleteListener(mSeekCompleteListener);
             mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
             mMediaPlayer.setOnErrorListener(mErrorListener);
             mMediaPlayer.setOnInfoListener(mInfoListener);
@@ -298,12 +299,12 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         try {
             if (isInPlaybackState()) {
                 if(mCurrentState == STATE_PAUSED){
-                    setRenderMode(RENDERMODE_CONTINUOUSLY); // set render mode RENDERMODE_CONTINUOUSLY
                     mMediaPlayer.resume();
                 }else{
                     mMediaPlayer.start();
                 }
                 mCurrentState = STATE_PLAYING;
+                setRenderMode(RENDERMODE_CONTINUOUSLY); // set render mode RENDERMODE_CONTINUOUSLY
             }
             mTargetState = STATE_PLAYING;
         } catch (Exception e) {

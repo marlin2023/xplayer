@@ -160,6 +160,14 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_wait(player_event_e e
             this->state_machine_change_state(STATE_DECODER_START);
             return;
         }
+
+        case EVT_SEEK:
+        {
+
+            this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
+            return;
+        }
+
         default:
         {
             return;

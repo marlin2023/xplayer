@@ -15,10 +15,10 @@ typedef enum _player_event_e_
     EVT_DECODE_GO_ON ,
     EVT_VIDEO_SYNC_GO_ON ,
 
-    EVT_OPEN ,
+    EVT_OPEN ,                  // 3
     EVT_CLOSE,
-    EVT_START,
-    EVT_PLAY ,                  // play
+    EVT_START,                  // 5
+    EVT_PLAY ,                  // 6 ,play
     EVT_PAUSE,
     EVT_RESUME ,                  // resume after pause
 

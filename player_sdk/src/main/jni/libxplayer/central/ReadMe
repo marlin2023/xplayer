@@ -110,6 +110,21 @@ Such as Video Decoder State Machine has state :
 
 
 
+-
+-
+- seek
+    现在浏览器的seek ，完了后会再掉BaseVideoView的start（） 方法。
+
+    需要把播放器的三个状态机的流程和工作再梳理下。。。。
+
+    seek 时间点：
+            1.播放中seek
+            2.暂停时候seek
+            3.缓冲中seek
+            4.播放结束seek.
+
+
+
 
 
 

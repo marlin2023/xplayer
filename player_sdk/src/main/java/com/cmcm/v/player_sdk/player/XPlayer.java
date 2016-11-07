@@ -309,7 +309,13 @@ public class XPlayer extends SimpleMediaPlayer {
                     return;
                 }
                 case MEDIA_SEEK_COMPLETE:
+                {
+                    Log.e(TAG ,"====>on ...MEDIA_SEEK_COMPLETE");
+                    if (mOnSeekCompleteListener != null){
+                        mOnSeekCompleteListener.onSeekComplete(mMediaPlayer);
+                    }
                     return;
+                }
 
                 case MEDIA_SET_VIDEO_SIZE:
                 {

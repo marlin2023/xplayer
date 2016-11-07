@@ -333,15 +333,37 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"===>is_pkt_q_full break;.\n");
                 // TODO ,here should to notify upper layer
                 // TODO
-                this->state_machine_change_state(STATE_PLAY_WAIT);
-                this->mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
+                if(this->old_state == STATE_SEEK_WAIT){
+                    //STATE_SEEK_WAIT
+                    // after seek, discard packet that comes from last play
+                    XLog::e(TAG ,"===>state_machine: sending seek done evt to decoder!\n");
+                    // Notify decoder thread
+                    this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_SEEK_DONE);
+                    this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_SEEK_DONE);
+                    this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_PLAY);
+                    this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_PLAY);
 
+                    this->state_machine_change_state(STATE_PLAY_WAIT);
+                    this->mediaFileHandle->notify(MEDIA_SEEK_COMPLETE ,0 ,0);
+                    return;
+                }
+
+                this->mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
+                this->state_machine_change_state(STATE_PLAY_WAIT);
                 // TODO
                 this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
+                //this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
 
                 return;
             }
             this->message_queue->push(EVT_GO_ON);
+            return;
+        }
+        case EVT_SEEK:
+        {
+            this->state_machine_change_state(STATE_SEEK_WAIT);
+            this->message_queue->push(EVT_READY_TO_SEEK);
+            //do_seek_pause_central_engine();
             return;
         }
 
@@ -366,10 +388,14 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
 {
     switch(evt)
     {
+        case EVT_START: // TODO
+
         case EVT_PLAY:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_PLAY Event.\n");
             this->state_machine_change_state(STATE_PLAY_PLAYING);
+
+            //
             this->message_queue->push(EVT_GO_ON);
             return;
         }
@@ -377,6 +403,11 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
         case EVT_STOP:
         {
             this->state_machine_change_state(STATE_STOPPED);
+            return;
+        }
+        default:
+        {
+            XLog::e(TAG ,"===>STATE_PLAY_WAIT receive others EVT:%d\n" ,evt);
             return;
         }
 
@@ -456,6 +487,7 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
 
         default:
         {
+            XLog::e(TAG ,"===>STATE_PLAYING receive others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -498,6 +530,11 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
+        default:
+        {
+            XLog::e(TAG ,"===>STATE_FILE_END_OF receive others EVT:%d\n" ,evt);
+            return;
+        }
 
     }
     return;
@@ -518,6 +555,12 @@ void CentralEngineStateMachine::central_engine_do_process_play_complete(player_e
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
+        default:
+        {
+            XLog::e(TAG ,"===>STATE_PLAY_COMPLETE receive others EVT:%d\n" ,evt);
+            return;
+        }
+
 
     }
     return;
@@ -541,6 +584,19 @@ void CentralEngineStateMachine::central_engine_do_process_play_paused(player_eve
             return;
         }
 
+        case EVT_SEEK:
+        {
+            this->state_machine_change_state(STATE_SEEK_WAIT);
+            this->message_queue->push(EVT_READY_TO_SEEK);
+            return;
+        }
+        default:
+        {
+            XLog::e(TAG ,"===>STATE_PLAY_PAUSED receive others EVT:%d\n" ,evt);
+            return;
+        }
+
+
     }
     return;
 
@@ -553,6 +609,11 @@ void CentralEngineStateMachine::central_engine_do_process_play_stopped(player_ev
         case EVT_CLOSE:
         {
             this->state_machine_change_state(STATE_IDLE);
+            return;
+        }
+        default:
+        {
+            XLog::e(TAG ,"===>STATE_PLAY_STOPPED receive others EVT:%d\n" ,evt);
             return;
         }
 
@@ -576,13 +637,6 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
             // Note that this event is sent by decode thread when it is in its wait state
             ffmpeg_do_seek();
 
-            // after seek, discard packet that comes from last play
-            XLog::e(TAG ,"===>state_machine: sending seek done evt to decoder!\n");
-
-            // Notify decoder thread
-            this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_SEEK_DONE);
-            this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_SEEK_DONE);
-
             // do resume actions
             av_read_play(fc);
 
@@ -590,8 +644,19 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
             // send read next packet message
             this->message_queue->push(EVT_GO_ON);
 
+            // after seek, discard packet that comes from last play
+            //XLog::e(TAG ,"===>state_machine: sending seek done evt to decoder!\n");
+            // Notify decoder thread
+            //this->mediaDecodeAudioStateMachineHandle->message_queue->push(EVT_SEEK_DONE);
+            //this->mediaDecodeVideoStateMachineHandle->message_queue->push(EVT_SEEK_DONE);
             return;
         }
+        default:
+        {
+            XLog::e(TAG ,"===>STATE_SEEK_WAIT receive others EVT:%d\n" ,evt);
+            return;
+        }
+
 
     }
     return;

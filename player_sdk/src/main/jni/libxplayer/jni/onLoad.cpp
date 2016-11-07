@@ -246,6 +246,11 @@ static void native_pause(JNIEnv *env, jobject thiz)
 
 static void native_resume(JNIEnv *env, jobject thiz)
 {
+    if(playerInner->centralEngineStateMachineHandle->state == STATE_BUFFERING){
+        XLog::e(TAG ,"======>call native_resume,but in buffering state ,and return.");
+        return;
+    }
+
     // audio opensl es
     playerInner->audioRender->resume();
 
