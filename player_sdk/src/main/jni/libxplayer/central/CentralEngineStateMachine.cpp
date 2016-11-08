@@ -342,7 +342,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                     XLog::e(TAG ,"===>state_machine: sending seek done evt to decoder 00!\n");
                     this->state_machine_change_state(STATE_PLAY_WAIT);
                     this->mediaFileHandle->notify(MEDIA_SEEK_COMPLETE ,0 ,0);
-
+                    //this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
                     // Notify decoder thread
                     this->mediaFileHandle->message_queue_audio_decode->push(EVT_SEEK_DONE);
                     this->mediaFileHandle->message_queue_video_decode->push(EVT_SEEK_DONE);
@@ -356,6 +356,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                 this->state_machine_change_state(STATE_PLAY_WAIT);
                 // TODO
                 this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
+                this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
                 this->hasShowFirstPic = true;
 
                 return;
@@ -398,9 +399,10 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_PLAY Event.\n");
             this->state_machine_change_state(STATE_PLAY_PLAYING);
-
             //
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
+            this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
+
             return;
         }
 
@@ -486,6 +488,13 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             //do_seek_pause_central_engine();
+            return;
+        }
+        case EVT_BUFFERING:
+        {
+            XLog::e(TAG ,"===>STATE_PLAYING receive EVT_BUFFERING EVT:\n");
+            this->state_machine_change_state(STATE_BUFFERING);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             return;
         }
 

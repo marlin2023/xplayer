@@ -62,7 +62,15 @@ public:
     */
     int max_node_count; // upper limit node count
 
+    /**
+    * empty function parameter handle.
+    */
+    void *empty_param; //
+
+
 private:
+
+    void notify_buffering_start();
 
     /**
     * first frame in frame queue.

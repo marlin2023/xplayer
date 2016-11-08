@@ -6,6 +6,8 @@
 
 #include "FrameQueue.h"
 #include "util/XLog.h"
+#include "MediaFile.h"
+#include "xplayer_android_def.h"
 
 FrameQueue::FrameQueue()
 {
@@ -120,6 +122,8 @@ int FrameQueue::get(AVFrame *frame)
             ret = 1;
             break;
         } else {
+            // TODO FRAME队列为空，这个时候需要判断下对应的packet队列是不是空，如果空则通知Buffering。
+            notify_buffering_start();
             pthread_cond_wait(&cond, &mutex);
         }
 
@@ -137,4 +141,29 @@ int FrameQueue::size()
     //pthread_mutex_unlock(&mutex);
 
     return nb_frame;
+}
+
+
+void FrameQueue::notify_buffering_start()
+{
+    MediaFile *mediaFileHandle = (MediaFile *)empty_param;
+    XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue.\n");
+    if(X_MAX_FRAME_VIDEO_Q_NODE_CNT == max_node_count){
+        if(mediaFileHandle->video_queue->size() == 0){
+            XLog::e(TAG ,"==>in notify_buffering_start function ，video frame have no data FrameQueue.\n");
+            // notify
+            // Notify UI and engine to send buffering start message
+            mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
+
+            // EVT_BUFFERING
+        }
+    }else{
+        if(mediaFileHandle->audio_queue->size() == 0){
+            XLog::e(TAG ,"==>in notify_buffering_start function ，audio frame have no data FrameQueue.\n");
+            // notify
+            mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
+
+        }
+    }
+
 }

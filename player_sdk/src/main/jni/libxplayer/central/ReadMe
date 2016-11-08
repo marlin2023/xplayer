@@ -132,9 +132,18 @@ Such as Video Decoder State Machine has state :
 
     -
 
+    - video | audio packet queue is empty will call callback function to notify buffering
+                - struct list_node *q_pop 函数
+                    // block until new code added
+                    if(q_head->empty_func)
+                    {
+                        el_mutex_unlock(q_head->mutex);
+                        q_head->empty_func(q_head->empty_parm);
+                        el_mutex_lock(q_head->mutex);
+                    }
+    -
 
-
-
+-
 
 
 

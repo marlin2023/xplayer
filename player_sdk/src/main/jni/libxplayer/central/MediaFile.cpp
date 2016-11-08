@@ -22,6 +22,8 @@ MediaFile::MediaFile()
     audio_frame_queue = new FrameQueue(X_MAX_FRAME_AUDIO_Q_NODE_CNT);
     video_frame_queue = new FrameQueue(X_MAX_FRAME_VIDEO_Q_NODE_CNT);
 
+    audio_frame_queue->empty_param = this;
+    video_frame_queue->empty_param = this;
     //
     audio_codec_context = NULL;
     video_codec_context = NULL;
