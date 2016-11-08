@@ -125,6 +125,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         mMediaPlayer.playInterface();
         // set GLSurfaceView.Render MODE
         setRenderMode(RENDERMODE_CONTINUOUSLY); // set render mode RENDERMODE_CONTINUOUSLY
+        mCurrentState = STATE_PLAYING;
     }
 
 
