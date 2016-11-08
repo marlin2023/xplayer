@@ -96,6 +96,44 @@ int FrameQueue::put(AVFrame *frame)
     return 0;
 }
 
+int FrameQueue::get(AVFrame *frame , bool block)
+{
+    AVFrameList *frame1;
+    int ret;
+
+    pthread_mutex_lock(&mutex);
+    for(;;) {
+
+        frame1 = first_frame;
+        if (frame1) {
+            first_frame = frame1->next;
+            if (!first_frame){
+                last_frame = NULL;
+            }
+
+            node_count --;
+            av_frame_ref(frame, frame1->frame); // set frame
+            av_frame_unref(frame1->frame);
+            av_frame_free(&frame1->frame);
+            av_free(frame1);
+
+            ret = 1;
+            break;
+        }  else if (!block) {
+            ret = 0;
+            break;
+        }else {
+            // TODO FRAME队列为空，这个时候需要判断下对应的packet队列是不是空，如果空则通知Buffering。
+            notify_buffering_start();
+            pthread_cond_wait(&cond, &mutex);
+        }
+
+    }
+    pthread_mutex_unlock(&mutex);
+
+    return ret;
+
+}
 
 int FrameQueue::get(AVFrame *frame)
 {

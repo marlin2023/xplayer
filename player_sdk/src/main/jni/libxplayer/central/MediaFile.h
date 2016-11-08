@@ -154,6 +154,10 @@ private:
 
 
 public:
+
+    bool stop_flag;
+
+    bool file_opened;
     /**
      * format context for input file
      */

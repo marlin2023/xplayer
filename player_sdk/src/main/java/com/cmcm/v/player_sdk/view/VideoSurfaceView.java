@@ -2,12 +2,9 @@ package com.cmcm.v.player_sdk.view;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.media.AudioManager;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
-
 
 import com.cmcm.v.player_sdk.player.IMediaPlayer;
 import com.cmcm.v.player_sdk.player.XPlayer;

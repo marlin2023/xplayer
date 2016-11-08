@@ -70,6 +70,8 @@ OpenSLEngine::OpenSLEngine(MediaFile *mediaFile)
 
     m_paused = false;
     m_running = true;
+
+    isInitialized = false;
 }
 
 OpenSLEngine::~OpenSLEngine()
@@ -277,6 +279,6 @@ int OpenSLEngine::InitPlayout()
     createEngine();
     createOutputMix();
     createAudioPlayer();
-
+    isInitialized = true;
     return 0;
 }

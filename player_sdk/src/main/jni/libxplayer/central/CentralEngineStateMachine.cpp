@@ -134,6 +134,7 @@ void CentralEngineStateMachine::central_engine_thread(MediaFile *mediaFile)
         // Exit thread until receive the EXIT_THREAD EVT
         if(evt == EVT_EXIT_THREAD)
         {
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDemuxStateMachine msq evt = EVT_EXIT_THREAD\n");
             break;
         }
 
@@ -249,8 +250,11 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
 
             if(mediaFileHandle->open())
             {
-
-
+                if(mediaFileHandle->stop_flag){
+                    XLog::d(ANDROID_LOG_INFO ,TAG ,"===>initialized state ready EVT_STOP ,change to stopped.\n");
+                    this->state_machine_change_state(STATE_STOPPED);
+                    return;
+                }
 
                 // open success.
                 this->state_machine_change_state(STATE_PREPARED);
@@ -264,6 +268,11 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
             }
             else
             {
+                if(mediaFileHandle->stop_flag){
+                    XLog::d(ANDROID_LOG_INFO ,TAG ,"===>initialized state ready EVT_STOP ,change to stopped.\n");
+                    this->state_machine_change_state(STATE_STOPPED);
+                    return;
+                }
                 // open failed
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: open file:-%s- failed !!!\n" ,mediaFileHandle->getSourceUrl());
                 this->state_machine_change_state(STATE_INITIALIZED);
@@ -271,6 +280,7 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
 
             return;
         }
+
         default:
         {
             return;
@@ -373,6 +383,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
 
         case EVT_STOP:
         {
+            XLog::e(TAG ,"===>STATE_BUFFERING receive EVT_STOP\n" );
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
@@ -434,9 +445,9 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
             // the eof of file or read error .
             if (demux_2_packet_queue() == AVERROR_EOF && this->read_retry_count > 5)
             {
-                XLog::e(TAG ,"state_machine:PLAYING FILE EOF,vpktq = %d,apktq = %d\n",
-                        mediaFileHandle->video_queue->size(),
-                        mediaFileHandle->audio_queue->size());
+                //XLog::e(TAG ,"state_machine:PLAYING FILE EOF,vpktq = %d,apktq = %d\n",
+                //        mediaFileHandle->video_queue->size(),
+                //        mediaFileHandle->audio_queue->size());
 
                 //is_file_eof = EL_TRUE;
                 // TODO
@@ -452,10 +463,10 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
             {
                 ret = 1;
 
-                XLog::d(ANDROID_LOG_INFO ,TAG ,"===> pkt q full, %d,%d,%d\n",
-                mediaFileHandle->video_queue->size(),
-                mediaFileHandle->audio_queue->size(),
-                mediaFileHandle->video_queue->q_size);
+                //XLog::d(ANDROID_LOG_INFO ,TAG ,"===> pkt q full, %d,%d,%d\n",
+                //mediaFileHandle->video_queue->size(),
+                //mediaFileHandle->audio_queue->size(),
+                //mediaFileHandle->video_queue->q_size);
             }
 
             if(ret)

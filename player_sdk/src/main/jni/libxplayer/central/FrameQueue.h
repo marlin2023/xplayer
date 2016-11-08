@@ -50,6 +50,12 @@ public:
     */
     int get(AVFrame *frame);
 
+    /**
+    * get avframe from the frame queue.
+    * return < 0 if aborted, 0 if no packet and > 0 if packet.
+    */
+    int get(AVFrame *frame , bool block);
+
     int size(); //nb_frames
 
     /**

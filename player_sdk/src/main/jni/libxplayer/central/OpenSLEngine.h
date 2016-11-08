@@ -131,6 +131,11 @@ public:
 
     SwrContext *swr_ctx;
 
+    /**
+     * mark if created success or not
+     */
+    bool isInitialized;
+
 };
 
 

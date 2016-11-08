@@ -261,8 +261,18 @@ static void native_resume(JNIEnv *env, jobject thiz)
 
 static void native_stop(JNIEnv *env, jobject thiz)
 {
-    // audio opensl es
-    playerInner->audioRender->pause();
+    XLog::e(TAG ,"======>in native_stop 1.");
+    if(playerInner->audioRender->isInitialized){
+        XLog::e(TAG ,"======>in native_stop 1.1.");
+        // audio opensl es
+        playerInner->audioRender->pause();
+        XLog::e(TAG ,"======>in native_stop 1.2.");
+    }
+    XLog::e(TAG ,"======>in native_stop 2.");
+
+    // set
+    playerInner->mediaFileHandle->stop_flag = true;
+    XLog::e(TAG ,"======>in native_stop 2.1");
 
     // process state
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_STOP);
@@ -274,6 +284,7 @@ static void native_stop(JNIEnv *env, jobject thiz)
     playerInner->mediaFileHandle->video_queue->flush();
     playerInner->mediaFileHandle->audio_frame_queue->flush();
     playerInner->mediaFileHandle->video_frame_queue->flush();
+    XLog::e(TAG ,"======>in native_stop 3.");
 
 }
 
@@ -282,23 +293,29 @@ static void native_release(JNIEnv *env, jobject thiz)
     // 关闭文件之前，分别向几个队列发CLOSE消息。
     // 这几个队列现在不处理CLOSE消息了，直接退出线程
 
-    playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_CLOSE);
-    playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_CLOSE);
-    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_CLOSE);
+    playerInner->mediaFileHandle->message_queue_video_decode->push_front(EVT_CLOSE);
+    playerInner->mediaFileHandle->message_queue_audio_decode->push_front(EVT_CLOSE);
+    playerInner->mediaFileHandle->message_queue_central_engine->push_front(EVT_CLOSE);
 
 
-    playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_EXIT_THREAD);
-    playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_EXIT_THREAD);
-    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_EXIT_THREAD);
+    playerInner->mediaFileHandle->message_queue_video_decode->push_front(EVT_EXIT_THREAD);
+    playerInner->mediaFileHandle->message_queue_audio_decode->push_front(EVT_EXIT_THREAD);
+    playerInner->mediaFileHandle->message_queue_central_engine->push_front(EVT_EXIT_THREAD);
 
+    XLog::e(TAG ,"======>in native_release 1.");
     pthread_join(playerInner->media_demux_tid, NULL);
+    XLog::e(TAG ,"======>in native_release 2.");
     pthread_join(playerInner->decode_video_tid, NULL);
+    XLog::e(TAG ,"======>in native_release 3.");
     pthread_join(playerInner->decode_audio_tid, NULL);
+    XLog::e(TAG ,"======>in native_release 4.");
 
     playerInner->mediaFileHandle->message_queue_video_decode->flush();
+    XLog::e(TAG ,"======>in native_release 5.");
     playerInner->mediaFileHandle->message_queue_audio_decode->flush();
+    XLog::e(TAG ,"======>in native_release 6.");
     playerInner->mediaFileHandle->message_queue_central_engine->flush();
-
+    XLog::e(TAG ,"======>in native_release 7.");
     // TODO
     // Release ffmpeg resources
 

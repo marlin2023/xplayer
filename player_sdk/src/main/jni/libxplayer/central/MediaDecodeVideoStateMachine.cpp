@@ -88,6 +88,7 @@ void * MediaDecodeVideoStateMachine::video_decode_thread(MediaFile *mediaFile)
         // Exit thread until receive the EXIT_THREAD EVT
         if(evt == EVT_EXIT_THREAD)
         {
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine msq evt = EVT_EXIT_THREAD\n" );
             break;
         }
 

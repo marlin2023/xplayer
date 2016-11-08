@@ -80,6 +80,7 @@ void * MediaDecodeAudioStateMachine::audio_decode_thread()
         // Exit thread until receive the EXIT_THREAD EVT
         if(evt == EVT_EXIT_THREAD)
         {
+            XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeAudioStateMachine msq evt = EVT_EXIT_THREAD\n" );
             break;
         }
 

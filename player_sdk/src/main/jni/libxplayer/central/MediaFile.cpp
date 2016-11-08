@@ -29,6 +29,10 @@ MediaFile::MediaFile()
     video_codec_context = NULL;
 
     //
+    file_opened = false;
+    stop_flag = false;  // not stop
+
+    //
     //
     // 如果是网络文件, 设置Buffer时间以及超时时间
     //if (strstr((const char *)source_url,"http://") ||
@@ -76,6 +80,22 @@ void MediaFile::notify(int msg, int ext1, int ext2)
     }
 }
 
+static int decode_interrupt_cb(void *ctx)
+{
+    MediaFile *is = (MediaFile *)ctx;
+
+    // 返回1，表示要ffmpeg退出被阻塞的内部函数，是Quit的含义。
+    // 如果文件没有打开，则不阻塞。
+    // 如果文件已经打开了，则该阻塞的，还是要阻塞
+    //int quit_ffmpeg_block = !is->file_opened;
+
+    if(is->stop_flag){
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>in decode_interrupt_cb ,stop_flag is true. \n");
+        return 1; // exit
+    }
+    return 0;
+}
+
 
 CM_BOOL MediaFile::open()
 {
@@ -93,6 +113,12 @@ CM_BOOL MediaFile::open()
         ret = CM_FALSE;
         goto notify_callback;
     }
+
+    // set interrup call back
+    // 设置最新版ffmpeg 1.0的回调格式
+    // 处理网络堵塞的情况，一直读取不到数据，程序无法退出
+    format_context->interrupt_callback.callback = decode_interrupt_cb;
+    format_context->interrupt_callback.opaque = this;
 
     // 2. Read packets of a media file to get stream information.
     ret = avformat_find_stream_info(format_context, NULL);
@@ -130,6 +156,8 @@ CM_BOOL MediaFile::open()
     stream_index[AVMEDIA_TYPE_VIDEO] = -1;
     stream_index[AVMEDIA_TYPE_AUDIO] = -1;
     av_support = HAS_NONE;
+
+    if(this->stop_flag){ return true;}
 
     XLog::d(ANDROID_LOG_INFO ,TAG ,"==> Traversing streams information in file ,nb_streams=%d\n" ,format_context->nb_streams);
     // Traversing streams information in file.
@@ -212,6 +240,9 @@ CM_BOOL MediaFile::open()
         ret = CM_FALSE;
         goto notify_callback;
     }
+
+    // set
+    file_opened = true;
 
     ret = CM_TRUE;
 
