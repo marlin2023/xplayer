@@ -46,7 +46,7 @@ void audioPlayerCallback(SLAndroidSimpleBufferQueueItf bq,
     // set current position
     openSLEngine->mediaFileHandle->current_position_ms = audioFrame->pkt_pts * av_q2d(openSLEngine->mediaFileHandle->audio_stream->time_base) * 1000 - openSLEngine->mediaFileHandle->beginning_audio_pts;   // in millisecond , use
 
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_audio_clock_time=%f\n", openSLEngine->mediaFileHandle->sync_audio_clock_time);
+    //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_audio_clock_time=%f\n", openSLEngine->mediaFileHandle->sync_audio_clock_time);
 
     // end
     int resampled_data_size = outsamples * audioFrame->channels * av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
