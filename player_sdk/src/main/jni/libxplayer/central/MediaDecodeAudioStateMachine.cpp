@@ -27,6 +27,10 @@ MediaDecodeAudioStateMachine::MediaDecodeAudioStateMachine(MediaFile *mediaFile)
 
 MediaDecodeAudioStateMachine::~MediaDecodeAudioStateMachine()
 {
+    if(this->mediaFileHandle->message_queue_audio_decode){
+        delete this->mediaFileHandle->message_queue_audio_decode;
+        this->mediaFileHandle->message_queue_audio_decode   = NULL;
+    }
 
 }
 

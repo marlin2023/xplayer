@@ -265,7 +265,7 @@ static void native_stop(JNIEnv *env, jobject thiz)
     if(playerInner->audioRender->isInitialized){
         XLog::e(TAG ,"======>in native_stop 1.1.");
         // audio opensl es
-        playerInner->audioRender->pause();
+        playerInner->audioRender->stop();
         XLog::e(TAG ,"======>in native_stop 1.2.");
     }
     XLog::e(TAG ,"======>in native_stop 2.");
@@ -318,7 +318,13 @@ static void native_release(JNIEnv *env, jobject thiz)
     XLog::e(TAG ,"======>in native_release 7.");
     // TODO
     // Release ffmpeg resources
-
+    playerInner->mediaFileHandle->close_file();
+    XLog::e(TAG ,"======>in native_release 8.");
+    if(playerInner){
+        delete playerInner;
+        playerInner = NULL;
+    }
+    XLog::e(TAG ,"======>in native_release 12.");
 }
 
 

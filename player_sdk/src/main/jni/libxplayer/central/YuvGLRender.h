@@ -159,6 +159,10 @@ private:
      */
     GLuint simpleProgram;
 
+    GLuint vertexShader;
+
+    GLuint fragmentShader;
+
     GLuint mPositionSlot;
 
     GLuint mT_texCoordInSlot;

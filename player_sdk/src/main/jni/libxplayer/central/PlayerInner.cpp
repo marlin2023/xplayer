@@ -27,6 +27,50 @@ PlayerInner::PlayerInner()
 
 }
 
+PlayerInner::~PlayerInner()
+{
+    XLog::e(TAG ,"======>in ~PlayerInner start.");
+
+    if(mediaFileHandle){
+        XLog::e(TAG ,"======>delete mediaFileHandle.");
+        delete mediaFileHandle;
+        mediaFileHandle = NULL;
+    }
+
+    if(mediaDecodeAudioStateMachineHandle){
+        XLog::e(TAG ,"======>delete mediaDecodeAudioStateMachineHandle.");
+        delete         mediaDecodeAudioStateMachineHandle;
+        mediaDecodeAudioStateMachineHandle = NULL;
+    }
+
+    if(mediaDecodeVideoStateMachineHandle){
+        XLog::e(TAG ,"======>delete mediaDecodeVideoStateMachineHandle.");
+        delete         mediaDecodeVideoStateMachineHandle;
+        mediaDecodeVideoStateMachineHandle = NULL;
+    }
+
+    if(centralEngineStateMachineHandle){
+        XLog::e(TAG ,"======>delete centralEngineStateMachineHandle.");
+        delete centralEngineStateMachineHandle;
+        centralEngineStateMachineHandle = NULL;
+    }
+
+    // audio engine
+    if(audioRender){
+        XLog::e(TAG ,"======>delete audioRender.");
+        delete audioRender;
+        audioRender = NULL;
+    }
+
+    // yuv gl
+    if(yuvGLRender){
+        XLog::e(TAG ,"======>delete yuvGLRender.");
+        delete yuvGLRender;
+        yuvGLRender = NULL;
+    }
+    XLog::e(TAG ,"======>in ~PlayerInner end.");
+}
+
 /**
  * player central engine init.
  */
@@ -132,7 +176,6 @@ void PlayerInner::seekTo(long msec)
     //mediaFileHandle->message_queue_central_engine->push(EVT_SEEK);
 
 }
-
 
 //-----------*******************-------------
 //          Thread according to function

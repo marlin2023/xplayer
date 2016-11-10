@@ -27,7 +27,10 @@ MediaDecodeVideoStateMachine::MediaDecodeVideoStateMachine(MediaFile *mediaFile)
 
 MediaDecodeVideoStateMachine::~MediaDecodeVideoStateMachine()
 {
-
+    if(this->mediaFileHandle->message_queue_video_decode){
+        delete this->mediaFileHandle->message_queue_video_decode;
+        this->mediaFileHandle->message_queue_video_decode = NULL;
+    }
 }
 
 void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)

@@ -126,6 +126,12 @@ public:
     */
     CM_BOOL is_pkt_q_full(int64_t buffer_ts_duration);
 
+    /**
+    * close file stream ,and free resource .
+    */
+    void close_file();
+
+
 private:
     /**
     * OPEN given stream by stream_index

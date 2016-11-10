@@ -68,6 +68,9 @@ OpenSLEngine::OpenSLEngine(MediaFile *mediaFile)
 
     mediaFileHandle = mediaFile;
 
+    resampled_buf = NULL;
+    swr_ctx = NULL;
+
     m_paused = false;
     m_running = true;
 
@@ -76,7 +79,17 @@ OpenSLEngine::OpenSLEngine(MediaFile *mediaFile)
 
 OpenSLEngine::~OpenSLEngine()
 {
+    // audio buffer
+    if(resampled_buf)
+    {
+        free(resampled_buf);
+        resampled_buf = NULL;
+    }
 
+    if(swr_ctx != NULL){
+        swr_free(&swr_ctx);
+        swr_ctx = NULL;
+    }
 
 }
 
@@ -249,8 +262,8 @@ int OpenSLEngine::createAudioPlayer()
         // init context
         #define MAX_AUDIO_FRAME_SIZE 192000 // 1 second of 48khz 32bit audio
 
-        int out_size = MAX_AUDIO_FRAME_SIZE*100;
-        resampled_buf = (uint8_t *)malloc(out_size);;
+        int out_size = MAX_AUDIO_FRAME_SIZE*10; // *100
+        resampled_buf = (uint8_t *)malloc(out_size);
         if(resampled_buf == NULL){
             XLog::e(TAG ,"===resampled_buf malloc failed. ");
             return -1;

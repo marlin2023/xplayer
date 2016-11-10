@@ -50,7 +50,13 @@ CentralEngineStateMachine::CentralEngineStateMachine(MediaFile *mediaFile ,
 
 CentralEngineStateMachine::~CentralEngineStateMachine()
 {
+    if(this->mediaFileHandle->message_queue_central_engine){
+        delete this->mediaFileHandle->message_queue_central_engine;
+        this->mediaFileHandle->message_queue_central_engine = NULL;
+    }
 
+    this->state = STATE_IDLE;
+    this->hasShowFirstPic = false;
 }
 
 int CentralEngineStateMachine::demux_2_packet_queue()

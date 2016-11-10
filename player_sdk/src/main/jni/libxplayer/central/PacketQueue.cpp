@@ -45,6 +45,7 @@ void PacketQueue::flush()
     for(pkt = first_packet; pkt != NULL; pkt = pkt1) {
         pkt1 = pkt->next;
         av_packet_unref(&pkt->pkt);
+        XLog::e(TAG ,"==>av_free packet ....\n");
         av_freep(&pkt);
     }
 
@@ -66,15 +67,6 @@ int PacketQueue::put(AVPacket* pkt)
         XLog::e(TAG ,"==>av_malloc failed.\n");
         return AVERROR(ENOMEM);
     }
-
-#if 0
-//    if ( (ret = av_packet_ref(pkt, pkt) ) < 0) {
-    //if ( (ret = av_packet_ref(&pkt1->pkt, pkt) ) < 0) {   // if use like this ,will change pkt side_data .
-//        av_free(pkt1);
-//        XLog::e(TAG ,"==>av_packet_ref failed.\n");
-//        return ret;
-//    }
-#endif
 
     pkt1->pkt = *pkt;
     pkt1->next = NULL;

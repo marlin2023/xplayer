@@ -46,6 +46,7 @@ void FrameQueue::flush()
         frame1 = frame->next;
         av_frame_free(&frame->frame);
         av_free(frame);
+        XLog::e(TAG ,"==>av_frame_free called.\n");
     }
 
     last_frame = NULL;

@@ -23,7 +23,18 @@ YuvGLRender::YuvGLRender(MediaFile *mediaFile)
 YuvGLRender::~YuvGLRender()
 {
 
+    // delete teture
+     glDeleteTextures(1, &textureYId);
+     textureYId = -1;
+     glDeleteTextures(1, &textureUId);
+     textureUId = -1;
+     glDeleteTextures(1, &textureVId);
+     textureVId = -1;
 
+    // free opengl resource
+    glDeleteShader(vertexShader);
+    glDeleteShader(fragmentShader);
+    glDeleteProgram(simpleProgram);
 }
 
 void YuvGLRender::init()
@@ -174,8 +185,8 @@ GLuint YuvGLRender::buildShader(const char* source, GLenum shaderType)
 GLuint YuvGLRender::buildProgram(const char* vertexShaderSource,
         const char* fragmentShaderSource)
 {
-    GLuint vertexShader = buildShader(vertexShaderSource, GL_VERTEX_SHADER);
-    GLuint fragmentShader = buildShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
+    vertexShader = buildShader(vertexShaderSource, GL_VERTEX_SHADER);
+    fragmentShader = buildShader(fragmentShaderSource, GL_FRAGMENT_SHADER);
     GLuint programHandle = glCreateProgram();
 
     if (programHandle)

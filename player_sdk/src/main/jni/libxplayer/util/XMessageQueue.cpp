@@ -24,7 +24,14 @@ XMessageQueue::XMessageQueue(char *name)
 
 XMessageQueue::~XMessageQueue()
 {
-    this->msg_queue.clear();
+
+    flush();
+
+    pthread_mutex_destroy(&mutexLock);
+    pthread_cond_destroy(&has_node);
+    pthread_cond_destroy(&has_space);
+
+    this->node_count_current = 0;
 }
 
 int XMessageQueue::init()
@@ -77,27 +84,6 @@ int XMessageQueue::push_front(player_event_e evt_type)
 
     return 0;
 }
-
-#if 0
-int XMessageQueue::push(ipc_msg_node_t *msg_node)
-{
-    pthread_mutex_lock(this->mutexLock);
-
-    if(this->msg_queue.size() >= this->node_count_max){ // full
-        pthread_cond_wait(&this->has_space, this->mutexLock);
-    }
-
-    // add message at the tail.
-    this->msg_queue.push_back(msg_node);
-    // alter node_count
-    this->node_count_current ++;
-
-    pthread_mutex_unlock(this->mutexLock);
-    pthread_cond_signal(&this->has_node);
-
-    return 0;
-}
-#endif
 
 
 player_event_e XMessageQueue::pop()

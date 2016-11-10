@@ -61,6 +61,29 @@ MediaFile::MediaFile()
 
 MediaFile::~MediaFile()
 {
+    // destroy queue
+    XLog::e(TAG ,"======>in ~MediaFile start.");
+    if(audio_queue){
+        delete audio_queue;
+        audio_queue = NULL;
+    }
+
+    if(video_queue){
+        delete video_queue;
+        video_queue = NULL;
+    }
+
+    if(audio_frame_queue){
+        delete audio_frame_queue;
+        audio_frame_queue = NULL;
+    }
+
+    if(video_frame_queue){
+        delete video_frame_queue;
+        video_frame_queue = NULL;
+    }
+    XLog::e(TAG ,"======>in ~MediaFile end.");
+
 
 }
 
@@ -432,4 +455,29 @@ is_not_full:
 
 }
 
+void MediaFile::close_file()
+{
 
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource .");
+    // Close the codec
+    if (audio_stream)
+    {
+        audio_stream->discard = AVDISCARD_ALL;
+        avcodec_close(audio_codec_context);
+        avcodec_free_context(&audio_codec_context);
+    }
+
+    if (video_stream)
+    {
+        video_stream->discard = AVDISCARD_ALL;
+        avcodec_close(video_codec_context);
+        avcodec_free_context(&video_codec_context);
+    }
+
+    if(format_context)
+    {
+        avformat_close_input(&format_context);
+        format_context = NULL;
+    }
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource end .");
+}
