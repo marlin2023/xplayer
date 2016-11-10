@@ -160,6 +160,7 @@ private:
 
 
 public:
+    bool end_of_file;
 
     bool stop_flag;
 
@@ -262,6 +263,11 @@ public:
      * seek position (in millisecond)
      */
     int64_t     seekpos;
+
+    /**
+     * seeking mark
+     */
+    int seeking_mark;
 
     /**
      * the first video packet in the video stream

@@ -187,6 +187,11 @@ void FrameQueue::notify_buffering_start()
 {
     MediaFile *mediaFileHandle = (MediaFile *)empty_param;
     XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue.\n");
+    if(mediaFileHandle->end_of_file){
+        XLog::e(TAG ,"==>in notify_buffering_start function ,is the end of file..\n");
+        return ;
+    }
+
     if(X_MAX_FRAME_VIDEO_Q_NODE_CNT == max_node_count){
         if(mediaFileHandle->video_queue->size() == 0){
             XLog::e(TAG ,"==>in notify_buffering_start function ，video frame have no data FrameQueue.\n");

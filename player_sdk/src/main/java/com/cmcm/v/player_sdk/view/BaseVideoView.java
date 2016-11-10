@@ -130,8 +130,6 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
         int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
         int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
 
-        Log.e(TAG, "=====>on BaseVideoView onMeasure, get width =" + width + ",mVideoWidth =" + mVideoWidth);
-        Log.e(TAG, "=====>on BaseVideoView onMeasure, get height =" + height + ",mVideoHeight =" + mVideoHeight);
         if (mVideoWidth > 0 && mVideoHeight > 0) {
             int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
             int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -157,7 +155,7 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                     if (mVideoSarNum > 0 && mVideoSarDen > 0){
 
                         displayAspectRatio = displayAspectRatio * mVideoSarNum / mVideoSarDen;
-                        Log.e(TAG, "=====>on BaseVideoView onMeasure mVideoSarNum =" + mVideoSarNum + "mVideoSarDen= " + mVideoSarDen +" ,displayAspectRatio =" + displayAspectRatio);
+                        //Log.e(TAG, "=====>on BaseVideoView onMeasure mVideoSarNum =" + mVideoSarNum + "mVideoSarDen= " + mVideoSarDen +" ,displayAspectRatio =" + displayAspectRatio);
                     }
 
                     break;
@@ -203,10 +201,8 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                     break;
             }
         }
-        Log.e(TAG, "=====>on BaseVideoView onMeasure 1,after compute ,surfaceview size :width =" + width + ",height =" + height);
+        //Log.e(TAG, "=====>on BaseVideoView onMeasure 1,after compute ,surfaceview size :width =" + width + ",height =" + height);
         setMeasuredDimension(width, height);
-//        setMeasuredDimension(984,553);
-        //setMeasuredDimension(640,360);
     }
 
 

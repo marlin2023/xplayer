@@ -160,7 +160,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         try {
 
             mMediaPlayer.setOnPreparedListener(mPreparedListener);
-            mMediaPlayer.setOnCompletionListener(mCompletionListener);
+            mMediaPlayer.setOnCompletionListener(mXplayerCompletionListener);
             mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
             mMediaPlayer.setOnSeekCompleteListener(mSeekCompleteListener);
             mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
@@ -171,7 +171,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
             mLastPositionOnCompletion = 0;
             mMediaPlayer.setDataSource(mUri.toString());
             //mMediaPlayer.setDisplay(mSurfaceHolder);
-//            mMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             mMediaPlayer.setScreenOnWhilePlaying(true);
             mMediaPlayer.prepareAsync();
 
@@ -312,6 +311,11 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
             if(mCurrentState == STATE_SEEKING){return;} // add for soft decoder.
 
             if (isInPlaybackState()) {
+//                // if in the end of file
+//                if(mMediaPlayer){
+//
+//                }
+
                 if(mCurrentState == STATE_PAUSED){
                     mMediaPlayer.resume();
                 }else{
@@ -355,9 +359,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
             mMediaPlayer = null;
             mCurrentState = STATE_IDLE;
             mTargetState = STATE_IDLE;
-//            AudioManager am = (AudioManager) mAppContext.getSystemService(
-//                    Context.AUDIO_SERVICE);
-//            am.abandonAudioFocus(null);
         }
     }
 
@@ -372,4 +373,31 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
             mSeekWhenPrepared = msec;
         }
     }
+
+    protected IMediaPlayer.OnCompletionListener mXplayerCompletionListener =
+            new IMediaPlayer.OnCompletionListener() {
+                public void onCompletion(IMediaPlayer mp) {
+                    mDuration = getDuration();
+                    mLastPositionOnCompletion = getCurrentPosition();
+                    setRenderMode(RENDERMODE_WHEN_DIRTY); // set mode
+
+                    if (mMediaController != null) {
+                        mMediaController.hide();
+                    }
+                    if(hasErrorWhenComplete()) { //断网时，或是播放中断网然后seekto就会走if分支
+                        mCurrentState = STATE_ERROR;
+                        mTargetState = STATE_PLAYBACK_COMPLETED;
+                        if (mOnErrorListener != null) {
+                            mOnErrorListener.onError(mMediaPlayer, 2, 0); //这种播放完成失败的定义为what=2，extra=0
+                        }
+                    } else {
+                        mCurrentState = STATE_PLAYBACK_COMPLETED;
+                        mTargetState = STATE_PLAYBACK_COMPLETED;
+                        if (mOnCompletionListener != null) {
+                            mOnCompletionListener.onCompletion(mMediaPlayer);
+                        }
+                    }
+                }
+            };
+
 }

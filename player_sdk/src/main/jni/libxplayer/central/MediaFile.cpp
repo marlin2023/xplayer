@@ -55,12 +55,14 @@ MediaFile::MediaFile()
 
     duration_ms = 0;
     current_position_ms = 0;
-
+    end_of_file = false;
 }
 
 
 MediaFile::~MediaFile()
 {
+    end_of_file = false;
+
     // destroy queue
     XLog::e(TAG ,"======>in ~MediaFile start.");
     if(audio_queue){

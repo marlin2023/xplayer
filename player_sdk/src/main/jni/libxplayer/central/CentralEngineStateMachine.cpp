@@ -364,6 +364,8 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                     this->mediaFileHandle->message_queue_video_decode->push(EVT_SEEK_DONE);
                     this->mediaFileHandle->message_queue_audio_decode->push(EVT_PLAY);
                     this->mediaFileHandle->message_queue_video_decode->push(EVT_PLAY);
+                    // re set seek_mark
+                    this->mediaFileHandle->seeking_mark = 0;
                     return;
                 }
 
@@ -374,6 +376,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                 this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
                 this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
                 this->hasShowFirstPic = true;
+                this->mediaFileHandle->seeking_mark = 0;
 
                 return;
             }
@@ -458,6 +461,7 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
                 //is_file_eof = EL_TRUE;
                 // TODO
                 this->state_machine_change_state(STATE_PLAY_FILE_END);
+                this->mediaFileHandle->end_of_file = true;
                 // send message
                 this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
                 //

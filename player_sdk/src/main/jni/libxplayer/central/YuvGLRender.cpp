@@ -66,13 +66,13 @@ void YuvGLRender::render_frame()
 {
     AVFrame *src_frame;
     src_frame = av_frame_alloc();
-    // TODO
     //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .");
     //this->mediaFileHandle->video_frame_queue->get(src_frame);
     int ret1 = this->mediaFileHandle->video_frame_queue->get(src_frame ,0); // no block mode
     if(ret1 != 1){
         XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .no video frame ,return");
         usleep(50 * 1000); //in microseconds
+        av_frame_free(&src_frame);  // free frame memory
         return;
     }
 
