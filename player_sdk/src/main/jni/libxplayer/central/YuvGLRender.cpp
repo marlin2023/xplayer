@@ -32,6 +32,14 @@ void YuvGLRender::init()
     glUseProgram(simpleProgram);
     XLog::d(ANDROID_LOG_WARN ,TAG ,"==>simpleProgram:%d\n", simpleProgram);
 
+    mPositionSlot = glGetAttribLocation(simpleProgram, "vPosition");
+    mT_texCoordInSlot = glGetAttribLocation(simpleProgram, "a_texCoord");
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"===>mPositionSlot:%d mT_texCoordInSlot:%d", mPositionSlot,
+                                               mT_texCoordInSlot);
+    glEnableVertexAttribArray(mPositionSlot);
+    glEnableVertexAttribArray(mT_texCoordInSlot);
+
+
     glGenTextures(1, &textureYId);
     XLog::d(ANDROID_LOG_WARN ,TAG ,"==>textureYId:%d\n", textureYId);
     glGenTextures(1, &textureUId);
@@ -94,29 +102,26 @@ void YuvGLRender::render_frame()
     GLint tex_v = glGetUniformLocation(simpleProgram, "SamplerV");
     checkGlError("glGetUniformLocation");
 
-    glBindAttribLocation(simpleProgram, ATTRIB_VERTEX, "vPosition");
-    glBindAttribLocation(simpleProgram, ATTRIB_TEXTURE, "a_texCoord");
-    checkGlError("glBindAttribLocation");
+    //GLint ATTRIB_VERTEX = glGetAttribLocation(simpleProgram, "vPosition");
+    //GLint ATTRIB_TEXTURE = glGetAttribLocation(simpleProgram, "a_texCoord");
+    //glBindAttribLocation(simpleProgram, ATTRIB_VERTEX, "vPosition");
+    //glBindAttribLocation(simpleProgram, ATTRIB_TEXTURE, "a_texCoord");
 
-    glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, 0, 0, squareVertices);
-    glEnableVertexAttribArray(ATTRIB_VERTEX);
+    //checkGlError("glBindAttribLocation");
 
-    glVertexAttribPointer(ATTRIB_TEXTURE, 2, GL_FLOAT, 0, 0, coordVertices);
-    glEnableVertexAttribArray(ATTRIB_TEXTURE);
+    glVertexAttribPointer(mPositionSlot, 2, GL_FLOAT, 0, 0, squareVertices);
+    glEnableVertexAttribArray(mPositionSlot);
+
+    glVertexAttribPointer(mT_texCoordInSlot, 2, GL_FLOAT, 0, 0, coordVertices);
+    glEnableVertexAttribArray(mT_texCoordInSlot);
 
     glActiveTexture(GL_TEXTURE0);
-    checkGlError("glActiveTexture");
     glBindTexture(GL_TEXTURE_2D, textureYId);
-    checkGlError("glBindTexture");
     glUniform1i(tex_y, 0);
-    checkGlError("glUniform1i");
 
     glActiveTexture(GL_TEXTURE1);
-    checkGlError("glActiveTexture");
     glBindTexture(GL_TEXTURE_2D, textureUId);
-    checkGlError("glBindTexture");
     glUniform1i(tex_u, 1);
-    checkGlError("glUniform1i");
 
     glActiveTexture(GL_TEXTURE2);
     checkGlError("glActiveTexture");

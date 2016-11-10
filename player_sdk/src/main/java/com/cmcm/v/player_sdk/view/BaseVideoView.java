@@ -97,6 +97,7 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
         mVideoSarDen = 0;
         mHasFistrPic = false;
 
+        getHolder().addCallback(mSHCallback);
         setFocusable(true);
         setFocusableInTouchMode(true);
         requestFocus();
@@ -128,6 +129,9 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
 
         int width = getDefaultSize(mVideoWidth, widthMeasureSpec);
         int height = getDefaultSize(mVideoHeight, heightMeasureSpec);
+
+        Log.e(TAG, "=====>on BaseVideoView onMeasure, get width =" + width + ",mVideoWidth =" + mVideoWidth);
+        Log.e(TAG, "=====>on BaseVideoView onMeasure, get height =" + height + ",mVideoHeight =" + mVideoHeight);
         if (mVideoWidth > 0 && mVideoHeight > 0) {
             int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
             int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
@@ -150,8 +154,12 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                 case VIDEO_LAYOUT_WRAP_CONTENT:
                 default:
                     displayAspectRatio = (float) mVideoWidth / (float) mVideoHeight;
-                    if (mVideoSarNum > 0 && mVideoSarDen > 0)
+                    if (mVideoSarNum > 0 && mVideoSarDen > 0){
+
                         displayAspectRatio = displayAspectRatio * mVideoSarNum / mVideoSarDen;
+                        Log.e(TAG, "=====>on BaseVideoView onMeasure mVideoSarNum =" + mVideoSarNum + "mVideoSarDen= " + mVideoSarDen +" ,displayAspectRatio =" + displayAspectRatio);
+                    }
+
                     break;
             }
             boolean shouldBeWider = displayAspectRatio > specAspectRatio;
@@ -195,9 +203,38 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                     break;
             }
         }
-
+        Log.e(TAG, "=====>on BaseVideoView onMeasure 1,after compute ,surfaceview size :width =" + width + ",height =" + height);
         setMeasuredDimension(width, height);
+//        setMeasuredDimension(984,553);
+        //setMeasuredDimension(640,360);
     }
+
+
+    SurfaceHolder.Callback mSHCallback = new SurfaceHolder.Callback()
+    {
+
+        @Override
+        public void surfaceChanged(SurfaceHolder holder,
+                                   int format,
+                                   int w,
+                                   int h) {
+            mSurfaceWidth = w;
+            mSurfaceHeight = h;
+            Log.i("chenyg", "SurfaceChanged() ,mSurfaceWidth =" + mSurfaceWidth + ",mSurfaceHeight = " + mSurfaceHeight);
+        }
+
+        @Override
+        public void surfaceCreated(SurfaceHolder holder) {
+            Log.i("chenyg", "surfaceCreated()");
+        }
+
+        @Override
+        public void surfaceDestroyed(SurfaceHolder holder) {
+            Log.i("chenyg", "surfaceDestroyed()");
+            mSurfaceHolder = null;
+        }
+
+    };
 
     @Override
     public View getView(){
@@ -340,28 +377,38 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
 
             if (mVideoWidth != 0 && mVideoHeight != 0) {
                 setVideoLayout(mVideoLayout);
+                Log.d(TAG, "====>before setFixedSize 1");
                 getHolder().setFixedSize(mVideoWidth, mVideoHeight);
+                invalidate();
+
+                Log.d(TAG, "====>before setFixedSize 2");
                 if (mSurfaceWidth == mVideoWidth &&
                         mSurfaceHeight == mVideoHeight) {
+                    Log.d(TAG, "====>after setFixedSize 2");
+
                     // We didn't actually change the size (it was
                     // already at the size we need), so we won't get a
                     // "surface changed" callback, so start the video
                     // here instead of in the callback.
                     if (mTargetState == STATE_PLAYING) {
+                        Log.d(TAG, "====>after setFixedSize 21");
                         start();
                         if (mMediaController != null) {
                             mMediaController.show();
                         }
                     } else if (!isPlaying() && (seekToPosition != 0 || getCurrentPosition() > 0)) {
+                        Log.d(TAG, "====>after setFixedSize 22");
                         if (mMediaController != null) {
                             mMediaController.show(0);
                         }
                     }
                 }
             } else {
+                Log.d(TAG, "====>after setFixedSize 2.1");
                 // We don't know the video size yet, but should start
                 // anyway. The video size might be reported to us later.
                 if (mTargetState == STATE_PLAYING) {
+                    Log.d(TAG, "====>after setFixedSize 2.2");
                     start();
                 }
             }
@@ -402,20 +449,22 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                                                int height,
                                                int sarNum,
                                                int sarDen) {
-                    if (mOnVideoSizeChangedListener != null) {
-                        mOnVideoSizeChangedListener.onVideoSizeChanged(mp,
-                                width, height, sarNum, sarDen);
-                    }
+//                    if (mOnVideoSizeChangedListener != null) {
+//                        mOnVideoSizeChangedListener.onVideoSizeChanged(mp,
+//                                width, height, sarNum, sarDen);
+//                    }
                     mVideoWidth = mp.getVideoWidth();
                     mVideoHeight = mp.getVideoHeight();
                     mVideoSarNum = sarNum;
                     mVideoSarDen = sarDen;
+                    Log.d(TAG, "OnVideoSizeChangedListener ,mVideoWidth = " + mVideoWidth + ",mVideoHeight=" + mVideoHeight);
                     if (mVideoWidth != 0 && mVideoHeight != 0) {
+                        Log.d(TAG, "OnVideoSizeChangedListener 01");
                         setVideoLayout(mVideoLayout);
-
                         getHolder().setFixedSize(mVideoWidth, mVideoHeight);
                         requestLayout();
                     }
+
                 }
             };
 

@@ -28,6 +28,9 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
     boolean isEGLContextInitilized;
 
+    public int lastW = 0;
+
+    public int lastH = 0;
 
     public VideoSurfaceView(Context context, IjkLibLoader libLoader) {
         super(context, libLoader);
@@ -52,7 +55,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         // bind the render to the surfaceivew
         setRenderer(this);
         setRenderMode(RENDERMODE_WHEN_DIRTY);           // set render mode
-//        setZOrderOnTop(true);
         Log.i(TAG, "VideoSurfaceView Construct ok...");
     }
 
@@ -60,6 +62,8 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         Log.i(TAG ,"========>onSurfaceCreated");
+        lastW = 0;
+        lastH = 0;
         // create gl program
         if(!isEGLContextInitilized){
             this.mMediaPlayer.initEGLCtx();
@@ -70,7 +74,18 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
-        Log.e(TAG, "=====>on GLSurfaceView onSurfaceChanged.function.........");
+        Log.e(TAG, "=====>on GLSurfaceView onSurfaceChanged.function..-->width=" + width + ",height=" + height);
+
+        if(mMediaPlayer!= null){
+            if ((lastW != width) || (lastH != width))
+            {
+                Log.e(TAG, "=====>on GLSurfaceView onSurfaceChanged.set glViewport....set -->width=" + width + ",height=" + height);
+                gl.glViewport(0, 0, width , height );
+                //gl.glViewport(0, 0, 640, 360);
+                lastW = width;
+                lastH = height;
+            }
+        }
 
     }
 
@@ -147,7 +162,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
             mMediaPlayer.setOnPreparedListener(mPreparedListener);
             mMediaPlayer.setOnCompletionListener(mCompletionListener);
             mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
-            //mMediaPlayer.setOnSeekCompleteListener(mOnSeekCompleteListener);
             mMediaPlayer.setOnSeekCompleteListener(mSeekCompleteListener);
             mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
             mMediaPlayer.setOnErrorListener(mErrorListener);

@@ -1,6 +1,7 @@
 //
 // Created by chris on 10/20/16.
 //
+// Refer to https://github.com/yuyutao/lt/blob/3c3d2fc5efd87918b94cc58f2c6f39a2612d6081/studio_workspace/cloudgame/app/src/main/jni/platform_ffmpeg/jni/CyberPlayer/video_render/video_render.c
 
 #ifndef XPLAYER_YUVGLRENDER_H
 #define XPLAYER_YUVGLRENDER_H
@@ -48,25 +49,36 @@ static const char* VERTEX_SHADER =
       "}                            \n";
 
 
-enum {
-    ATTRIB_VERTEX,
-    ATTRIB_TEXTURE,
-};
+//enum {
+//    ATTRIB_VERTEX,
+//    ATTRIB_TEXTURE,
+//};
 
-
-static GLfloat squareVertices[] = {
-    0.0f, 0.0f,
-    1.0f, 0.0f,
-    0.0f,  1.0f,
-    1.0f,  1.0f,
-};
-
-static GLfloat coordVertices[] = {
+static const GLfloat squareVertices[] = {
+    -1.0f, -1.0f,
+     1.0f, -1.0f,
     -1.0f, 1.0f,
+     1.0f, 1.0f, };
+
+static const GLfloat coordVertices[] = {
+    0.0f, 1.0f,
     1.0f, 1.0f,
-    -1.0f,  -1.0f,
-    1.0f,  -1.0f,
-};
+     0.0f, 0.0f,
+    1.0f, 0.0f, };
+
+//static GLfloat squareVertices[] = {
+//    0.0f, 0.0f,
+//    1.0f, 0.0f,
+//    0.0f,  1.0f,
+//    1.0f,  1.0f,
+//};
+
+//static GLfloat coordVertices[] = {
+//    -1.0f, 1.0f,
+//    1.0f, 1.0f,
+//    -1.0f,  -1.0f,
+//    1.0f,  -1.0f,
+//};
 
 class YuvGLRender{
 
@@ -147,6 +159,9 @@ private:
      */
     GLuint simpleProgram;
 
+    GLuint mPositionSlot;
+
+    GLuint mT_texCoordInSlot;
 
 };
 

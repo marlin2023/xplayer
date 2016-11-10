@@ -322,21 +322,21 @@ public class XPlayer extends SimpleMediaPlayer {
                     Log.e(TAG ,"====>on ...MEDIA_SET_VIDEO_SIZE");
                     // TODO ???set videowidth !!!!
                     // 会导致主线程哪里阻塞？？？？
-//                    mMediaPlayer.mVideoWidth = msg.arg1;
-//                    mMediaPlayer.mVideoHeight = msg.arg2;
-//                    if (mOnVideoSizeChangedListener != null){
-//                        mOnVideoSizeChangedListener.onVideoSizeChanged( mMediaPlayer ,mMediaPlayer.mVideoWidth, mMediaPlayer.mVideoHeight, mMediaPlayer.mVideoSarNum, mMediaPlayer.mVideoSarDen);
-//                    }
+                    mMediaPlayer.mVideoWidth = msg.arg1;
+                    mMediaPlayer.mVideoHeight = msg.arg2;
+                    if (mOnVideoSizeChangedListener != null){
+                        mOnVideoSizeChangedListener.onVideoSizeChanged( mMediaPlayer ,mMediaPlayer.mVideoWidth, mMediaPlayer.mVideoHeight, mMediaPlayer.mVideoSarNum, mMediaPlayer.mVideoSarDen);
+                    }
                     return;
                 }
                 case MEDIA_SET_VIDEO_SAR:
                 {
                     Log.e(TAG ,"====>on ...MEDIA_SET_VIDEO_SAR");
-//                    mMediaPlayer.mVideoSarNum = msg.arg1;
-//                    mMediaPlayer.mVideoSarDen = msg.arg2;
-//                    if (mOnVideoSizeChangedListener != null){
-//                        mOnVideoSizeChangedListener.onVideoSizeChanged( mMediaPlayer ,mMediaPlayer.mVideoWidth, mMediaPlayer.mVideoHeight, mMediaPlayer.mVideoSarNum, mMediaPlayer.mVideoSarDen);
-//                    }
+                    mMediaPlayer.mVideoSarNum = msg.arg1;
+                    mMediaPlayer.mVideoSarDen = msg.arg2;
+                    if (mOnVideoSizeChangedListener != null){
+                        mOnVideoSizeChangedListener.onVideoSizeChanged( mMediaPlayer ,mMediaPlayer.mVideoWidth, mMediaPlayer.mVideoHeight, mMediaPlayer.mVideoSarNum, mMediaPlayer.mVideoSarDen);
+                    }
                     return;
                 }
                 case MEDIA_ERROR:
