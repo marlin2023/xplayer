@@ -62,12 +62,12 @@ PlayerInner::~PlayerInner()
         audioRender = NULL;
     }
 
-    // yuv gl
-    if(yuvGLRender){
-        XLog::e(TAG ,"======>delete yuvGLRender.");
-        delete yuvGLRender;
-        yuvGLRender = NULL;
-    }
+    // yuv gl ,this should be release in GLSurfaceView Render Thread.
+    //if(yuvGLRender){
+    //    XLog::e(TAG ,"======>delete yuvGLRender.");
+    //    delete yuvGLRender;
+    //    yuvGLRender = NULL;
+    //}
     XLog::e(TAG ,"======>in ~PlayerInner end.");
 }
 
@@ -151,6 +151,10 @@ bool PlayerInner::isPlaying()
 
 long PlayerInner::getCurrentPosition()
 {
+
+    if(mediaFileHandle == NULL){
+        return 0.f;
+    }
     // TODO need subtract the base time
     XLog::e(TAG ,"====>current_position_ms= %ld\n",this->mediaFileHandle->current_position_ms);
     if(this->mediaFileHandle->seeking_mark == 1){
@@ -162,6 +166,10 @@ long PlayerInner::getCurrentPosition()
 
 long PlayerInner::getDuration()
 {
+    if(mediaFileHandle == NULL){
+        return 0.f;
+    }
+
     XLog::e(TAG ,"====>current_duration_ms= %lld\n",this->mediaFileHandle->duration_ms);
     return this->mediaFileHandle->duration_ms;
 }
@@ -169,6 +177,10 @@ long PlayerInner::getDuration()
 
 void PlayerInner::seekTo(long msec)
 {
+    if(mediaFileHandle == NULL){
+        return ;
+    }
+
     XLog::e(TAG ,"====>seekTo position = %ld\n",msec);
     this->mediaFileHandle->seekpos = msec;
     if(this->mediaFileHandle->seekpos > this->mediaFileHandle->duration_ms){

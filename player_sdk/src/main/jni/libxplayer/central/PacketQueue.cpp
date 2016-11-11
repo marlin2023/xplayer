@@ -45,7 +45,7 @@ void PacketQueue::flush()
     for(pkt = first_packet; pkt != NULL; pkt = pkt1) {
         pkt1 = pkt->next;
         av_packet_unref(&pkt->pkt);
-        XLog::e(TAG ,"==>av_free packet ....\n");
+        //XLog::e(TAG ,"==>av_free packet ....\n");
         av_freep(&pkt);
     }
 

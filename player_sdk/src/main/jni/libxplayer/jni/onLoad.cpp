@@ -275,9 +275,9 @@ static void native_stop(JNIEnv *env, jobject thiz)
     XLog::e(TAG ,"======>in native_stop 2.1");
 
     // process state
-    playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_STOP);
-    playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_STOP);
-    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_STOP);
+    playerInner->mediaFileHandle->message_queue_video_decode->push_front(EVT_STOP);
+    playerInner->mediaFileHandle->message_queue_audio_decode->push_front(EVT_STOP);
+    playerInner->mediaFileHandle->message_queue_central_engine->push_front(EVT_STOP);
 
     // clear packet&frame q
     playerInner->mediaFileHandle->audio_queue->flush();

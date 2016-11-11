@@ -32,6 +32,10 @@ MediaFile::MediaFile()
     file_opened = false;
     stop_flag = false;  // not stop
 
+    audio_stream = NULL;
+    video_stream = NULL;
+    format_context = NULL;
+
     //
     //
     // 如果是网络文件, 设置Buffer时间以及超时时间
@@ -464,22 +468,28 @@ void MediaFile::close_file()
     // Close the codec
     if (audio_stream)
     {
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource .1");
         audio_stream->discard = AVDISCARD_ALL;
         avcodec_close(audio_codec_context);
         avcodec_free_context(&audio_codec_context);
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource .11");
     }
 
     if (video_stream)
     {
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource .2");
         video_stream->discard = AVDISCARD_ALL;
         avcodec_close(video_codec_context);
         avcodec_free_context(&video_codec_context);
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource .22");
     }
 
     if(format_context)
     {
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource 3.");
         avformat_close_input(&format_context);
         format_context = NULL;
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource 33.");
     }
     XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource end .");
 }

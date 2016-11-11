@@ -123,7 +123,7 @@ Such as Video Decoder State Machine has state :
             3.缓冲中seek
             4.播放结束seek.
 
-
+    seek 完成后 要调用player.start 方法播放起来。
 
 -
 - 播放过程中 Loading
@@ -148,4 +148,26 @@ Such as Video Decoder State Machine has state :
 - 播放结束后 oncomplete ，音视频解码线程在堵塞等待数据，这里是有问题的，需要改成非阻塞。
 
 
+--
+- 用户pause 时机：   1.buffering 时候也可能会调pause ,stop ,close
+                    2.prepared 之前也可能会调pause stop close
 
+
+
+--
+--
+-   视频tab 页面，就一个播放器实例
+
+
+--
+--
+-   view 中有一个播放器实例，是这样的，view对应的播放器可以多次销毁多次创建，但view 可以只创建一次，最后不需要的时候再销毁。
+
+
+--
+--
+-   播放器实例销毁的时候，如果播放器不支持多实例，就要保证上一个实例销毁后，才能创建下一个播放器实例。同时要注意一个问题，就是opengl es的资源必须在GLSurfaceView Render 线程创建。
+
+-
+-
+-

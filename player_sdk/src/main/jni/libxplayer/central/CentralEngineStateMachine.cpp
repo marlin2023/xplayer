@@ -340,7 +340,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
     {
         case EVT_GO_ON:
         {
-
+            mediaFileHandle->end_of_file = false;
             if (demux_2_packet_queue() == AVERROR_EOF && this->read_retry_count > 5)
             {
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"===>AVERROR_EOF....\n");
@@ -452,6 +452,8 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
         case EVT_GO_ON:
         {
             int ret = 0;
+            mediaFileHandle->end_of_file = false;
+
             //XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAYING ,receive EVT_GO_ON Event .\n");
             // the eof of file or read error .
             if (demux_2_packet_queue() == AVERROR_EOF && this->read_retry_count > 5)
