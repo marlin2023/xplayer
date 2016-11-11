@@ -171,6 +171,10 @@ void PlayerInner::seekTo(long msec)
 {
     XLog::e(TAG ,"====>seekTo position = %ld\n",msec);
     this->mediaFileHandle->seekpos = msec;
+    if(this->mediaFileHandle->seekpos > this->mediaFileHandle->duration_ms){
+        this->mediaFileHandle->seekpos = this->mediaFileHandle->duration_ms;
+    }
+
     this->mediaFileHandle->seeking_mark = 1;
     //
     av_read_pause(this->mediaFileHandle->format_context);

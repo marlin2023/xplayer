@@ -755,8 +755,9 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
 
     XLog::e(TAG ,"state_machine: seek start(in msec):%lld, pts = %lld\n", (int64_t)abs_seek_pos,(int64_t)pts);
 
+    //ret = avformat_seek_file(fc, st_index, INT64_MIN, pts, INT64_MAX, 0);
     ret = avformat_seek_file(fc, st_index, INT64_MIN, pts, INT64_MAX, 0);
 
-    XLog::e(TAG ,"state_machine: after avformat_seek_file, ret = %d\n",ret);
+    XLog::e(TAG ,"-state_machine: after avformat_seek_file, ret = %d\n",ret);
     return;
 }

@@ -109,7 +109,7 @@ void OpenSLEngine::play()
 
 void OpenSLEngine::pause()
 {
-    if (bqPlayerPlay == NULL){ return;}
+    if ((bqPlayerPlay == NULL )|| (isInitialized == false )){ return;}
 
     m_paused = true;
     (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PAUSED);   // set paused.
@@ -118,7 +118,7 @@ void OpenSLEngine::pause()
 
 void OpenSLEngine::resume()
 {
-    if (bqPlayerPlay == NULL){ return;}
+    if ((bqPlayerPlay == NULL )|| (isInitialized == false )){ return;}
 
     m_paused = false;
     (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
@@ -126,7 +126,7 @@ void OpenSLEngine::resume()
 
 void OpenSLEngine::stop()
 {
-    if (bqPlayerPlay == NULL){ return;}
+    if ((bqPlayerPlay == NULL )|| (isInitialized == false )){ return;}
     (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
 
     if (bqPlayerObject != NULL) {
