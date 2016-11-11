@@ -32,6 +32,8 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
     public int lastH = 0;
 
+    public boolean isFileCompleted;
+
     public VideoSurfaceView(Context context, IjkLibLoader libLoader) {
         super(context, libLoader);
         initView();
@@ -64,6 +66,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         Log.i(TAG ,"========>onSurfaceCreated");
         lastW = 0;
         lastH = 0;
+        isFileCompleted = false;
         // create gl program
         if(!isEGLContextInitilized){
             this.mMediaPlayer.initEGLCtx();
@@ -311,10 +314,12 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
             if(mCurrentState == STATE_SEEKING){return;} // add for soft decoder.
 
             if (isInPlaybackState()) {
-//                // if in the end of file
-//                if(mMediaPlayer){
-//
-//                }
+                // if in the end of file
+                if(isFileCompleted){
+                    mMediaPlayer.seekTo(0);
+                    isFileCompleted = false;    // reset
+                    return;
+                }
 
                 if(mCurrentState == STATE_PAUSED){
                     mMediaPlayer.resume();
@@ -379,7 +384,9 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
                 public void onCompletion(IMediaPlayer mp) {
                     mDuration = getDuration();
                     mLastPositionOnCompletion = getCurrentPosition();
+
                     setRenderMode(RENDERMODE_WHEN_DIRTY); // set mode
+                    isFileCompleted = true;
 
                     if (mMediaController != null) {
                         mMediaController.hide();

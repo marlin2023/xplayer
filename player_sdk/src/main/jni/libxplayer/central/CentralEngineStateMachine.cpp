@@ -362,8 +362,10 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                     // Notify decoder thread
                     this->mediaFileHandle->message_queue_audio_decode->push(EVT_SEEK_DONE);
                     this->mediaFileHandle->message_queue_video_decode->push(EVT_SEEK_DONE);
+
                     this->mediaFileHandle->message_queue_audio_decode->push(EVT_PLAY);
                     this->mediaFileHandle->message_queue_video_decode->push(EVT_PLAY);
+
                     // re set seek_mark
                     this->mediaFileHandle->seeking_mark = 0;
                     return;
@@ -508,7 +510,6 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
         {
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
-            //do_seek_pause_central_engine();
             return;
         }
         case EVT_BUFFERING:
@@ -543,8 +544,7 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
 
                 XLog::e(TAG ,"====>state_machine: notify eof and should quit ...\n");
                 this->state_machine_change_state(STATE_PLAY_COMPLETE);
-                this->mediaFileHandle->message_queue_central_engine->push(EVT_STOP);
-                //this->message_queue->push(EVT_STOP);    // receive stop msg
+                //this->mediaFileHandle->message_queue_central_engine->push(EVT_STOP);
                 this->mediaFileHandle->notify(MEDIA_PLAYBACK_COMPLETE ,0 ,0);
             }else{
                 usleep(50000);
@@ -583,6 +583,13 @@ void CentralEngineStateMachine::central_engine_do_process_play_complete(player_e
         case EVT_GO_ON:
         {
 
+            return;
+        }
+        case EVT_SEEK:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PLAY_COMPLETE receive EVT_SEEK !\n");
+            this->state_machine_change_state(STATE_SEEK_WAIT);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
         }
         case EVT_STOP:
@@ -664,6 +671,7 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
     {
         case EVT_READY_TO_SEEK:
         {
+            XLog::e(TAG ,"===>STATE_SEEK_WAIT receive EVT_READY_TO_SEEK\n");
             // do seek work
             AVFormatContext *fc = this->mediaFileHandle->format_context;
 
@@ -707,7 +715,7 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
     // do seek actions
     int ret,i;
     AVPacket packet;
-
+    XLog::e(TAG ,"===>in ffmpeg do work function\n");
     AVFormatContext *fc = this->mediaFileHandle->format_context;
 
     // clear packet & frame queue

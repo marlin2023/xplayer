@@ -144,6 +144,8 @@ Such as Video Decoder State Machine has state :
     -
 
 -
+-
+- 播放结束后 oncomplete ，音视频解码线程在堵塞等待数据，这里是有问题的，需要改成非阻塞。
 
 
 
