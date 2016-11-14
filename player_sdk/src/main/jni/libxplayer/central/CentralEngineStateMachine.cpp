@@ -306,12 +306,13 @@ void CentralEngineStateMachine::central_engine_do_process_prepared(player_event_
             XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PREPARED receive EVT_START.\n");
             this->state_machine_change_state(STATE_BUFFERING);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
-
-
-            // TODO
-            // TODO here ,send EVT_START to audio decode state machine & video decode state machine
-            //
-            //el_do_start_central_engine();
+            return;
+        }
+        case EVT_SEEK:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PREPARED receive EVT_SEEK.\n");
+            this->state_machine_change_state(STATE_SEEK_WAIT);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
 
             return;
         }
@@ -376,7 +377,6 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                 this->state_machine_change_state(STATE_PLAY_WAIT);
                 // TODO
                 this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
-                this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
                 this->hasShowFirstPic = true;
                 this->mediaFileHandle->seeking_mark = 0;
 
@@ -677,8 +677,10 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
             // do seek work
             AVFormatContext *fc = this->mediaFileHandle->format_context;
 
-            // Notify UI and engine to send buffering start message
-            this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
+            if(this->hasShowFirstPic){
+                // Notify UI and engine to send buffering start message
+                this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
+            }
             this->state_machine_change_state(STATE_BUFFERING);
             // Note that this event is sent by decode thread when it is in its wait state
             ffmpeg_do_seek();

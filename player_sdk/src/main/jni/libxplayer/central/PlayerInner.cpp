@@ -183,6 +183,10 @@ void PlayerInner::seekTo(long msec)
 
     XLog::e(TAG ,"====>seekTo position = %ld\n",msec);
     this->mediaFileHandle->seekpos = msec;
+
+
+
+
     if(this->mediaFileHandle->seekpos > this->mediaFileHandle->duration_ms){
         this->mediaFileHandle->seekpos = this->mediaFileHandle->duration_ms;
     }
@@ -192,8 +196,6 @@ void PlayerInner::seekTo(long msec)
     av_read_pause(this->mediaFileHandle->format_context);
     mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
     mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
-
-    //mediaFileHandle->message_queue_central_engine->push(EVT_SEEK);
 
 }
 

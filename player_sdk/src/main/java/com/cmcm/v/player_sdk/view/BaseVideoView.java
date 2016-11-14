@@ -362,11 +362,11 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                 seekTo(seekToPosition);
             }else{
                 if(!mHasFistrPic) {
-                    //if (BaseVideoView.this instanceof VideoViewAndroid) {
+                    if (BaseVideoView.this instanceof VideoViewAndroid) {   // changed by yanlong
                         if (mOnInfoListener != null) {
                             mOnInfoListener.onInfo(mMediaPlayer, IMediaPlayer.MEDIA_INFO_FIRST_SHOW_PIC, 0);
                         }
-                    //}
+                    }
                     mHasFistrPic = true;
                 }
             }
