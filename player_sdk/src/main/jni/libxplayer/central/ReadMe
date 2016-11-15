@@ -126,7 +126,7 @@ Such as Video Decoder State Machine has state :
             5.起播之前的seek ，这个时候的seek时间点和其他阶段的seek 处理是不同的,这个时间点是在onPrepared 回调中判断是否需要进行seek 操作的。
                 首次seek时机移到了onprepared回调中
             -
-                
+
 
 
     seek 完成后 要调用player.start 方法播放起来。

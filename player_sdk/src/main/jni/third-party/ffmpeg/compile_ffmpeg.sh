@@ -150,7 +150,7 @@ FF_CFG_FLAGS="$FF_CFG_FLAGS --enable-inline-asm"
 
 export FF_CFG_FLAGS="$FF_CFG_FLAGS $COMMON_FF_CFG_FLAGS"
 echo "[*] cd ffmpeg source directory"
-cd $FF_BUILD_ROOT/ffmpeg/ffmpeg-3.1.3
+cd $FF_BUILD_ROOT/ffmpeg/ffmpeg-3.2
 if [ -f "./config.h" ]; then
     echo '[*] make clean'
     make clean

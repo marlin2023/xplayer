@@ -6,7 +6,7 @@ LOCAL_MODULE := cmxplayer
 
 # set include path
 LOCAL_C_INCLUDES += $(realpath $(LOCAL_PATH)/..)
-LOCAL_C_INCLUDES += $(realpath $(LOCAL_PATH)/../third-party/ffmpeg/ffmpeg-3.1.3/)
+LOCAL_C_INCLUDES += $(realpath $(LOCAL_PATH)/../third-party/ffmpeg/ffmpeg-3.2/)
 
 # source files
 LOCAL_SRC_FILES := jni/onLoad.cpp   \
