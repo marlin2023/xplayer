@@ -40,6 +40,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ll.addView(surfaceView.getView());
 
         surfaceView.setOnPreparedListener(mOnPreparedListener);
+        surfaceView.setOnErrorListener(mOnErrorListener);
         surfaceView.setVideoPath("/sdcard/hh.mp4");
 //        surfaceView.start();
     }
@@ -53,6 +54,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     surfaceView.start();
                 }
 
+            };
+
+    private IMediaPlayer.OnErrorListener mOnErrorListener =
+            new IMediaPlayer.OnErrorListener(){
+                public boolean onError(IMediaPlayer mp, int what, int extra){
+                    Log.d(TAG, "onErrorListener");
+                    return false;
+                }
             };
 
     @Override

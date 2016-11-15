@@ -8,6 +8,7 @@
 
 #include "MediaFile.h"
 #include "util/XLog.h"
+#include "xplayer_android_def.h"
 
 MediaFile::MediaFile()
 {
@@ -139,6 +140,7 @@ CM_BOOL MediaFile::open()
     if(ret != 0){
 
         XLog::e(TAG ,"av_open_input_file,ret %d err\n",ret);
+        this->notify(MEDIA_ERROR ,MEDIA_ERROR_IO, ret);
         ret = CM_FALSE;
         goto notify_callback;
     }
@@ -161,6 +163,7 @@ CM_BOOL MediaFile::open()
             format_context = NULL;
         }
         ret = CM_FALSE;
+        this->notify(MEDIA_ERROR ,MEDIA_ERROR_IO, ret);
         goto notify_callback;
     }
 
@@ -267,6 +270,7 @@ CM_BOOL MediaFile::open()
     if(!av_support)
     {
         ret = CM_FALSE;
+        this->notify(MEDIA_ERROR ,MEDIA_ERROR_UNSUPPORTED, ret);
         goto notify_callback;
     }
 
@@ -293,12 +297,14 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
     if (stream_index < 0 || stream_index >= ic->nb_streams)
     {
         XLog::e(TAG ,"===> invalid stream_index %d \n" ,stream_index);
+        this->notify(MEDIA_ERROR ,MEDIA_ERROR_IO, CM_FALSE);
         return CM_FALSE;
     }
 
     codec_context = avcodec_alloc_context3(NULL);
     if (!codec_context){
         XLog::e(TAG ,"===> avcodec_alloc_context3 failed\n");
+        this->notify(MEDIA_ERROR ,MEDIA_ERROR_IO, CM_FALSE);
         return CM_FALSE;
     }
 
@@ -306,6 +312,7 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
     if (ret < 0){
         XLog::e(TAG ,"===> avcodec_parameters_to_context failed\n");
         ret = CM_FALSE;
+        this->notify(MEDIA_ERROR ,MEDIA_ERROR_IO, CM_FALSE);
         goto fail;
     }
 
@@ -317,6 +324,7 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
         }else if(codec_context->codec_type == AVMEDIA_TYPE_VIDEO){
             XLog::e(TAG ,"===> open video decoder err\n");
         }
+        this->notify(MEDIA_ERROR ,MEDIA_ERROR_IO, CM_FALSE);
         ret = CM_FALSE;
         goto fail;
     }
@@ -413,7 +421,6 @@ CM_BOOL MediaFile::is_pkt_q_full(int64_t max_buffer_ts)
             if(video_queue->q_size >= X_MAX_PKT_VIDEO_Q_MEM_SPACE)
             {
                 XLog::d(ANDROID_LOG_WARN ,TAG ,"===>pkt video q exceed limit space, q full\n");
-
                 goto is_full;
             }
 
@@ -456,7 +463,6 @@ is_not_full:
         buffering_percent = 99;
     }
     this->notify(MEDIA_BUFFERING_UPDATE ,buffering_percent* 100 ,100);
-
     return CM_FALSE;
 
 }

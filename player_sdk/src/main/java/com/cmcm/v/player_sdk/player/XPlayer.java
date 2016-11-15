@@ -341,6 +341,9 @@ public class XPlayer extends SimpleMediaPlayer {
                 }
                 case MEDIA_ERROR:
                     Log.e(TAG, "Error (" + msg.arg1 + "," + msg.arg2 + ")");
+                    if(mOnErrorListener != null){
+                        mOnErrorListener.onError(mMediaPlayer, msg.arg1, msg.arg2);
+                    }
                     return;
 
                 case MEDIA_INFO:    // import
