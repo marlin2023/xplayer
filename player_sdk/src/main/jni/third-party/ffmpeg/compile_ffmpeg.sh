@@ -186,7 +186,6 @@ $CC -lm -lz -shared --sysroot=$FF_SYSROOT -Wl,--no-undefined -Wl,-z,noexecstack 
     libavformat/*.o \
     libswresample/*.o \
     libswscale/*.o \
-    libavfilter/*.o \
     $FF_ASM_OBJ_DIR \
     $FF_DEP_LIBS $FF_EXTRA_LDFLAGS\
     -o $FF_PREFIX/libffmpeg.so
