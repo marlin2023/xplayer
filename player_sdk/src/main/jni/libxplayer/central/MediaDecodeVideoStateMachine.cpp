@@ -46,8 +46,7 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
     frame = av_frame_alloc();
     if(!frame){
         XLog::e(TAG ,"===>decode_one_video_packet, error for av_frame_alloc.\n");
-        //TODO:donghao确认是否需要加
-        this->mediaFileHandle->notify(MEDIA_ERROR ,MEDIA_ERROR_UNSUPPORTED, CM_FALSE);
+        this->mediaFileHandle->notify(MEDIA_ERROR ,MEDIA_ERROE_MEM, CM_FALSE);
         return;
     }
 

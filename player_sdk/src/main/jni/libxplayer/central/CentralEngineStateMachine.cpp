@@ -279,7 +279,7 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
                     this->state_machine_change_state(STATE_STOPPED);
                     return;
                 }
-                // open failed
+                // open failed,already notify app in open func
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: open file:-%s- failed !!!\n" ,mediaFileHandle->getSourceUrl());
                 this->state_machine_change_state(STATE_INITIALIZED);
             }

@@ -5,6 +5,7 @@
 #include "PlayerInner.h"
 #include "util/XLog.h"
 #include "util/XMessageType.h"
+#include "xplayer_android_def.h"
 
 #define TAG "PLAYER_INNER"
 
@@ -90,6 +91,7 @@ void PlayerInner::player_engine_init()
     if(ret)
     {
         XLog::e(TAG ,"create media demux thread err %d\n",ret);
+        this->mediaFileHandle->notify(MEDIA_ERROR, MEDIA_CREATE_DEMUX_THREAD_ERROR, ret);
         goto init_eout;
     }
 
@@ -98,6 +100,7 @@ void PlayerInner::player_engine_init()
     if(ret)
     {
         XLog::e(TAG ,"create video decode thread err %d\n",ret);
+        this->mediaFileHandle->notify(MEDIA_ERROR, MEDIA_CREATE_VIDEO_THREAD_ERROR, ret);
         goto init_eout;
     }
 
@@ -106,6 +109,7 @@ void PlayerInner::player_engine_init()
     if(ret)
     {
         XLog::e(TAG ,"create audio decode thread err %d\n",ret);
+        this->mediaFileHandle->notify(MEDIA_ERROR, MEDIA_CREATE_AUDIO_THREAD_ERROR, ret);
         goto init_eout;
     }
 
