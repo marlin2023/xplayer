@@ -11,6 +11,7 @@
 
 #include <assert.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "OpenSLEngine.h"
 
@@ -31,8 +32,19 @@ void audioPlayerCallback(SLAndroidSimpleBufferQueueItf bq,
     AVFrame *audioFrame;
     audioFrame = av_frame_alloc();
     // TODO
-    openSLEngine->mediaFileHandle->audio_frame_queue->get(audioFrame);
-
+    //openSLEngine->mediaFileHandle->audio_frame_queue->get(audioFrame);
+    #if 1
+    int rr = openSLEngine->mediaFileHandle->audio_frame_queue->get(audioFrame ,0);
+    if(rr == 0){
+        XLog::e(TAG ,"==>SimpleBufferQueueCallback ===============in callback. have no audio data>\n");
+        usleep(10000);
+        // free avframe memory
+        if(audioFrame){
+            av_frame_free(&audioFrame);
+        }
+        return;
+    }
+    #endif
     //
     int needed_buf_size = av_samples_get_buffer_size(NULL,
                                            audioFrame->channels,
@@ -127,15 +139,17 @@ void OpenSLEngine::resume()
 void OpenSLEngine::stop()
 {
     if ((bqPlayerPlay == NULL )|| (isInitialized == false )){ return;}
+    XLog::e(TAG ,"==>OpenSLEngine::stop 1\n");
     (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
-
+    XLog::e(TAG ,"==>OpenSLEngine::stop 2\n");
     if (bqPlayerObject != NULL) {
+        XLog::e(TAG ,"==>OpenSLEngine::stop 3\n");
         (*bqPlayerObject)->Destroy(bqPlayerObject);
         bqPlayerObject = NULL;
         bqPlayerPlay = NULL;
         bqPlayerBufferQueue = NULL;
     }
-
+    XLog::e(TAG ,"==>OpenSLEngine::stop 4\n");
     if (outputMixObject != NULL) {
         (*outputMixObject)->Destroy(outputMixObject);
         outputMixObject = NULL;

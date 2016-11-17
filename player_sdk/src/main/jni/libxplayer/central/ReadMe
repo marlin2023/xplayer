@@ -198,3 +198,11 @@ Such as Video Decoder State Machine has state :
 -
 -   触控面板
     每次通过触控面板进行播放器相关操作后都会执行 updatePausePlay  ,这个函数会对播放器的状态进行判断，从而显示相应的按钮。
+
+
+-
+-
+- opensl es
+    https://audioprograming.wordpress.com/2012/10/29/lock-free-audio-io-with-opensl-es-on-android/
+    callback should not be blocked.
+

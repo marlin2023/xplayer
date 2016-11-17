@@ -426,7 +426,7 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
             //
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
-
+            this->mediaFileHandle->startRender();   // add
             return;
         }
 
@@ -751,6 +751,16 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
     }
 
     int64_t seek_pos = av_rescale(this->mediaFileHandle->seekpos, AV_TIME_BASE, 1000); //milliseconds_to_fftime(msec);
+    if(seek_pos >= this->mediaFileHandle->format_context->duration){
+        // oncomplete
+        XLog::e(TAG ,"====>state_machine: =====>ffmpeg_do_seek  onComplete.\n");
+        XLog::e(TAG ,"====>state_machine: =====>ffmpeg_do_seek notify eof and should quit ...\n");
+        this->state_machine_change_state(STATE_PLAY_COMPLETE);
+        this->mediaFileHandle->message_queue_video_decode->push(EVT_SEEK_DONE);
+        this->mediaFileHandle->message_queue_audio_decode->push(EVT_SEEK_DONE);
+        this->mediaFileHandle->notify(MEDIA_PLAYBACK_COMPLETE ,0 ,0);
+        return;
+    }
     int64_t start_time = this->mediaFileHandle->format_context->start_time;
     if (start_time > 0 && start_time != AV_NOPTS_VALUE){
         seek_pos += start_time;

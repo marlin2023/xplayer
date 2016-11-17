@@ -178,7 +178,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_wait(player_event_e e
 
         case EVT_SEEK:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>decoder audio: receive EVT_SEEK\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>decoder video: receive EVT_SEEK\n");
             this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
             return;
         }
