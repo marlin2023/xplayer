@@ -29,8 +29,8 @@ extern "C" {
 #define X_S_2_MS(sec) ((sec) * 1000)
 #define X_MS_2_US(msec) ((msec) * 1000)
 
-#define X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS X_S_2_MS(3)        // in ms unit
-#define X_MAX_PKT_Q_NETWORK_BUFFERING_TS X_S_2_MS(6)              // in ms unit
+#define X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS X_S_2_MS(2)        // in ms unit
+#define X_MAX_PKT_Q_NETWORK_BUFFERING_TS X_S_2_MS(4)              // in ms unit
 
 #define X_MAX_PKT_Q_TS         X_S_2_MS(0.6)                  // in ms unit
 #define X_MAX_PKT_Q_NETWORK_TS X_S_2_MS(40)                   // in ms unit

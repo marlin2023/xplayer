@@ -49,8 +49,8 @@ MediaFile::MediaFile()
     //    strstr((const char *)source_url,"rtsp://") ||
     //    strstr((const char *)source_url,"rtmp://"))
     //{
-        start_playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;    // 3s
-        max_buffering_time = X_MAX_PKT_Q_NETWORK_BUFFERING_TS;                    // 6s
+        start_playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;    // 2s
+        max_buffering_time = X_MAX_PKT_Q_NETWORK_BUFFERING_TS;                    // 4s
 
         //is_network_media = X_TRUE;
     //}
