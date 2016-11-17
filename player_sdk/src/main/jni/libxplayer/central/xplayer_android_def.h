@@ -35,11 +35,15 @@ enum media_error_type {
 
     // -xx
     MEDIA_ERROR_IO          = -1004,
+    MEDIA_ERROE_MEM         = -1005,
     MEDIA_ERROR_MALFORMED   = -1007,
     MEDIA_ERROR_UNSUPPORTED = -1010,
     MEDIA_ERROR_TIMED_OUT   = -110,
 
     MEDIA_ERROR_IJK_PLAYER  = -10000,
+    MEDIA_CREATE_DEMUX_THREAD_ERROR = -10001,
+    MEDIA_CREATE_VIDEO_THREAD_ERROR = -10002,
+    MEDIA_CREATE_AUDIO_THREAD_ERROR = -10003,
 };
 
 // Info and warning codes for the media player framework.  These are non fatal,
