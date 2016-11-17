@@ -37,7 +37,9 @@ void audioPlayerCallback(SLAndroidSimpleBufferQueueItf bq,
     int rr = openSLEngine->mediaFileHandle->audio_frame_queue->get(audioFrame ,0);
     if(rr == 0){
         XLog::e(TAG ,"==>SimpleBufferQueueCallback ===============in callback. have no audio data>\n");
-        usleep(10000);
+        //usleep(10000);
+        uint8_t silence_buf[1024] = {0};
+        (*bq)->Enqueue(bq, (uint8_t *) silence_buf , 1);  // must add this statement .
         // free avframe memory
         if(audioFrame){
             av_frame_free(&audioFrame);

@@ -192,11 +192,11 @@ void FrameQueue::notify_buffering_start()
         return;
     }
 
-    XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue.\n");
     if(mediaFileHandle->end_of_file){
         XLog::e(TAG ,"==>in notify_buffering_start function ,is the end of file..\n");
         return ;
     }
+    XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue.\n");
 
     bool isVideoFrameQueueEmpty = false;
 

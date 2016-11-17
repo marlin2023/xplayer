@@ -82,7 +82,7 @@ void YuvGLRender::render_frame()
     double video_frame_render_pts = (double) src_frame->pts * av_q2d(mediaFileHandle->video_stream->time_base) * 1000;   // in millisecond
     double sync_audio_clock_time = mediaFileHandle->sync_audio_clock_time;
     double diff_time = video_frame_render_pts - sync_audio_clock_time;
-    //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,sync_audio_clock_time =%f ,diff_time =%f\n", video_frame_render_pts ,sync_audio_clock_time,diff_time);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,sync_audio_clock_time =%f ,diff_time =%f\n", video_frame_render_pts ,sync_audio_clock_time,diff_time);
 
     // TODO filter some error diff_time.
     //av_frame_free(&src_frame);

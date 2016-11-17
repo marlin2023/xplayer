@@ -548,7 +548,7 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
 
                 XLog::e(TAG ,"====>state_machine: notify eof and should quit ...\n");
                 this->state_machine_change_state(STATE_PLAY_COMPLETE);
-                //this->mediaFileHandle->message_queue_central_engine->push(EVT_STOP);
+                this->mediaFileHandle->stopRender();
                 this->mediaFileHandle->notify(MEDIA_PLAYBACK_COMPLETE ,0 ,0);
             }else{
                 usleep(50000);
@@ -758,6 +758,7 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
         this->state_machine_change_state(STATE_PLAY_COMPLETE);
         this->mediaFileHandle->message_queue_video_decode->push(EVT_SEEK_DONE);
         this->mediaFileHandle->message_queue_audio_decode->push(EVT_SEEK_DONE);
+        this->mediaFileHandle->stopRender();
         this->mediaFileHandle->notify(MEDIA_PLAYBACK_COMPLETE ,0 ,0);
         return;
     }

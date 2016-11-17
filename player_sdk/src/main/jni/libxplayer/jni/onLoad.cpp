@@ -295,7 +295,6 @@ static void native_play(JNIEnv *env, jobject thiz)
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_START);
     // TODO
     playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_PLAY);
-    playerInner->mediaFileHandle->startRender();
     // audio render thread.
     playerInner->player_start();
 
