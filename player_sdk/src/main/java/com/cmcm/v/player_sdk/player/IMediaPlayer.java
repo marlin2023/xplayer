@@ -109,6 +109,8 @@ public interface IMediaPlayer {
 
     void setOnInfoListener(OnInfoListener listener);
 
+    void setRenderControler(GLRenderControlerListener listener);
+
     void resetListeners();
 
     /*--------------------
@@ -140,6 +142,14 @@ public interface IMediaPlayer {
 
     interface OnInfoListener {
         boolean onInfo(IMediaPlayer mp, int what, int extra);
+    }
+
+    // add because of opengl
+    interface GLRenderControlerListener{
+
+        void setGLStartRenderMode();
+
+        void setGLStopRenderMode();
     }
 
     /*--------------------

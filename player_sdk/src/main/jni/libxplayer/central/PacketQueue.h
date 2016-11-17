@@ -45,7 +45,7 @@ public:
 
     void abort();
 
-
+    void notify_buffering_start();
 
     /**
     * get buffered packet sum duration in packet queue.
@@ -53,6 +53,11 @@ public:
     int64_t get_buffer_packet_ts();
 
     unsigned long long q_size;
+
+    /**
+    * empty function parameter handle.
+    */
+    void *empty_param; //
 
 private:
 

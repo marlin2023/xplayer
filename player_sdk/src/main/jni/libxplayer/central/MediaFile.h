@@ -35,7 +35,8 @@ extern "C" {
 #define X_MAX_PKT_Q_TS         X_S_2_MS(0.6)                  // in ms unit
 #define X_MAX_PKT_Q_NETWORK_TS X_S_2_MS(40)                   // in ms unit
 
-#define X_MAX_FRAME_VIDEO_Q_NODE_CNT 20                         // max frm q video frame count
+#define X_MAX_FRAME_VIDEO_Q_NODE_CNT 30                         // max frm q video frame count
+#define X_MIN_FRAME_VIDEO_Q_NODE_CNT 10                         // max frm q video frame count
 
 #define X_MAX_FRAME_Q_TIME_LIMIT (0.7)                          // s
 
@@ -103,6 +104,11 @@ public:
 
     void notify(int msg, int ext1, int ext2);
 
+    void startRender();
+
+    void stopRender();
+
+    void jNI2BufferState();
 
     /**
      * set source url
@@ -165,6 +171,8 @@ public:
     bool stop_flag;
 
     bool file_opened;
+
+    bool isBuffering ;
     /**
      * format context for input file
      */

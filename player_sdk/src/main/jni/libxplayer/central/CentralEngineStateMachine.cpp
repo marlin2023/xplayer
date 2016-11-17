@@ -351,6 +351,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
             if(mediaFileHandle->is_pkt_q_full(mediaFileHandle->start_playing_buffering_time))
             {
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"===>is_pkt_q_full break;.\n");
+                this->mediaFileHandle->isBuffering = false;
                 // TODO ,here should to notify upper layer
                 // TODO
                 if( (this->old_state == STATE_SEEK_WAIT ) && (this->hasShowFirstPic == true)){
@@ -358,17 +359,17 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                     // after seek, discard packet that comes from last play
                     XLog::e(TAG ,"===>state_machine: sending seek done evt to decoder 00!\n");
                     this->state_machine_change_state(STATE_PLAY_WAIT);
-                    this->mediaFileHandle->notify(MEDIA_SEEK_COMPLETE ,0 ,0);
-                    //this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
                     // Notify decoder thread
-                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_SEEK_DONE);
                     this->mediaFileHandle->message_queue_video_decode->push(EVT_SEEK_DONE);
-
-                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_PLAY);
                     this->mediaFileHandle->message_queue_video_decode->push(EVT_PLAY);
+                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_SEEK_DONE);
+                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_PLAY);
 
                     // re set seek_mark
                     this->mediaFileHandle->seeking_mark = 0;
+                    usleep(10000);
+                    XLog::e(TAG ,"===>state_machine: MEDIA_SEEK_COMPLETE notify\n");
+                    this->mediaFileHandle->notify(MEDIA_SEEK_COMPLETE ,0 ,0);
                     return;
                 }
 
@@ -377,6 +378,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                 this->state_machine_change_state(STATE_PLAY_WAIT);
                 // TODO
                 this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
+                //this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
                 this->hasShowFirstPic = true;
                 this->mediaFileHandle->seeking_mark = 0;
 
@@ -722,6 +724,7 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
     XLog::e(TAG ,"===>in ffmpeg do work function\n");
     AVFormatContext *fc = this->mediaFileHandle->format_context;
 
+    mediaFileHandle->stopRender();  // stop render
     // clear packet & frame queue
     this->mediaFileHandle->audio_queue->flush();
     this->mediaFileHandle->video_queue->flush();
@@ -747,20 +750,20 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
         }
     }
 
-    abs_seek_pos = this->mediaFileHandle->seekpos +
-            this->mediaFileHandle->beginning_video_pts;
+    int64_t seek_pos = av_rescale(this->mediaFileHandle->seekpos, AV_TIME_BASE, 1000); //milliseconds_to_fftime(msec);
+    int64_t start_time = this->mediaFileHandle->format_context->start_time;
+    if (start_time > 0 && start_time != AV_NOPTS_VALUE){
+        seek_pos += start_time;
+    }
 
     XLog::e(TAG ,"state_machine: =====>before avcodec_flush_buffers 00\n");
     avcodec_flush_buffers(this->mediaFileHandle->video_codec_context);
     XLog::e(TAG ,"state_machine: =====>before avcodec_flush_buffers 01\n");
     avcodec_flush_buffers(this->mediaFileHandle->audio_codec_context);
 
-    pts = (int64_t)( ((double)abs_seek_pos/1000) / av_q2d(this->mediaFileHandle->video_stream->time_base));
-
-    XLog::e(TAG ,"state_machine: seek start(in msec):%lld, pts = %lld\n", (int64_t)abs_seek_pos,(int64_t)pts);
-
-    //ret = avformat_seek_file(fc, st_index, INT64_MIN, pts, INT64_MAX, 0);
-    ret = avformat_seek_file(fc, st_index, INT64_MIN, pts, INT64_MAX, 0);
+    // TODO need to judge the seek_pos value .
+    XLog::e(TAG ,"state_machine: seek start(in msec):%lld, pts = %lld\n", (int64_t)this->mediaFileHandle->seekpos,(int64_t)seek_pos);
+    ret = avformat_seek_file(fc, -1, INT64_MIN, seek_pos, INT64_MAX, 0);
 
     XLog::e(TAG ,"-state_machine: after avformat_seek_file, ret = %d\n",ret);
     return;

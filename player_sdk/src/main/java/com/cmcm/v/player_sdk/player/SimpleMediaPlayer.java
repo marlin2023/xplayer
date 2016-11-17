@@ -19,6 +19,8 @@ public abstract class SimpleMediaPlayer implements IMediaPlayer {
     protected OnErrorListener mOnErrorListener;
     protected OnInfoListener mOnInfoListener;
 
+    protected GLRenderControlerListener mGLRenderControlerListener;
+
     public SimpleMediaPlayer() {
     }
 
@@ -80,6 +82,10 @@ public abstract class SimpleMediaPlayer implements IMediaPlayer {
 
     public final void setOnInfoListener(OnInfoListener listener) {
         this.mOnInfoListener = listener;
+    }
+
+    public void setRenderControler(GLRenderControlerListener listener) {
+        this.mGLRenderControlerListener = listener;
     }
 
     public void resetListeners() {

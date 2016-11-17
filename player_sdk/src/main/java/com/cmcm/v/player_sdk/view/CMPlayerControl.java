@@ -45,6 +45,8 @@ public interface CMPlayerControl extends MediaController.MediaPlayerControl {
     void setOnVideoSizeChangedListener(IMediaPlayer.OnVideoSizeChangedListener l);
     void setOnErrorListener(IMediaPlayer.OnErrorListener l);
     void setOnInfoListener(IMediaPlayer.OnInfoListener l);
+    void setRenderControler(IMediaPlayer.GLRenderControlerListener l);
+
     void release(boolean clearTargetState);
     View getView();
     int  getCurrentState();

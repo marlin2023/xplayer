@@ -7,6 +7,8 @@
 #define TAG "FFMpegPacketQueue"
 
 #include "PacketQueue.h"
+#include "MediaFile.h"
+#include "xplayer_android_def.h"
 
 #include "util/XLog.h"
 
@@ -120,9 +122,13 @@ int PacketQueue::get(AVPacket *pkt, bool block)
             ret = 1;
             break;
         } else if (!block) {
+            // block
+            notify_buffering_start();
+            //
             ret = 0;
             break;
         } else {
+            notify_buffering_start();
             pthread_cond_wait(&cond, &mutex);
         }
 
@@ -198,4 +204,50 @@ int64_t PacketQueue::get_last_pkt_pts()
     pthread_mutex_unlock(&mutex);
 
     return pts;
+}
+
+void PacketQueue::notify_buffering_start()
+{
+
+    MediaFile *mediaFileHandle = (MediaFile *)empty_param;
+
+    if(mediaFileHandle->isBuffering){
+        XLog::e(TAG ,"==>in notify_buffering_start function ,but is in Buffering ,then return.\n");
+        return;
+    }
+
+    XLog::e(TAG ,"==>in notify_buffering_start function PacketQueue.\n");
+    if(mediaFileHandle->end_of_file){
+        XLog::e(TAG ,"==>in notify_buffering_start function ,is the end of file..\n");
+        return ;
+    }
+
+    bool isAudioPacketQueueEmpty = false;
+    bool isVideoPacketQueueEmpty = false;
+#if 1
+    if(mediaFileHandle->audio_queue->size() == 0){
+        isAudioPacketQueueEmpty = true;
+        XLog::e(TAG ,"==>in notify_buffering_start function PacketQueue ,isAudioPacketQueueEmpty is true.\n");
+    }
+
+    if(mediaFileHandle->video_queue->size() == 0){
+        isVideoPacketQueueEmpty = true;
+        XLog::e(TAG ,"==>in notify_buffering_start function PacketQueue ,isVideoPacketQueueEmpty is true.\n");
+    }
+
+    if(isAudioPacketQueueEmpty && isVideoPacketQueueEmpty){
+        XLog::e(TAG ,"==>in notify_buffering_start function ,notify buffering_start.\n");
+        // stop render
+        mediaFileHandle->stopRender();
+        // change state to buffering state.
+        mediaFileHandle->jNI2BufferState();
+
+        // notify
+        mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
+        mediaFileHandle->isBuffering = true;
+        // notify engine to stop playing
+        // 回调上层接口更及时？？？？TODO
+
+    }
+#endif
 }

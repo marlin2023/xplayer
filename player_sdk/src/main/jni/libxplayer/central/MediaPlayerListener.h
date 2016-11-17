@@ -11,6 +11,10 @@ class MediaPlayerListener
 public:
     virtual void notify(int msg, int ext1, int ext2) = 0;
 
+    virtual void JNIStopGlRenderMode() = 0;
+    virtual void JNIStartGlRenderMode() = 0;
+
+    virtual void JNI2BufferState() = 0;
 };
 
 #endif //XPLAYER_MEDIAPLAYERLISTENER_H

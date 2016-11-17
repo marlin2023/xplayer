@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.MediaController;
 
 import com.cmcm.v.player_sdk.player.IMediaPlayer;
+import com.cmcm.v.player_sdk.player.XPlayer;
 
 import java.util.Map;
 
@@ -57,6 +58,7 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
     protected IMediaPlayer.OnVideoSizeChangedListener mOnVideoSizeChangedListener;
     protected IMediaPlayer.OnErrorListener mOnErrorListener;
     protected IMediaPlayer.OnInfoListener mOnInfoListener;
+    protected IMediaPlayer.GLRenderControlerListener mGLRenderControlerListener;
 
     // recording the seek position while preparing
     protected int mSeekWhenPrepared;
@@ -496,10 +498,27 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
                         }
                     }
 
-
                     return true;
                 }
             };
+
+    protected IMediaPlayer.GLRenderControlerListener mGLRenderControler = new IMediaPlayer.GLRenderControlerListener()
+    {
+        public void setGLStartRenderMode()
+        {
+            setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
+        }
+
+        public void setGLStopRenderMode()
+        {
+            setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
+        }
+    };
+
+    @Override
+    public void setRenderControler(IMediaPlayer.GLRenderControlerListener l) {
+        mGLRenderControlerListener = l;
+    }
 
     @Override
     public void setOnPreparedListener(IMediaPlayer.OnPreparedListener l) {

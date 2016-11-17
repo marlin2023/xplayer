@@ -46,7 +46,7 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
     frame = av_frame_alloc();
     if(!frame){
         XLog::e(TAG ,"===>decode_one_video_packet, error for av_frame_alloc.\n");
-        this->mediaFileHandle->notify(MEDIA_ERROR ,MEDIA_ERROE_MEM, CM_FALSE);
+        //this->mediaFileHandle->notify(MEDIA_ERROR ,MEDIA_ERROE_MEM, CM_FALSE);
         return;
     }
 
@@ -62,6 +62,13 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
             // TODO
             // TODO send frame
             mediaFileHandle->video_frame_queue->put(frame);
+
+            if( mediaFileHandle->isBuffering &&  (mediaFileHandle->video_frame_queue->size() >= X_MIN_FRAME_VIDEO_Q_NODE_CNT)){
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME ,vdieo frame q size = %d\n" ,mediaFileHandle->video_frame_queue->size());
+                mediaFileHandle->startRender();
+                mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
+                mediaFileHandle->isBuffering = false;
+            }
             //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME ,vdieo frame q size = %d\n" ,mediaFileHandle->video_frame_queue->size());
         }
 
@@ -226,8 +233,9 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
         {
             //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_DECODE_GO_ON event!\n");
             //
-            if(mediaFileHandle->video_frame_queue->node_count >= mediaFileHandle->video_frame_queue->max_node_count)
+            if(mediaFileHandle->video_frame_queue->node_count >= X_MAX_FRAME_VIDEO_Q_NODE_CNT)
             {
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine video_frame_queue is full!\n");
                 usleep(50000);
                 this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
                 return;
@@ -242,8 +250,8 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
                     this->state_machine_change_state(STATE_DECODER_START);  // change state.
 
                 }else{
+                    XLog::d(ANDROID_LOG_INFO ,TAG ,"video decoder statemachine , not in the end of file ,why in here,Should Buffering!\n");
                     usleep(50000);
-                    XLog::d(ANDROID_LOG_INFO ,TAG ,"video decoder statemachine , not in the end of file ,why in here!\n");
                     this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
                 }
                 return;

@@ -18,6 +18,10 @@ static const char *className = "com/cmcm/v/player_sdk/player/XPlayer";
 struct fields_t {
     jfieldID    context;
     jmethodID   post_event;
+
+    jmethodID   stopRenderMode;
+    jmethodID   startRenderMode;
+
 };
 fields_t fields;
 
@@ -71,6 +75,9 @@ public:
     JNIMediaPlayerListener(JNIEnv* env, jobject thiz, jobject weak_thiz);
     ~JNIMediaPlayerListener();
     void notify(int msg, int ext1, int ext2);
+    void JNIStopGlRenderMode();
+    void JNIStartGlRenderMode();
+    void JNI2BufferState();
 
 private:
     JNIMediaPlayerListener();
@@ -126,6 +133,56 @@ void JNIMediaPlayerListener::notify(int msg, int ext1, int ext2)
     }
 }
 
+void JNIMediaPlayerListener::JNIStopGlRenderMode()
+{
+    JNIEnv *env = getJNIEnv();
+    JavaVM *svm = getJvm();
+    bool isAttached = false;
+    if(env == NULL)
+    {
+        svm->AttachCurrentThread(&env, NULL);
+        isAttached = true;
+    }
+    env->CallStaticVoidMethod(mClass, fields.stopRenderMode, mObject);
+
+    if(isAttached)
+    {
+        svm->DetachCurrentThread();
+    }
+
+    playerInner->audioRender->pause();
+}
+
+void JNIMediaPlayerListener::JNIStartGlRenderMode()
+{
+    JNIEnv *env = getJNIEnv();
+    JavaVM *svm = getJvm();
+    bool isAttached = false;
+    if(env == NULL)
+    {
+        svm->AttachCurrentThread(&env, NULL);
+        isAttached = true;
+    }
+    env->CallStaticVoidMethod(mClass, fields.startRenderMode, mObject);
+
+    if(isAttached)
+    {
+        svm->DetachCurrentThread();
+    }
+
+    playerInner->audioRender->resume();
+}
+
+void JNIMediaPlayerListener::JNI2BufferState()
+{
+    XLog::e(TAG ,"======>in JNI2BufferState  .");
+    playerInner->centralEngineStateMachineHandle->state_machine_change_state(STATE_BUFFERING);
+    playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_PAUSE);
+    playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_PAUSE);
+
+}
+
+
 // ----------------------------------------------------------------------------
 
 // be called when library be loaded.
@@ -145,6 +202,22 @@ jni_native_init(JNIEnv *env , jobject thiz)
         jniThrowException(env, "java/lang/RuntimeException", "Can't find FFMpegMediaPlayer.postEventFromNative");
         return;
     }
+
+    fields.stopRenderMode= env->GetStaticMethodID(clazz, "stopRenderMode","()V");
+    if (fields.stopRenderMode == NULL) {
+        jniThrowException(env, "java/lang/RuntimeException", "Can't find FFMpegMediaPlayer.stopRenderMode");
+        return;
+    }
+
+
+    fields.startRenderMode= env->GetStaticMethodID(clazz, "startRenderMode","()V");
+    if (fields.startRenderMode == NULL) {
+        jniThrowException(env, "java/lang/RuntimeException", "Can't find FFMpegMediaPlayer.startRenderMode");
+        return;
+    }
+
+
+
 }
 //
 static void jni_native_setup(JNIEnv *env, jobject thiz ,jobject weak_this)
@@ -222,8 +295,11 @@ static void native_play(JNIEnv *env, jobject thiz)
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_START);
     // TODO
     playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_PLAY);
+    playerInner->mediaFileHandle->startRender();
     // audio render thread.
     playerInner->player_start();
+
+    playerInner->mediaFileHandle->startRender();
     XLog::e(TAG ,"======>playerInner->player_start.SimpleBufferQueueCallback");
 
 }
@@ -233,9 +309,20 @@ static void native_pause(JNIEnv *env, jobject thiz)
     // playerInner->player_engine_prepare();
     // playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_START);
 
+    playerInner->mediaFileHandle->stopRender();
+
     // audio opensl es
     playerInner->audioRender->pause();
 
+    if(playerInner->mediaFileHandle->isBuffering){
+
+        XLog::e(TAG ,"======>call native_pause, and in buffering state.");
+        //
+        playerInner->centralEngineStateMachineHandle->state_machine_change_state(STATE_BUFFERING);
+        playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_PAUSE);
+        playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_PAUSE);
+        return ;
+    }
     // process state
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_PAUSE);
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_PAUSE);
@@ -250,6 +337,7 @@ static void native_resume(JNIEnv *env, jobject thiz)
         return;
     }
 
+
     // audio opensl es
     playerInner->audioRender->resume();
 
@@ -257,6 +345,7 @@ static void native_resume(JNIEnv *env, jobject thiz)
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_RESUME);
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_RESUME);
     playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_RESUME);
+    playerInner->mediaFileHandle->startRender();
 }
 
 static void native_stop(JNIEnv *env, jobject thiz)

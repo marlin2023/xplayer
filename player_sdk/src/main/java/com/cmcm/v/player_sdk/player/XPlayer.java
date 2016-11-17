@@ -47,6 +47,8 @@ public class XPlayer extends SimpleMediaPlayer {
      */
     EventHandler mEventHandler;
 
+    private static GLRenderControlerListener    mGLRenderControlerListener;
+
     static {
         try {
             System.loadLibrary("ffmpeg");
@@ -420,5 +422,21 @@ public class XPlayer extends SimpleMediaPlayer {
     public native void _play();
 
     public native void _renderFrame();
+
+
+    @Override
+    public void setRenderControler(GLRenderControlerListener listener) {
+        mGLRenderControlerListener = listener;
+    }
+
+    public static void stopRenderMode() {
+        if (mGLRenderControlerListener != null)
+            mGLRenderControlerListener.setGLStopRenderMode();
+    }
+
+    public static void startRenderMode() {
+        if (mGLRenderControlerListener != null)
+            mGLRenderControlerListener.setGLStartRenderMode();
+    }
 
 }

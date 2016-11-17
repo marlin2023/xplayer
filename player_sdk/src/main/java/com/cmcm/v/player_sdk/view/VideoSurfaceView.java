@@ -169,6 +169,8 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
             mMediaPlayer.setOnVideoSizeChangedListener(mSizeChangedListener);
             mMediaPlayer.setOnErrorListener(mErrorListener);
             mMediaPlayer.setOnInfoListener(mInfoListener);
+
+            mMediaPlayer.setRenderControler(mGLRenderControler);
             mCurrentBufferPercentage = 0;
             mDuration = -1;
             mLastPositionOnCompletion = 0;
@@ -228,7 +230,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
                     if((percent == 100) && (isCalledPlay == 0)){
                         isCalledPlay = 1;
                         Log.i("chris" ,"=====>call play function ");
-                        play();
+                        play(); //TODO ZZZZZZZZZ
                     }
                 }
             };
@@ -327,7 +329,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
                     mMediaPlayer.start();
                 }
                 mCurrentState = STATE_PLAYING;
-                setRenderMode(RENDERMODE_CONTINUOUSLY); // set render mode RENDERMODE_CONTINUOUSLY
             }
             mTargetState = STATE_PLAYING;
         } catch (Exception e) {
@@ -340,7 +341,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         try {
             if (isInPlaybackState()) {
                 if (mMediaPlayer.isPlaying()) {
-                    setRenderMode(RENDERMODE_WHEN_DIRTY); // set render mode RENDERMODE_WHEN_DIRTY
                     mMediaPlayer.pause();
                     mCurrentState = STATE_PAUSED;
                 }
@@ -368,6 +368,11 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
     }
 
     @Override
+    public void setRenderControler(IMediaPlayer.GLRenderControlerListener l) {
+
+    }
+
+    @Override
     public void seekTo(int msec) {
         if (isInPlaybackState()) {
             setRenderMode(RENDERMODE_WHEN_DIRTY);   // set render mode
@@ -378,6 +383,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
             mSeekWhenPrepared = msec;
         }
     }
+
 
     protected IMediaPlayer.OnCompletionListener mXplayerCompletionListener =
             new IMediaPlayer.OnCompletionListener() {
