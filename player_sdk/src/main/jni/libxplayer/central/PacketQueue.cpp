@@ -236,7 +236,7 @@ void PacketQueue::notify_buffering_start()
     }
 
     if(isAudioPacketQueueEmpty && isVideoPacketQueueEmpty){
-        XLog::e(TAG ,"==>in notify_buffering_start function ,notify buffering_start.\n");
+        XLog::e(TAG ,"==>in PacketQueue::notify_buffering_start function ,notify buffering_start.MEDIA_INFO_BUFFERING_START\n");
         // stop render
         mediaFileHandle->stopRender();
         // change state to buffering state.

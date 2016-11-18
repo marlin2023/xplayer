@@ -59,12 +59,12 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
 
             //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME\n");
             frame->pts = av_frame_get_best_effort_timestamp(frame);
-            // TODO
+
             // TODO send frame
             mediaFileHandle->video_frame_queue->put(frame);
 
             if( mediaFileHandle->isBuffering &&  (mediaFileHandle->video_frame_queue->size() >= X_MIN_FRAME_VIDEO_Q_NODE_CNT)){
-                XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME ,vdieo frame q size = %d\n" ,mediaFileHandle->video_frame_queue->size());
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME ,vdieo frame q size = %d ,notify MEDIA_INFO_BUFFERING_END.\n" ,mediaFileHandle->video_frame_queue->size());
                 mediaFileHandle->startRender();
                 mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
                 mediaFileHandle->isBuffering = false;

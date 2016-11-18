@@ -71,6 +71,7 @@ void YuvGLRender::render_frame()
     int ret1 = this->mediaFileHandle->video_frame_queue->get(src_frame ,0); // no block mode
     if(ret1 != 1){
         XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .no video frame ,return ,video packet size = %d" ,mediaFileHandle->video_queue->size());
+        mediaFileHandle->stopRender();
         usleep(50 * 1000); //in microseconds
         av_frame_free(&src_frame);  // free frame memory
         return;
@@ -82,10 +83,12 @@ void YuvGLRender::render_frame()
     double video_frame_render_pts = (double) src_frame->pts * av_q2d(mediaFileHandle->video_stream->time_base) * 1000;   // in millisecond
     double sync_audio_clock_time = mediaFileHandle->sync_audio_clock_time;
     double diff_time = video_frame_render_pts - sync_audio_clock_time;
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,sync_audio_clock_time =%f ,diff_time =%f\n", video_frame_render_pts ,sync_audio_clock_time,diff_time);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,sync_audio_clock_time =%f ,diff_time =%f ,"
+                                                                "video_frame_q size =%d ,audio_frame_q size =%d\n",
+                                                                 video_frame_render_pts ,sync_audio_clock_time,diff_time ,
+                                                                 mediaFileHandle->video_frame_queue->size() ,mediaFileHandle->audio_frame_queue->size());
 
     // TODO filter some error diff_time.
-    //av_frame_free(&src_frame);
     if((diff_time > 0) && (diff_time < 800)){ // 100 millisecond
         usleep(diff_time * 1000); //in microseconds
     }else if(diff_time  < -500){

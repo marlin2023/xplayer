@@ -196,23 +196,28 @@ void FrameQueue::notify_buffering_start()
         XLog::e(TAG ,"==>in notify_buffering_start function ,is the end of file..\n");
         return ;
     }
-    XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue.\n");
+    XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue,video_frame_queue->size() =%d ,audio_frame_size =%d\n" ,mediaFileHandle->video_frame_queue->size(),mediaFileHandle->audio_frame_queue->size());
 
     bool isVideoFrameQueueEmpty = false;
+    bool isAudioFrameQueueEmpty = false;
 
     if(mediaFileHandle->video_frame_queue->size() == 0){
         isVideoFrameQueueEmpty = true;
         XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue ,isVideoFrameQueueEmpty is true.\n");
     }
 
-    if(isVideoFrameQueueEmpty){
-        XLog::e(TAG ,"==>in notify_buffering_start function ,notify buffering_start.\n");
+    if(mediaFileHandle->audio_frame_queue->size() == 0){
+        isAudioFrameQueueEmpty = true;
+        XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue ,isAudioFrameQueueEmpty is true.\n");
+    }
+
+    if(isVideoFrameQueueEmpty || isAudioFrameQueueEmpty){
+        XLog::e(TAG ,"==>in FrameQueue::notify_buffering_start function ,notify buffering_start.MEDIA_INFO_BUFFERING_START\n");
         // stop render
         mediaFileHandle->stopRender();
         // notify
         mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
         mediaFileHandle->isBuffering = true;
-
     }
 
 }

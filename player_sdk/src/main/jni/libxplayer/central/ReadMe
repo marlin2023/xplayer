@@ -206,3 +206,9 @@ Such as Video Decoder State Machine has state :
     https://audioprograming.wordpress.com/2012/10/29/lock-free-audio-io-with-opensl-es-on-android/
     callback should not be blocked.
 
+
+TODO
+    1.音视频同步机制 , 可以考虑按照系统的时间戳进行同步。 按照系统时钟时间戳进行同步更合理，如何做？？
+    2.缓冲buffer的大小调节。
+    3.同步那里逻辑需要改下。
+

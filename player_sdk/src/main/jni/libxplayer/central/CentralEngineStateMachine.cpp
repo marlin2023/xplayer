@@ -373,14 +373,22 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
                     return;
                 }
 
-                XLog::e(TAG ,"===>state_machine: show first pic 0\n");
-                this->mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
+
                 this->state_machine_change_state(STATE_PLAY_WAIT);
-                // TODO
-                this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
-                //this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
-                this->hasShowFirstPic = true;
-                this->mediaFileHandle->seeking_mark = 0;
+                if(this->hasShowFirstPic){
+                    XLog::e(TAG ,"===>state_machine: central engine ..buffering over .\n");
+                    this->mediaFileHandle->message_queue_video_decode->push(EVT_PLAY);
+                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_PLAY);
+                    mediaFileHandle->isBuffering = true;
+                }else{
+                    XLog::e(TAG ,"===>state_machine: show first pic 0\n");
+                    this->mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
+                    // TODO
+                    this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
+
+                    this->hasShowFirstPic = true;
+                    this->mediaFileHandle->seeking_mark = 0;
+                }
 
                 return;
             }
@@ -421,12 +429,13 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
         {XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_RESUME Event.\n");}
         case EVT_PLAY:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_PLAY Event.\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_PLAY Event. ,NOTIFY MEDIA_INFO_BUFFERING_END\n");
             this->state_machine_change_state(STATE_PLAY_PLAYING);
             //
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
             this->mediaFileHandle->startRender();   // add
+            this->mediaFileHandle->isBuffering = false;
             return;
         }
 
@@ -479,10 +488,10 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
             {
                 ret = 1;
 
-                //XLog::d(ANDROID_LOG_INFO ,TAG ,"===> pkt q full, %d,%d,%d\n",
-                //mediaFileHandle->video_queue->size(),
-                //mediaFileHandle->audio_queue->size(),
-                //mediaFileHandle->video_queue->q_size);
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"===> pkt q full, %d,%d,%d\n",
+                mediaFileHandle->video_queue->size(),
+                mediaFileHandle->audio_queue->size(),
+                mediaFileHandle->video_queue->q_size);
             }
 
             if(ret)
@@ -680,8 +689,11 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
             AVFormatContext *fc = this->mediaFileHandle->format_context;
 
             if(this->hasShowFirstPic){
+                XLog::e(TAG ,"===>STATE_SEEK_WAIT receive EVT_READY_TO_SEEK ,and notify buffering_start MEDIA_INFO_BUFFERING_START.\n");
                 // Notify UI and engine to send buffering start message
                 this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
+                mediaFileHandle->stopRender();
+                mediaFileHandle->isBuffering = true;
             }
             this->state_machine_change_state(STATE_BUFFERING);
             // Note that this event is sent by decode thread when it is in its wait state
