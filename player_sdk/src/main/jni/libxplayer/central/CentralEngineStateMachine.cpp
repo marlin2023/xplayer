@@ -464,16 +464,28 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
         {
             int ret = 0;
             mediaFileHandle->end_of_file = false;
+            // Video packet q is full
+            if(mediaFileHandle->video_queue->q_size >= X_MAX_PKT_VIDEO_Q_MEM_SPACE)
+            {
+                ret = 1;
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"===> pkt q full, %d,%d,%d\n",
+                mediaFileHandle->video_queue->size(),
+                mediaFileHandle->audio_queue->size(),
+                mediaFileHandle->video_queue->q_size);
 
-            //XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAYING ,receive EVT_GO_ON Event .\n");
+                usleep(50000);
+                this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
+                return;
+
+            }
+
             // the eof of file or read error .
             if (demux_2_packet_queue() == AVERROR_EOF && this->read_retry_count > 5)
             {
-                //XLog::e(TAG ,"state_machine:PLAYING FILE EOF,vpktq = %d,apktq = %d\n",
-                //        mediaFileHandle->video_queue->size(),
-                //        mediaFileHandle->audio_queue->size());
+                XLog::e(TAG ,"state_machine:PLAYING FILE EOF,vpktq = %d,apktq = %d\n",
+                        mediaFileHandle->video_queue->size(),
+                        mediaFileHandle->audio_queue->size());
 
-                //is_file_eof = EL_TRUE;
                 // TODO
                 this->state_machine_change_state(STATE_PLAY_FILE_END);
                 this->mediaFileHandle->end_of_file = true;
@@ -483,25 +495,7 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
                 return;
             }
 
-            // Video packet q is full
-            if(mediaFileHandle->video_queue->q_size >= X_MAX_PKT_VIDEO_Q_MEM_SPACE)
-            {
-                ret = 1;
-
-                XLog::d(ANDROID_LOG_INFO ,TAG ,"===> pkt q full, %d,%d,%d\n",
-                mediaFileHandle->video_queue->size(),
-                mediaFileHandle->audio_queue->size(),
-                mediaFileHandle->video_queue->q_size);
-            }
-
-            if(ret)
-            {
-                usleep(10000);
-            }
-            else
-            {
-                usleep(1000);
-            }
+            usleep(10000);
 
             //
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
@@ -552,8 +546,8 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
             // notify TODO
             if( (mediaFileHandle->video_queue->size() == 0) &&
                 (mediaFileHandle->audio_queue->size() == 0) &&
-                (mediaFileHandle->video_frame_queue->size() == 0) &&
-                (mediaFileHandle->audio_frame_queue->size() == 0)){
+                ( (mediaFileHandle->video_frame_queue->size() == 0) ||
+                (mediaFileHandle->audio_frame_queue->size() == 0 ) )){
 
                 XLog::e(TAG ,"====>state_machine: notify eof and should quit ...\n");
                 this->state_machine_change_state(STATE_PLAY_COMPLETE);
@@ -570,6 +564,13 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
         {
             XLog::e(TAG ,"====>state_machine: pause in play file end ...\n");
             this->state_machine_change_state(STATE_PLAY_PAUSED);
+            return;
+        }
+        case EVT_SEEK:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PLAY_FILE_END receive EVT_SEEK !\n");
+            this->state_machine_change_state(STATE_SEEK_WAIT);
+            this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
         }
 

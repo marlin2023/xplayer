@@ -29,7 +29,7 @@ extern "C" {
 #define X_S_2_MS(sec) ((sec) * 1000)
 #define X_MS_2_US(msec) ((msec) * 1000)
 
-#define X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS X_S_2_MS(2)        // in ms unit
+#define X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS X_S_2_MS(1)        // in ms unit
 #define X_MAX_PKT_Q_NETWORK_BUFFERING_TS X_S_2_MS(4)              // in ms unit
 
 #define X_MAX_PKT_Q_TS         X_S_2_MS(0.6)                  // in ms unit
@@ -48,8 +48,8 @@ extern "C" {
 //#define X_MAX_PKT_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(10)                // 10M space size
 //#define X_MAX_PKT_AUDIO_Q_MEM_SPACE  X_MEGA_SIZE(5)                 // 5M space size
 
-#define X_MAX_PKT_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(0.5)                // 10M space size
-#define X_MAX_PKT_AUDIO_Q_MEM_SPACE  X_MEGA_SIZE(0.25)                 // 5M space size
+#define X_MAX_PKT_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(4)                // 4M space size
+#define X_MAX_PKT_AUDIO_Q_MEM_SPACE  X_MEGA_SIZE(2)                 // 2M space size
 
 
 /**

@@ -194,6 +194,8 @@ void FrameQueue::notify_buffering_start()
 
     if(mediaFileHandle->end_of_file){
         XLog::e(TAG ,"==>in notify_buffering_start function ,is the end of file..\n");
+        XLog::e(TAG ,"==>in notify_buffering_start function video_packet_q size =%d ,audio_packet_q size =%d" ,mediaFileHandle->video_queue->size() ,mediaFileHandle->audio_queue->size());
+        XLog::e(TAG ,"==>in notify_buffering_start function video_frame_q size =%d ,audio_frame_q size =%d" ,mediaFileHandle->video_frame_queue->size() ,mediaFileHandle->audio_frame_queue->size());
         return ;
     }
     XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue,video_frame_queue->size() =%d ,audio_frame_size =%d\n" ,mediaFileHandle->video_frame_queue->size(),mediaFileHandle->audio_frame_queue->size());
