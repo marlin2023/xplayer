@@ -130,7 +130,10 @@ void MediaFile::stopRender()
 
     if (mListener != NULL)
     {
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>in mediafile ,stopRender. \n");
         mListener->JNIStopGlRenderMode();
+    }else{
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>in mediafile ,stopRender 2. \n");
     }
 }
 
@@ -139,7 +142,10 @@ void MediaFile::jNI2BufferState()
 
     if (mListener != NULL)
     {
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>in mediafile ,jNI2BufferState. \n");
         mListener->JNI2BufferState();
+    }else{
+        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>in mediafile ,jNI2BufferState.1 \n");
     }
 }
 
@@ -460,7 +466,7 @@ CM_BOOL MediaFile::is_pkt_q_full(int64_t max_buffer_ts)
             // 音频、视频，缓冲均已经达到最大缓冲的时间值
             if(q_v_buffer_ts > max_buffer_ts && q_a_buffer_ts > max_buffer_ts)
             {
-                XLog::d(ANDROID_LOG_WARN ,TAG ,"queue is full: v ts = %lld, a ts = %lld, both > max buffer ts: %lld, is full\n",
+                XLog::d(ANDROID_LOG_WARN ,TAG ,"===>video packet queue is full: v ts = %lld, a ts = %lld, both > max buffer ts: %lld, is full\n",
                            q_v_buffer_ts,
                            q_a_buffer_ts,
                            max_buffer_ts);

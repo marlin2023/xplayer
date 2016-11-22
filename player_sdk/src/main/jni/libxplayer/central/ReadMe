@@ -219,3 +219,19 @@ TODO
     1.buffer 逻辑修改下 ：
         1.1）packet队列只是缓冲数据，packet队列的状态最终只会影响文件是否读取结束。
         1.2）frame queue 队列负责和上层交互，如果队列中没有数据，则通知上层buffer ，
+
+-----
+    线程 Demux Thread
+    作用： 就是读数据   Demux audio & video data into audio video packet q
+    1.openfile  ==>获取文件流信息
+    2.读media data ,分别入audio packet q 和 video packet q.
+    3.读到文件末尾的处理
+    4.
+
+-----
+    缓冲逻辑
+    buffer 逻辑 ：
+    1.1）packet队列只是缓冲数据，packet队列的状态最终只会影响文件是否读取结束。
+    1.2）frame queue 队列负责和上层交互，如果frame 队列中没有数据，则通知上层buffer .
+
+-----

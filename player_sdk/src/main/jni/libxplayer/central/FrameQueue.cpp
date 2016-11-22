@@ -225,6 +225,8 @@ void FrameQueue::notify_buffering_start()
         mediaFileHandle->stopRender();
         // notify
         mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
+        //
+        mediaFileHandle->jNI2BufferState();
         mediaFileHandle->isBuffering = true;
     }
 

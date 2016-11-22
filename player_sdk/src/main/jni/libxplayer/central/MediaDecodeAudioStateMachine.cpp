@@ -139,7 +139,13 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_wait(player_event_e e
         //{
         //    return;
         //}
-
+        case EVT_START:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeAudioStateMachine thread recv EVT_START evt!!\n");
+            this->state_machine_change_state(STATE_DECODER_WORK);
+            this->mediaFileHandle->message_queue_audio_decode->push(EVT_DECODE_GO_ON);
+            return;
+        }
         case EVT_RESUME:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeAudioStateMachine thread recv resume evt!!\n");
