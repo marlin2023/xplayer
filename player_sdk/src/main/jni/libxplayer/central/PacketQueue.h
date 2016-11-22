@@ -45,8 +45,6 @@ public:
 
     void abort();
 
-    void notify_buffering_start();
-
     /**
     * get buffered packet sum duration in packet queue.
     */

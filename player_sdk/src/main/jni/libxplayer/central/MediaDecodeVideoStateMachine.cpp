@@ -57,19 +57,9 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
         send_result = avcodec_send_packet(codec_ctx, packet1);
         while ( avcodec_receive_frame(codec_ctx, frame) == 0 ) {
 
-            //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME\n");
             frame->pts = av_frame_get_best_effort_timestamp(frame);
-
             // TODO send frame
             mediaFileHandle->video_frame_queue->put(frame);
-
-            if( mediaFileHandle->isBuffering &&  (mediaFileHandle->video_frame_queue->size() >= X_MIN_FRAME_VIDEO_Q_NODE_CNT)){
-                XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME ,vdieo frame q size = %d ,notify MEDIA_INFO_BUFFERING_END.\n" ,mediaFileHandle->video_frame_queue->size());
-                mediaFileHandle->startRender();
-                mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
-                mediaFileHandle->isBuffering = false;
-            }
-            //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDecodeVideoStateMachine GOT FRAME ,vdieo frame q size = %d\n" ,mediaFileHandle->video_frame_queue->size());
         }
 
     } while (send_result == AVERROR(EAGAIN));
@@ -250,7 +240,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
                     this->state_machine_change_state(STATE_DECODER_START);  // change state.
 
                 }else{
-                    XLog::d(ANDROID_LOG_INFO ,TAG ,"video decoder statemachine , not in the end of file ,why in here,Should Buffering!\n");
+                    XLog::d(ANDROID_LOG_INFO ,TAG ,"video decoder statemachine , not in the end of file ,may will go in Buffering! ,video packet q size = %d\n" ,mediaFileHandle->video_queue->size());
                     usleep(50000);
                     this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
                 }

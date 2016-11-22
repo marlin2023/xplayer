@@ -78,6 +78,8 @@ private:
 
     void notify_buffering_start();
 
+    void notify_buffering_end();
+
     /**
     * first frame in frame queue.
     */

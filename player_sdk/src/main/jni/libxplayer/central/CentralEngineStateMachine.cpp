@@ -224,23 +224,7 @@ void CentralEngineStateMachine::central_engine_state_machine_process_event(playe
 
 void CentralEngineStateMachine::central_engine_do_process_idle(player_event_e evt)
 {
-    switch(evt)
-    {
-        case EVT_OPEN:
-        {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: idle state recv EVT_OPEN\n");
-            //el_state_machine_change_state(demux_file_state_machine, EL_ENGINE_CENTRAL_STATE_PREPARE);
-
-            // 通过ipc，使得状态机和thread关联起来
-            // 在一个线程中，驱动另一个线程。
-            //el_ipc_send(EVT_GO_ON, el_msg_q_demux_file);
-            return;
-        }
-        default:
-        {
-            return;
-        }
-    }
+    XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: idle state recv evt :%d\n" ,evt);
     return;
 
 }
@@ -267,9 +251,6 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: open file:-%s- success !!!\n" ,mediaFileHandle->getSourceUrl());
 
                 // TODO notify upper open success ,and upper will send EVT_START and go into Buffering state.
-                // TODO
-                //this->message_queue->push(EVT_START);   //TODO here should be performed in upper layer
-                //
                 this->mediaFileHandle->notify(MEDIA_PREPARED ,0 ,0);
             }
             else
@@ -342,53 +323,30 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
         case EVT_GO_ON:
         {
             mediaFileHandle->end_of_file = false;
+            mediaFileHandle->isBuffering = true;
             if (demux_2_packet_queue() == AVERROR_EOF && this->read_retry_count > 5)
             {
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"===>AVERROR_EOF....\n");
                 break;
             }
 
-            if(mediaFileHandle->is_pkt_q_full(mediaFileHandle->start_playing_buffering_time))
+            // TODO ,here buffer data size different for the first load and the later .
+            if(mediaFileHandle->isPlayedBefore){
+                mediaFileHandle->playing_buffering_time = X_MAX_PKT_Q_NETWORK_BUFFERING_TS;
+            }else{
+                mediaFileHandle->playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;    // first buffer before player start to play.
+            }
+
+            if(mediaFileHandle->is_pkt_q_full(mediaFileHandle->playing_buffering_time))
             {
-                XLog::d(ANDROID_LOG_INFO ,TAG ,"===>is_pkt_q_full break;.\n");
-                this->mediaFileHandle->isBuffering = false;
-                // TODO ,here should to notify upper layer
-                // TODO
-                if( (this->old_state == STATE_SEEK_WAIT ) && (this->hasShowFirstPic == true)){
-                    //STATE_SEEK_WAIT
-                    // after seek, discard packet that comes from last play
-                    XLog::e(TAG ,"===>state_machine: sending seek done evt to decoder 00!\n");
-                    this->state_machine_change_state(STATE_PLAY_WAIT);
-                    // Notify decoder thread
-                    this->mediaFileHandle->message_queue_video_decode->push(EVT_SEEK_DONE);
-                    this->mediaFileHandle->message_queue_video_decode->push(EVT_PLAY);
-                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_SEEK_DONE);
-                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_PLAY);
-
-                    // re set seek_mark
-                    this->mediaFileHandle->seeking_mark = 0;
-                    usleep(10000);
-                    XLog::e(TAG ,"===>state_machine: MEDIA_SEEK_COMPLETE notify\n");
-                    this->mediaFileHandle->notify(MEDIA_SEEK_COMPLETE ,0 ,0);
-                    return;
-                }
-
-
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"===>is_pkt_q_full break ,and change demux state machine to STATE_PLAY_WAIT state.\n");
+                //
                 this->state_machine_change_state(STATE_PLAY_WAIT);
-                if(this->hasShowFirstPic){
-                    XLog::e(TAG ,"===>state_machine: central engine ..buffering over .\n");
-                    this->mediaFileHandle->message_queue_video_decode->push(EVT_PLAY);
-                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_PLAY);
-                    mediaFileHandle->isBuffering = true;
-                }else{
-                    XLog::e(TAG ,"===>state_machine: show first pic 0\n");
-                    this->mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
-                    // TODO
-                    this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
-
-                    this->hasShowFirstPic = true;
-                    this->mediaFileHandle->seeking_mark = 0;
-                }
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"===>is_pkt_q_full break ,after set STATE_PLAY_WAIT state ,then to push decoder state machine to work.\n");
+                this->mediaFileHandle->message_queue_video_decode->push(EVT_START); // start to decode video packet data .
+                this->mediaFileHandle->message_queue_audio_decode->push(EVT_START);
+                // demux continue to work ,go into playing state .
+                this->mediaFileHandle->message_queue_central_engine->push(EVT_PLAY);
 
                 return;
             }
@@ -426,16 +384,12 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
     {
         case EVT_START: // TODO
         case EVT_RESUME:    // after seek
-        {XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_RESUME Event.\n");}
         case EVT_PLAY:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_PLAY Event. ,NOTIFY MEDIA_INFO_BUFFERING_END\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_PLAY Event. only change state to PLAY_PLAYING state.\n");
             this->state_machine_change_state(STATE_PLAY_PLAYING);
             //
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
-            this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
-            this->mediaFileHandle->startRender();   // add
-            this->mediaFileHandle->isBuffering = false;
             return;
         }
 
@@ -494,27 +448,28 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
                 //
                 return;
             }
-
-            usleep(10000);
-
+            usleep(1000);
             //
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             return;
         }
         case EVT_PAUSE:
         {
+            XLog::e(TAG ,"===>STATE_PLAYING receive EVT_PAUSE EVT:\n");
             this->state_machine_change_state(STATE_PLAY_PAUSED);
             return;
         }
 
         case EVT_STOP:
         {
+            XLog::e(TAG ,"===>STATE_PLAYING receive EVT_STOP EVT:\n");
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
 
         case EVT_SEEK:
         {
+            XLog::e(TAG ,"===>STATE_PLAYING receive EVT_SEEK EVT:\n");
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
@@ -568,7 +523,7 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
         }
         case EVT_SEEK:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PLAY_FILE_END receive EVT_SEEK !\n");
+            XLog::e(TAG ,"===>STATE_PLAY_FILE_END receive EVT_SEEK EVT:\n");
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;

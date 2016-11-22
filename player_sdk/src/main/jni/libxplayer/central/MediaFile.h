@@ -35,12 +35,12 @@ extern "C" {
 #define X_MAX_PKT_Q_TS         X_S_2_MS(0.6)                  // in ms unit
 #define X_MAX_PKT_Q_NETWORK_TS X_S_2_MS(40)                   // in ms unit
 
-#define X_MAX_FRAME_VIDEO_Q_NODE_CNT 30                         // max frm q video frame count
+#define X_MAX_FRAME_VIDEO_Q_NODE_CNT 40                         // max frm q video frame count
 #define X_MIN_FRAME_VIDEO_Q_NODE_CNT 10                         // max frm q video frame count
 
 #define X_MAX_FRAME_Q_TIME_LIMIT (0.7)                          // s
 
-#define X_MAX_FRAME_AUDIO_Q_NODE_CNT 40                         // max frm q audio frame count
+#define X_MAX_FRAME_AUDIO_Q_NODE_CNT 80                         // max frm q audio frame count
 
 #define X_MEGA_SIZE(t) ((t) * 1024 * 1024)
 #define X_MAX_FRAME_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(40)              // 40M space size
@@ -242,6 +242,8 @@ public:
     */
     long long start_playing_buffering_time;
 
+    long long playing_buffering_time;
+
     /**
     * max buffering time.
     */
@@ -289,6 +291,10 @@ public:
      */
     int64_t                 beginning_audio_pts;
 
+    /**
+     * Whether the player is started up ,and display some frames before.
+     */
+    bool isPlayedBefore;
 
     /**
      * message queue for CentralEngineStateMachine

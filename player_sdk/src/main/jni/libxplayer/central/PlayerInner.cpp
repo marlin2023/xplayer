@@ -77,10 +77,7 @@ PlayerInner::~PlayerInner()
  */
 void PlayerInner::player_engine_init()
 {
-
     int ret;
-
-
 
     //1. Register all formats and codecs
     av_register_all();
@@ -94,7 +91,6 @@ void PlayerInner::player_engine_init()
         this->mediaFileHandle->notify(MEDIA_ERROR, MEDIA_CREATE_DEMUX_THREAD_ERROR, ret);
         goto init_eout;
     }
-
 
     ret = pthread_create(&decode_video_tid, NULL, video_decode_thread, (void*)this);
     if(ret)
@@ -161,9 +157,9 @@ long PlayerInner::getCurrentPosition()
     }
     // TODO need subtract the base time
     XLog::e(TAG ,"====>current_position_ms= %ld\n",this->mediaFileHandle->current_position_ms);
-    if(this->mediaFileHandle->seeking_mark == 1){
-        return this->mediaFileHandle->seekpos;
-    }
+    //if(this->mediaFileHandle->seeking_mark == 1){
+    //    return this->mediaFileHandle->seekpos;
+    //}
     return this->mediaFileHandle->current_position_ms;
 }
 
@@ -187,9 +183,6 @@ void PlayerInner::seekTo(long msec)
 
     XLog::e(TAG ,"====>seekTo position = %ld\n",msec);
     this->mediaFileHandle->seekpos = msec;
-
-
-
 
     if(this->mediaFileHandle->seekpos > this->mediaFileHandle->duration_ms){
         this->mediaFileHandle->seekpos = this->mediaFileHandle->duration_ms;

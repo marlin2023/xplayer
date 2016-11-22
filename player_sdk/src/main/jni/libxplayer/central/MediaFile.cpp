@@ -37,6 +37,7 @@ MediaFile::MediaFile()
     file_opened = false;
     stop_flag = false;  // not stop
     isBuffering = false;
+    isPlayedBefore = false;
 
     audio_stream = NULL;
     video_stream = NULL;

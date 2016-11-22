@@ -91,6 +91,11 @@ int FrameQueue::put(AVFrame *frame)
     last_frame = frame1;
     node_count ++;
 
+    if(node_count > X_MIN_FRAME_VIDEO_Q_NODE_CNT){
+        // TODO
+        notify_buffering_end();
+    }
+
     pthread_cond_signal(&cond);
     pthread_mutex_unlock(&mutex);
 
@@ -187,8 +192,8 @@ void FrameQueue::notify_buffering_start()
 {
     MediaFile *mediaFileHandle = (MediaFile *)empty_param;
 
-    if(mediaFileHandle->isBuffering){
-        XLog::e(TAG ,"==>in notify_buffering_start function ,but is in Buffering ,then return.\n");
+    if(mediaFileHandle->isBuffering || !mediaFileHandle->isPlayedBefore){   // first loading end
+        XLog::e(TAG ,"==>in notify_buffering_start function ,but is in Buffering or not played ,then return.\n");
         return;
     }
 
@@ -198,6 +203,7 @@ void FrameQueue::notify_buffering_start()
         XLog::e(TAG ,"==>in notify_buffering_start function video_frame_q size =%d ,audio_frame_q size =%d" ,mediaFileHandle->video_frame_queue->size() ,mediaFileHandle->audio_frame_queue->size());
         return ;
     }
+    XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue,video_packet_q size =%d ,audio_packet_q size =%d" ,mediaFileHandle->video_queue->size() ,mediaFileHandle->audio_queue->size());
     XLog::e(TAG ,"==>in notify_buffering_start function FrameQueue,video_frame_queue->size() =%d ,audio_frame_size =%d\n" ,mediaFileHandle->video_frame_queue->size(),mediaFileHandle->audio_frame_queue->size());
 
     bool isVideoFrameQueueEmpty = false;
@@ -220,6 +226,36 @@ void FrameQueue::notify_buffering_start()
         // notify
         mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
         mediaFileHandle->isBuffering = true;
+    }
+
+}
+
+void FrameQueue::notify_buffering_end()
+{
+    MediaFile *mediaFileHandle = (MediaFile *)empty_param;
+    if( ( mediaFileHandle == NULL) || ( !mediaFileHandle->isBuffering) ){return ;}
+
+    XLog::e(TAG ,"==>in notify_buffering_end function FrameQueue,video_frame_queue->size() =%d ,audio_frame_size =%d\n" ,mediaFileHandle->video_frame_queue->size(),mediaFileHandle->audio_frame_queue->size());
+
+    bool ret = false;
+    if(max_node_count == X_MAX_FRAME_VIDEO_Q_NODE_CNT){ // video frame q
+        XLog::e(TAG ,"==>in notify_buffering_end function FrameQueue ,video frame meet the conditions.\n");
+        ret = true;
+    }
+
+    if(ret){
+        if(!mediaFileHandle->isPlayedBefore){   // first loading end
+            XLog::e(TAG ,"===>state_machine: show first pic 0\n");
+            mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
+            mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
+            mediaFileHandle->isPlayedBefore = true;  // set player played mark.
+        }else{ // buffering during the playing .
+            XLog::e(TAG ,"===>state_machine: buffering end.0\n");
+            // TODO
+            mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
+            mediaFileHandle->startRender();
+        }
+        mediaFileHandle->isBuffering = false;
     }
 
 }

@@ -207,10 +207,9 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
     {
         case EVT_DECODE_GO_ON:
         {
-            //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeAudioStateMachine recv EVT_DECODE_GO_ON event!\n");
             if(mediaFileHandle->audio_frame_queue->node_count >= mediaFileHandle->audio_frame_queue->max_node_count)
             {
-                //audio_frame_q->full_func(audio_frame_q->full_parm);
+                //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeAudioStateMachine recv EVT_DECODE_GO_ON event! 11\n");
                 usleep(50000);
                 this->mediaFileHandle->message_queue_audio_decode->push(EVT_DECODE_GO_ON);
                 return;
@@ -218,7 +217,6 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
 
             //
             AVPacket pkt;
-            //int ret = mediaFileHandle->audio_queue->get(&pkt ,1);
             int ret = mediaFileHandle->audio_queue->get(&pkt ,0);   // non block
             if(ret == 0){   // get no packet.
                 if(mediaFileHandle->end_of_file){ // end of file
@@ -226,15 +224,12 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
                     this->state_machine_change_state(STATE_DECODER_START);  // change state.
 
                 }else{
+                    XLog::d(ANDROID_LOG_INFO ,TAG ,"audio decoder statemachine , not in the end of file ,may will be in buffering,Audio packet q size =%d\n" ,mediaFileHandle->audio_queue->size());
                     usleep(50000);
-                    XLog::d(ANDROID_LOG_INFO ,TAG ,"audio decoder statemachine , not in the end of file ,why in here!\n");
-                    this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
+                    this->mediaFileHandle->message_queue_audio_decode->push(EVT_DECODE_GO_ON);
                 }
                 return;
             }
-
-            int rr = mediaFileHandle->audio_queue->size();
-            //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeAudioStateMachine ,pkt.size = %d ,rr=%d ,ret =%d\n" ,pkt.size ,rr ,ret);
 
             decode_one_audio_packet(&pkt );
             this->mediaFileHandle->message_queue_audio_decode->push(EVT_DECODE_GO_ON);
@@ -243,7 +238,7 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_work(player_event_e e
         }
         case EVT_PAUSE:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"decoder:mac = %d,audio decode paused!\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"audio decoder statemachine:mac = %d,audio decode paused!\n");
             this->state_machine_change_state(STATE_DECODER_WAIT);
 
             return;

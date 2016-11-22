@@ -72,7 +72,7 @@ void YuvGLRender::render_frame()
     if(ret1 != 1){
         XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .no video frame ,return ,video packet size = %d ,video packet q mem size =%d" ,mediaFileHandle->video_queue->size() ,mediaFileHandle->video_queue->q_size);
         XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .no video frame ,return ,audio packet size = %d ,audio packet q mem size =%d" ,mediaFileHandle->audio_queue->size() ,mediaFileHandle->audio_queue->q_size);
-        mediaFileHandle->stopRender();
+        //mediaFileHandle->stopRender();
         usleep(50 * 1000); //in microseconds
         av_frame_free(&src_frame);  // free frame memory
         return;
