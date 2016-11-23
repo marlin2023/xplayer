@@ -157,9 +157,9 @@ long PlayerInner::getCurrentPosition()
     }
     // TODO need subtract the base time
     XLog::e(TAG ,"====>current_position_ms= %ld\n",this->mediaFileHandle->current_position_ms);
-    //if(this->mediaFileHandle->seeking_mark == 1){
-    //    return this->mediaFileHandle->seekpos;
-    //}
+    if(this->mediaFileHandle->seeking_mark == 1){
+        return this->mediaFileHandle->seekpos;
+    }
     return this->mediaFileHandle->current_position_ms;
 }
 
