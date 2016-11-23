@@ -35,7 +35,7 @@ extern "C" {
 #define X_MAX_PKT_Q_TS         X_S_2_MS(0.6)                  // in ms unit
 #define X_MAX_PKT_Q_NETWORK_TS X_S_2_MS(40)                   // in ms unit
 
-#define X_MAX_FRAME_VIDEO_Q_NODE_CNT 30                         // max frm q video frame count
+#define X_MAX_FRAME_VIDEO_Q_NODE_CNT 25                         // max frm q video frame count
 #define X_MIN_FRAME_VIDEO_Q_NODE_CNT 10                         // min frm q video frame count
 
 #define X_MAX_FRAME_Q_TIME_LIMIT (0.7)                          // s
