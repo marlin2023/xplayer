@@ -147,41 +147,40 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_wait(player_event_e e
             return;
         }
         case EVT_PLAY:
-        //{
-        //    return;
-        //}
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_wait state recv EVT_PLAY evt!!\n");
+        }
         case EVT_START:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread recv EVT_START evt!!\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_wait state recv EVT_START evt!!\n");
             this->state_machine_change_state(STATE_DECODER_WORK);
             this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
             return;
         }
         case EVT_RESUME:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread recv resume evt!!\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_wait state recv EVT_RESUME evt!!\n");
             this->state_machine_change_state(STATE_DECODER_WORK);
-
             // step into decode loop logic, to make it loops, we send message selfly
             this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
             return;
         }
         case EVT_STOP:
         {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_wait state recv EVT_STOP evt!!\n");
             this->state_machine_change_state(STATE_DECODER_START);
             return;
         }
-
         case EVT_SEEK:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>decoder video: receive EVT_SEEK\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_wait state recv EVT_SEEK evt!!\n");
             this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
             return;
         }
 
         default:
         {
-            XLog::e(TAG ,"===>VIDEO_DECODE_WAIT receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_wait state recv others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -193,9 +192,12 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_start(player_event_e 
     switch(evt)
     {
         case EVT_RESUME:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_start state recv EVT_RESUME evt!!\n");
+        }
         case EVT_START:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine recv start event,goto work state!\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_start state recv EVT_START evt!!\n");
             this->state_machine_change_state(STATE_DECODER_WORK);
             this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
 
@@ -203,17 +205,17 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_start(player_event_e 
         }
         case EVT_SEEK:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>decoder video start state: receive EVT_SEEK\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_start state recv EVT_SEEK evt!!\n");
             this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
             // send msg to central engine
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>decoder video start state:send msg to central engine\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_start state send msg to central engine\n");
             mediaFileHandle->message_queue_central_engine->push(EVT_SEEK);
             return;
         }
 
         default:
         {
-            XLog::e(TAG ,"===>VIDEO_DECODE_START receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_start state receive others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -264,7 +266,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
 
         case EVT_PAUSE:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"decoder:mac = %d,video decode paused!\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_work state recv EVT_PAUSE evt!!\n");
             this->state_machine_change_state(STATE_DECODER_WAIT);
 
             return;
@@ -272,7 +274,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
 
         case EVT_STOP:
         {
-
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_work state recv EVT_STOP evt!!\n");
             this->state_machine_change_state(STATE_DECODER_START);  // change state.
 
             // TODO set mark
@@ -281,17 +283,17 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
         }
         case EVT_SEEK:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>decoder video work state: receive EVT_SEEK\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_work state recv EVT_SEEK evt!!\n");
             this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
 
             // send msg to central engine
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>decoder video work state:send msg to central engine\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_work state send msg to central engine\n");
             mediaFileHandle->message_queue_central_engine->push(EVT_SEEK);
             return;
         }
         default:
         {
-            XLog::e(TAG ,"===>VIDEO_DECODE_WORK receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_start state receive others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -304,18 +306,18 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_seek_wait(player_even
     {
         case EVT_SEEK_DONE:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_SEEK_DONE!\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread seek_wait state recv EVT_SEEK_DONE evt!!\n");
             this->state_machine_change_state(STATE_DECODER_WAIT);
             return;
         }
         case EVT_SEEK_PAUSE:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_SEEK_PAUSE!\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread seek_wait state recv EVT_SEEK_PAUSE evt!!\n");
             return;
         }
         case EVT_START:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine recv start event,goto work state!\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread seek_wait state recv EVT_START evt!!\n");
             this->state_machine_change_state(STATE_DECODER_WORK);
             this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
 
@@ -324,7 +326,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_seek_wait(player_even
 
         default:
         {
-            XLog::e(TAG ,"===>VIDEO_DECODE_SEEK_WAIT receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread seek_wait state receive others EVT:%d\n" ,evt);
             return;
         }
     }

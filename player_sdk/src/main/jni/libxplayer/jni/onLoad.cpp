@@ -177,9 +177,10 @@ void JNIMediaPlayerListener::JNI2BufferState()
 {
     XLog::e(TAG ,"======>in JNI2BufferState  ..");
     playerInner->centralEngineStateMachineHandle->state_machine_change_state(STATE_BUFFERING);
-    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);    // push to loop
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_PAUSE);
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_PAUSE);
+    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);    // push to loop ,must to perform after push msg evt to decode machine.
+
 
 }
 

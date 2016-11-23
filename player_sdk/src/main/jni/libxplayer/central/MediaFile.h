@@ -40,7 +40,7 @@ extern "C" {
 
 #define X_MAX_FRAME_Q_TIME_LIMIT (0.7)                          // s
 
-#define X_MAX_FRAME_AUDIO_Q_NODE_CNT 90                         // max frm q audio frame count
+#define X_MAX_FRAME_AUDIO_Q_NODE_CNT 100                         // max frm q audio frame count
 
 #define X_MEGA_SIZE(t) ((t) * 1024 * 1024)
 #define X_MAX_FRAME_VIDEO_Q_MEM_SPACE  X_MEGA_SIZE(40)              // 40M space size

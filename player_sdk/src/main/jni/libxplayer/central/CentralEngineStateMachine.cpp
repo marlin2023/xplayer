@@ -224,7 +224,8 @@ void CentralEngineStateMachine::central_engine_state_machine_process_event(playe
 
 void CentralEngineStateMachine::central_engine_do_process_idle(player_event_e evt)
 {
-    XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: idle state recv evt :%d\n" ,evt);
+    XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread idle state recv evt :%d\n" ,evt);
+
     return;
 
 }
@@ -236,27 +237,25 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
     {
         case EVT_OPEN:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: initialized state recv EVT_OPEN\n");
-
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread initialized state recv EVT_OPEN evt!!\n");
             if(mediaFileHandle->open())
             {
                 if(mediaFileHandle->stop_flag){
-                    XLog::d(ANDROID_LOG_INFO ,TAG ,"===>initialized state ready EVT_STOP ,change to stopped.\n");
+                    XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread initialized state ready EVT_STOP ,change to stopped.\n");
                     this->state_machine_change_state(STATE_STOPPED);
                     return;
                 }
 
                 // open success.
                 this->state_machine_change_state(STATE_PREPARED);
-                XLog::d(ANDROID_LOG_INFO ,TAG ,"state_machine: open file:-%s- success !!!\n" ,mediaFileHandle->getSourceUrl());
-
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread initialized state open file:-%s- success !!!\n" ,mediaFileHandle->getSourceUrl());
                 // TODO notify upper open success ,and upper will send EVT_START and go into Buffering state.
                 this->mediaFileHandle->notify(MEDIA_PREPARED ,0 ,0);
             }
             else
             {
                 if(mediaFileHandle->stop_flag){
-                    XLog::d(ANDROID_LOG_INFO ,TAG ,"===>initialized state ready EVT_STOP ,change to stopped.\n");
+                    XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread initialized state ready EVT_STOP ,change to stopped.\n");
                     this->state_machine_change_state(STATE_STOPPED);
                     return;
                 }
@@ -284,14 +283,15 @@ void CentralEngineStateMachine::central_engine_do_process_prepared(player_event_
     {
         case EVT_START:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PREPARED receive EVT_START.\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread STATE_PREPARED recv EVT_START evt.\n");
             this->state_machine_change_state(STATE_BUFFERING);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             return;
         }
         case EVT_SEEK:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PREPARED receive EVT_SEEK.\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread STATE_PREPARED recv EVT_SEEK evt.\n");
+
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
 
@@ -301,13 +301,14 @@ void CentralEngineStateMachine::central_engine_do_process_prepared(player_event_
         case EVT_STOP:
         {
             // do stop actions
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread STATE_PREPARED recv EVT_STOP evt.\n");
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
 
         default:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PREPARED receive others EVT.\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread STATE_PREPARED recv other evt %d.\n" ,evt);
             return;
         }
     }
@@ -355,6 +356,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
         }
         case EVT_SEEK:
         {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread STATE_BUFFERING recv EVT_SEEK evt.\n");
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
@@ -362,14 +364,14 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
 
         case EVT_STOP:
         {
-            XLog::e(TAG ,"===>STATE_BUFFERING receive EVT_STOP\n" );
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread STATE_BUFFERING recv EVT_STOP evt.\n");
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
 
         default:
         {
-            XLog::e(TAG ,"===>STATE_BUFFERING receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread STATE_BUFFERING receive others EVT:%d\n" ,evt);
             return;
         }
 
@@ -383,10 +385,16 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
     switch(evt)
     {
         case EVT_START: // TODO
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_WAIT_STATE recv EVT_START evt ,only change state to PLAY_PLAYING state.\n");
+        }
         case EVT_RESUME:    // after seek
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_WAIT_STATE recv EVT_RESUME evt ,only change state to PLAY_PLAYING state.\n");
+        }
         case EVT_PLAY:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>in PLAY_WAIT STATE ,receive EVT_PLAY Event. only change state to PLAY_PLAYING state.\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_WAIT_STATE recv EVT_PLAY evt ,only change state to PLAY_PLAYING state.\n");
             this->state_machine_change_state(STATE_PLAY_PLAYING);
             //
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
@@ -395,12 +403,13 @@ void CentralEngineStateMachine::central_engine_do_process_play_wait(player_event
 
         case EVT_STOP:
         {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_WAIT_STATE recv EVT_STOP evt.\n");
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
         default:
         {
-            XLog::e(TAG ,"===>STATE_PLAY_WAIT receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_WAIT_STATE receive others EVT:%d\n" ,evt);
             return;
         }
 
@@ -455,28 +464,28 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
         }
         case EVT_PAUSE:
         {
-            XLog::e(TAG ,"===>STATE_PLAYING receive EVT_PAUSE EVT:\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAYING_STATE recv EVT_PAUSE evt.\n");
             this->state_machine_change_state(STATE_PLAY_PAUSED);
             return;
         }
 
         case EVT_STOP:
         {
-            XLog::e(TAG ,"===>STATE_PLAYING receive EVT_STOP EVT:\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAYING_STATE recv EVT_STOP evt.\n");
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
 
         case EVT_SEEK:
         {
-            XLog::e(TAG ,"===>STATE_PLAYING receive EVT_SEEK EVT:\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAYING_STATE recv EVT_SEEK evt.\n");
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
         }
         case EVT_BUFFERING:
         {
-            XLog::e(TAG ,"===>STATE_PLAYING receive EVT_BUFFERING EVT:\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAYING_STATE recv EVT_BUFFERING evt.\n");
             this->state_machine_change_state(STATE_BUFFERING);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             return;
@@ -484,7 +493,7 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
 
         default:
         {
-            XLog::e(TAG ,"===>STATE_PLAYING receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAYING_STATE receive others EVT:%d\n" ,evt);
             return;
         }
     }
@@ -517,13 +526,13 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
 
         case EVT_PAUSE:
         {
-            XLog::e(TAG ,"====>state_machine: pause in play file end ...\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_FILE_END_STATE recv EVT_PAUSE evt.\n");
             this->state_machine_change_state(STATE_PLAY_PAUSED);
             return;
         }
         case EVT_SEEK:
         {
-            XLog::e(TAG ,"===>STATE_PLAY_FILE_END receive EVT_SEEK EVT:\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_FILE_END_STATE recv EVT_SEEK evt.\n");
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
@@ -531,12 +540,13 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
 
         case EVT_STOP:
         {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_FILE_END_STATE recv EVT_STOP evt.\n");
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
         default:
         {
-            XLog::e(TAG ,"===>STATE_FILE_END_OF receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_FILE_END_STATE receive others EVT:%d\n" ,evt);
             return;
         }
 
@@ -551,24 +561,25 @@ void CentralEngineStateMachine::central_engine_do_process_play_complete(player_e
     {
         case EVT_GO_ON:
         {
-
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_COMPLETE_STATE recv EVT_GO_ON evt.\n");
             return;
         }
         case EVT_SEEK:
         {
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"===>STATE_PLAY_COMPLETE receive EVT_SEEK !\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_COMPLETE_STATE recv EVT_SEEK evt.\n");
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
         }
         case EVT_STOP:
         {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_COMPLETE_STATE recv EVT_STOP evt.\n");
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
         default:
         {
-            XLog::e(TAG ,"===>STATE_PLAY_COMPLETE receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_COMPLETE_STATE receive others EVT:%d\n" ,evt);
             return;
         }
 
@@ -584,6 +595,7 @@ void CentralEngineStateMachine::central_engine_do_process_play_paused(player_eve
     {
         case EVT_RESUME:
         {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_PAUSED_STATE recv EVT_RESUME evt.\n");
             this->state_machine_change_state(STATE_PLAY_PLAYING);
             // send read next packet message
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
@@ -591,12 +603,14 @@ void CentralEngineStateMachine::central_engine_do_process_play_paused(player_eve
         }
         case EVT_STOP:
         {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_PAUSED_STATE recv EVT_STOP evt.\n");
             this->state_machine_change_state(STATE_STOPPED);
             return;
         }
 
         case EVT_SEEK:
         {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_PAUSED_STATE recv EVT_SEEK evt.\n");
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
 
@@ -604,7 +618,7 @@ void CentralEngineStateMachine::central_engine_do_process_play_paused(player_eve
         }
         default:
         {
-            XLog::e(TAG ,"===>STATE_PLAY_PAUSED receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_PAUSED_STATE receive others EVT:%d\n" ,evt);
             return;
         }
 
@@ -620,12 +634,13 @@ void CentralEngineStateMachine::central_engine_do_process_play_stopped(player_ev
     {
         case EVT_CLOSE:
         {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_STOPED_STATE recv EVT_CLOSE evt.\n");
             this->state_machine_change_state(STATE_IDLE);
             return;
         }
         default:
         {
-            XLog::e(TAG ,"===>STATE_PLAY_STOPPED receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_STOPED_STATE receive others EVT:%d\n" ,evt);
             return;
         }
 
@@ -640,7 +655,7 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
     {
         case EVT_READY_TO_SEEK:
         {
-            XLog::e(TAG ,"===>STATE_SEEK_WAIT receive EVT_READY_TO_SEEK\n");
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread SEEK_WAIT_STATE recv EVT_READY_TO_SEEK evt.\n");
             // do seek work
             AVFormatContext *fc = this->mediaFileHandle->format_context;
 
@@ -670,7 +685,7 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
         }
         default:
         {
-            XLog::e(TAG ,"===>STATE_SEEK_WAIT receive others EVT:%d\n" ,evt);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread SEEK_WAIT_STATE receive others EVT:%d\n" ,evt);
             return;
         }
 
@@ -744,6 +759,6 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
     XLog::e(TAG ,"state_machine: seek start(in msec):%lld, pts = %lld\n", (int64_t)this->mediaFileHandle->seekpos,(int64_t)seek_pos);
     ret = avformat_seek_file(fc, -1, INT64_MIN, seek_pos, INT64_MAX, 0);
 
-    XLog::e(TAG ,"-state_machine: after avformat_seek_file, ret = %d\n",ret);
+    XLog::e(TAG ,"state_machine: after avformat_seek_file, ret = %d\n",ret);
     return;
 }
