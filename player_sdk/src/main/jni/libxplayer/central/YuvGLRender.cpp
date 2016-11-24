@@ -96,13 +96,9 @@ void YuvGLRender::render_frame()
         sync_sleep_time = diff_time * 1000;
 
     }else if( (diff_time >= -500) && (diff_time <= 0) ){
-        sync_sleep_time = 0;
+        sync_sleep_time = 500;
     }else if(diff_time  < -500){
-        if(sync_audio_clock_time > 0){
-            av_frame_free(&src_frame);  // free frame memory
-            return ;
-        }
-        sync_sleep_time = 40 * 1000;    // 40ms
+        sync_sleep_time = 1000;    /// video frame need to catch the audio frame clock.
     }else{
         sync_sleep_time = 800 * 1000;
     }

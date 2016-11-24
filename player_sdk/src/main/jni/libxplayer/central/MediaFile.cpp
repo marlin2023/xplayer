@@ -375,9 +375,13 @@ CM_BOOL MediaFile::stream_component_open(int stream_index)
     // set codec context.
     if (codec_context->codec_type == AVMEDIA_TYPE_AUDIO){
         audio_codec_context = codec_context;
+        sync_audio_clock_time = 0;
         if(this->audio_stream->start_time != AV_NOPTS_VALUE)
         {
             this->beginning_audio_pts = (int64_t)(this->audio_stream->start_time * av_q2d(this->audio_stream->time_base)*1000);
+            // set sync time base
+            sync_audio_clock_time = this->beginning_audio_pts;
+
             XLog::e(TAG ,"==beginning_audio_pts ,set audio begin pts = %lld\n",this->beginning_audio_pts);
         }
 
