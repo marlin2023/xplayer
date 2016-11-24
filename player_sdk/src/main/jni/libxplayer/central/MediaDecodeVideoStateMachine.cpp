@@ -46,7 +46,7 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
     frame = av_frame_alloc();
     if(!frame){
         XLog::e(TAG ,"===>decode_one_video_packet, error for av_frame_alloc.\n");
-        //this->mediaFileHandle->notify(MEDIA_ERROR ,MEDIA_ERROE_MEM, CM_FALSE);
+        this->mediaFileHandle->notify(MEDIA_ERROR ,MEDIA_ERROE_MEM, CM_FALSE);
         return;
     }
 
@@ -58,7 +58,6 @@ void MediaDecodeVideoStateMachine::decode_one_video_packet(AVPacket *packet1)
         while ( avcodec_receive_frame(codec_ctx, frame) == 0 ) {
 
             frame->pts = av_frame_get_best_effort_timestamp(frame);
-            // TODO send frame
             mediaFileHandle->video_frame_queue->put(frame);
         }
 
@@ -207,9 +206,6 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_start(player_event_e 
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_start state recv EVT_SEEK evt!!\n");
             this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
-            // send msg to central engine
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_start state send msg to central engine\n");
-            mediaFileHandle->message_queue_central_engine->push(EVT_SEEK);
             return;
         }
 
@@ -240,7 +236,6 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
             }
 
             AVPacket pkt;
-            //int ret = mediaFileHandle->video_queue->get(&pkt ,1);
             int ret = mediaFileHandle->video_queue->get(&pkt ,0);   // non block
             if(ret == 0){   // get no packet.
                 if(mediaFileHandle->end_of_file){ // end of file
@@ -285,10 +280,6 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_work state recv EVT_SEEK evt!!\n");
             this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
-
-            // send msg to central engine
-            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_work state send msg to central engine\n");
-            mediaFileHandle->message_queue_central_engine->push(EVT_SEEK);
             return;
         }
         default:

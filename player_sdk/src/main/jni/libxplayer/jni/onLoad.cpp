@@ -327,7 +327,7 @@ static void native_pause(JNIEnv *env, jobject thiz)
     // process state
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_PAUSE);
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_PAUSE);
-    playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_PAUSE);
+    //playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_PAUSE); // demux thread need to read packet when network not good condition .
 
 }
 

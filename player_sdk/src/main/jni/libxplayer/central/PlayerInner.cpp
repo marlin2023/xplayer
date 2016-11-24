@@ -191,8 +191,10 @@ void PlayerInner::seekTo(long msec)
     this->mediaFileHandle->seeking_mark = 1;
     //
     av_read_pause(this->mediaFileHandle->format_context);
-    mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
-    mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
+    mediaFileHandle->message_queue_central_engine->push_front(EVT_SEEK);
+
+    // mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
+    // mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
 
 }
 

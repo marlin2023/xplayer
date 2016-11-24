@@ -62,7 +62,7 @@ int CentralEngineStateMachine::demux_2_packet_queue()
     AVFormatContext *format_context = mediaFileHandle->format_context;
 
     // read packet from stream
-    XLog::e(TAG ,"==> before av_read_frame return: \n");
+    //XLog::e(TAG ,"==> before av_read_frame return: \n");
     if((ret = av_read_frame(format_context, &packet)) < 0)
     {
         read_retry_count++;
@@ -71,7 +71,7 @@ int CentralEngineStateMachine::demux_2_packet_queue()
     }
 
     read_retry_count = 0;
-    XLog::e(TAG ,"==> after av_read_frame return: %d\n", ret);
+    //XLog::e(TAG ,"==> after av_read_frame return: %d\n", ret);
     // here ,audio packet will be put into audio packet queue ;
     // video packet will be put into video packet queue.
     return add_packet_to_q(&packet ,mediaFileHandle);
@@ -328,7 +328,7 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
             }
 
             // TODO ,here buffer data size different for the first load and the later .
-            if(mediaFileHandle->isPlayedBefore){
+            if( mediaFileHandle->isPlayedBefore || (mediaFileHandle->seeking_mark == 1) ){
                 mediaFileHandle->playing_buffering_time = X_MAX_PKT_Q_NETWORK_BUFFERING_TS;
             }else{
                 mediaFileHandle->playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;    // first buffer before player start to play.
@@ -475,6 +475,8 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
         case EVT_SEEK:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAYING_STATE recv EVT_SEEK evt.\n");
+            mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
+            mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
@@ -529,6 +531,8 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
         case EVT_SEEK:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_FILE_END_STATE recv EVT_SEEK evt.\n");
+            mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
+            mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
@@ -563,6 +567,8 @@ void CentralEngineStateMachine::central_engine_do_process_play_complete(player_e
         case EVT_SEEK:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_COMPLETE_STATE recv EVT_SEEK evt.\n");
+            mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
+            mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
@@ -607,6 +613,8 @@ void CentralEngineStateMachine::central_engine_do_process_play_paused(player_eve
         case EVT_SEEK:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_PAUSED_STATE recv EVT_SEEK evt.\n");
+            mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
+            mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
 
@@ -750,9 +758,9 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
     if(ret < 0)
     {
         XLog::e(TAG ,"state_machine: =====>avformat_seek_file failed. seek_pos = %lld\n" ,seek_pos);
+        return;
     }
-    this->mediaFileHandle->seeking_mark = 0;
-    this->mediaFileHandle->isPlayedBefore = false;
+
     XLog::e(TAG ,"state_machine: after avformat_seek_file, ret = %d\n",ret);
     return;
 }
