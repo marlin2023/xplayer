@@ -130,7 +130,6 @@ void MediaFile::stopRender()
 
     if (mListener != NULL)
     {
-        XLog::d(ANDROID_LOG_INFO ,TAG ,"==>in mediafile ,stopRender. \n");
         mListener->JNIStopGlRenderMode();
     }else{
         XLog::d(ANDROID_LOG_INFO ,TAG ,"==>in mediafile ,stopRender 2. \n");
@@ -156,7 +155,12 @@ static int decode_interrupt_cb(void *ctx)
     // 返回1，表示要ffmpeg退出被阻塞的内部函数，是Quit的含义。
     // 如果文件没有打开，则不阻塞。
     // 如果文件已经打开了，则该阻塞的，还是要阻塞
-    //int quit_ffmpeg_block = !is->file_opened;
+
+    // TODO need set timeout for av_read_frame or not .
+    //struct timeval interrupttime;
+    //if (gettimeofday(&interrupttime, NULL) < 0) {
+    //    XLog::d(ANDROID_LOG_INFO ,TAG ,"==>in mediafile ,get interrupt time failed1 \n");
+    //}
 
     if(is->stop_flag){
         XLog::d(ANDROID_LOG_INFO ,TAG ,"==>in decode_interrupt_cb ,stop_flag is true. \n");

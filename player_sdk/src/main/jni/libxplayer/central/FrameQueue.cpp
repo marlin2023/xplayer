@@ -193,7 +193,7 @@ void FrameQueue::notify_buffering_start()
     MediaFile *mediaFileHandle = (MediaFile *)empty_param;
 
     if(mediaFileHandle->isBuffering || !mediaFileHandle->isPlayedBefore){   // first loading end
-        XLog::e(TAG ,"==>in notify_buffering_start function ,but is in Buffering or not played ,then return.video_packet_q size =%d ,audio_packet_q size =%d" ,mediaFileHandle->video_queue->size() ,mediaFileHandle->audio_queue->size());
+        // XLog::e(TAG ,"==>in notify_buffering_start function ,but is in Buffering or not played ,then return.video_packet_q size =%d ,audio_packet_q size =%d" ,mediaFileHandle->video_queue->size() ,mediaFileHandle->audio_queue->size());
         return;
     }
 

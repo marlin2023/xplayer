@@ -89,15 +89,24 @@ void YuvGLRender::render_frame()
                                                                  video_frame_render_pts ,sync_audio_clock_time,diff_time ,
                                                                  mediaFileHandle->video_frame_queue->size() ,mediaFileHandle->audio_frame_queue->size());
 
-    // TODO filter some error diff_time.
-    if((diff_time > 0) && (diff_time < 800)){ // 100 millisecond
-        usleep(diff_time * 1000); //in microseconds
-    }else if(diff_time  < -500){
-        av_frame_free(&src_frame);  // free frame memory
-        return ;
-    }
+    double sync_sleep_time = 0.f;
 
-    //return; // TODO
+    // TODO filter some error diff_time.
+    if( (diff_time > 0) && (diff_time < 800) ){ // 100 millisecond
+        sync_sleep_time = diff_time * 1000;
+
+    }else if( (diff_time >= -500) && (diff_time <= 0) ){
+        sync_sleep_time = 0;
+    }else if(diff_time  < -500){
+        if(sync_audio_clock_time > 0){
+            av_frame_free(&src_frame);  // free frame memory
+            return ;
+        }
+        sync_sleep_time = 40 * 1000;    // 40ms
+    }else{
+        sync_sleep_time = 800 * 1000;
+    }
+    usleep(sync_sleep_time); //in microseconds
     // For synchronization end
 
     // src_frame->data[0]

@@ -126,35 +126,7 @@ Such as Video Decoder State Machine has state :
             5.起播之前的seek ，这个时候的seek时间点和其他阶段的seek 处理是不同的,这个时间点是在onPrepared 回调中判断是否需要进行seek 操作的。
                 首次seek时机移到了onprepared回调中
             -
-
-
-
     seek 完成后 要调用player.start 方法播放起来。
-
--
-- 播放过程中 Loading
-
-    - video | audio packet queue is empty will call callback function to notify buffering [回调 el_pkt_q_empty_goto_buffering_cb 函数]
-        is_empty(audio_pkt_q) && q_is_empty(video_pkt_q) .
-        When Buffering , 要停止渲染 ，GLSurfaceView 设置render mode.
-
-        -->
-
-    -
-    - buffering 有两种
-        - 一种是原来按照picture queue 队列的数据为基准，就是解码后的视频队列数据，比如有15帧数据了，就可以开始播放，不到的话就开始buffering .
-        - 还有一种就是按照packet queue ,这里是解码之前的数据为基准，这样的一个好处是解码前数据小 ,播放器占用内存低【这里存在一个假设是机器的解码性能是不存在问题的】，好像这种更合理些。。。。。。。。。
-
-
-    - struct list_node *q_pop 函数
-        // block until new code added
-        if(q_head->empty_func)
-        {
-            el_mutex_unlock(q_head->mutex);
-            q_head->empty_func(q_head->empty_parm);
-            el_mutex_lock(q_head->mutex);
-        }
-    -
 
 -
 -
@@ -166,41 +138,26 @@ Such as Video Decoder State Machine has state :
                     2.prepared 之前也可能会调pause stop close
 
 
-
---
 --
 -   视频tab 页面，就一个播放器实例
 
-
---
 --
 -   view 中有一个播放器实例，是这样的，view对应的播放器可以多次销毁多次创建，但view 可以只创建一次，最后不需要的时候再销毁。
-
 
 --
 --
 -   播放器实例销毁的时候，如果播放器不支持多实例，就要保证上一个实例销毁后，才能创建下一个播放器实例。同时要注意一个问题，就是opengl es的资源必须在GLSurfaceView Render 线程创建。
 
 -
--
--
--
 -   首次播放，this->mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100); 上层调 play 播放。
 
-
-
---
 --
 -   first_show_pic   这个回调并没有调起播放器播放，而是告诉上层播放器控制界面的变化。
 
-
---
 -
 -   触控面板
     每次通过触控面板进行播放器相关操作后都会执行 updatePausePlay  ,这个函数会对播放器的状态进行判断，从而显示相应的按钮。
 
-
--
 -
 - opensl es
     https://audioprograming.wordpress.com/2012/10/29/lock-free-audio-io-with-opensl-es-on-android/
@@ -208,8 +165,8 @@ Such as Video Decoder State Machine has state :
 
 
 TODO
-    1.音视频同步机制 , 可以考虑按照系统的时间戳进行同步。 按照系统时钟时间戳进行同步更合理，如何做？？
-    2.缓冲buffer的大小调节。
+    1.缓冲buffer机制调整
+    2.音视频同步机制 , 可以考虑按照系统的时间戳进行同步。 按照系统时钟时间戳进行同步更合理，如何做？？
     3.同步那里逻辑需要改下。
 ------------>
 TODO
@@ -248,6 +205,20 @@ TODO
     每次seek后 会把开始时候packet q buffer的size 重置到开始播放时候的大小。
 
     --
+
+
+---
+   TODO 同步逻辑
+   同步那里逻辑需要改下
+   DTS（Decode timestamp 解码时间戳）
+   PTS（Presentation timestamp显示时间戳）
+   SCR (System Clock Reference)
+   STC（System time clock ）
+   同步有三种选择：同步音频到视频，同步视频到音频，或者音视频都同步到外部时钟。
+   一般采用同步视频到音频，因为人对声音尤其的敏感。
+
+
+
 
 
 

@@ -126,8 +126,9 @@ void OpenSLEngine::pause()
     if ((bqPlayerPlay == NULL )|| (isInitialized == false )){ return;}
 
     m_paused = true;
-    (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PAUSED);   // set paused.
-
+    SLresult result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PAUSED);   // set paused.
+    assert(SL_RESULT_SUCCESS == result);
+    XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in opensl es pause ,ret =%d===============>\n" ,result);
 }
 
 void OpenSLEngine::resume()

@@ -62,6 +62,7 @@ int CentralEngineStateMachine::demux_2_packet_queue()
     AVFormatContext *format_context = mediaFileHandle->format_context;
 
     // read packet from stream
+    XLog::e(TAG ,"==> before av_read_frame return: \n");
     if((ret = av_read_frame(format_context, &packet)) < 0)
     {
         read_retry_count++;
@@ -70,7 +71,7 @@ int CentralEngineStateMachine::demux_2_packet_queue()
     }
 
     read_retry_count = 0;
-
+    XLog::e(TAG ,"==> after av_read_frame return: %d\n", ret);
     // here ,audio packet will be put into audio packet queue ;
     // video packet will be put into video packet queue.
     return add_packet_to_q(&packet ,mediaFileHandle);
@@ -722,7 +723,7 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
     }
 
     int64_t seek_pos = av_rescale(this->mediaFileHandle->seekpos, AV_TIME_BASE, 1000); //milliseconds_to_fftime(msec);
-    if(seek_pos >= this->mediaFileHandle->format_context->duration){
+    if(seek_pos >= this->mediaFileHandle->format_context->duration  ){
         // oncomplete
         XLog::e(TAG ,"====>state_machine: =====>ffmpeg_do_seek  onComplete.\n");
         XLog::e(TAG ,"====>state_machine: =====>ffmpeg_do_seek notify eof and should quit ...\n");
@@ -746,6 +747,10 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
     // TODO need to judge the seek_pos value .
     XLog::e(TAG ,"state_machine: seek start(in msec):%lld, pts = %lld\n", (int64_t)this->mediaFileHandle->seekpos,(int64_t)seek_pos);
     ret = avformat_seek_file(fc, -1, INT64_MIN, seek_pos, INT64_MAX, 0);
+    if(ret < 0)
+    {
+        XLog::e(TAG ,"state_machine: =====>avformat_seek_file failed. seek_pos = %lld\n" ,seek_pos);
+    }
     this->mediaFileHandle->seeking_mark = 0;
     this->mediaFileHandle->isPlayedBefore = false;
     XLog::e(TAG ,"state_machine: after avformat_seek_file, ret = %d\n",ret);
