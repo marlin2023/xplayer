@@ -185,10 +185,10 @@ void PlayerInner::seekTo(long msec)
         this->mediaFileHandle->seekpos = this->mediaFileHandle->duration_ms;
     }
 
-    XLog::e(TAG ,"====>seekTo position = %ld\n",msec);
+    XLog::e(TAG ,"====>PlayerInner::seekTo position = %ld\n",msec);
     this->mediaFileHandle->seeking_mark = true;
     this->mediaFileHandle->seekpos = msec;
-    this->mediaFileHandle->sync_audio_clock_time = this->mediaFileHandle->beginning_audio_pts + msec;
+    // this->mediaFileHandle->sync_audio_clock_time = this->mediaFileHandle->beginning_audio_pts + msec;    // should not be here.
 
     av_read_pause(this->mediaFileHandle->format_context);
     mediaFileHandle->message_queue_central_engine->push_front(EVT_SEEK);

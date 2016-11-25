@@ -743,6 +743,11 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
         this->mediaFileHandle->notify(MEDIA_PLAYBACK_COMPLETE ,0 ,0);
         return;
     }
+
+    // amend the audio clock time used to synchronize .
+    this->mediaFileHandle->sync_audio_clock_time = this->mediaFileHandle->beginning_audio_pts + this->mediaFileHandle->seekpos;
+    XLog::e(TAG ,"====>state_machine: =====>after amend ,the sync_audio_clock_time = %lld.\n" ,this->mediaFileHandle->sync_audio_clock_time);
+
     int64_t start_time = this->mediaFileHandle->format_context->start_time;
     if (start_time > 0 && start_time != AV_NOPTS_VALUE){
         seek_pos += start_time;

@@ -84,10 +84,10 @@ void YuvGLRender::render_frame()
     double video_frame_render_pts = (double) src_frame->pts * av_q2d(mediaFileHandle->video_stream->time_base) * 1000;   // in millisecond
     double sync_audio_clock_time = mediaFileHandle->sync_audio_clock_time;
     double diff_time = video_frame_render_pts - sync_audio_clock_time;
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,sync_audio_clock_time =%f ,diff_time =%f ,"
-                                                                "video_frame_q size =%d ,audio_frame_q size =%d\n",
-                                                                 video_frame_render_pts ,sync_audio_clock_time,diff_time ,
-                                                                 mediaFileHandle->video_frame_queue->size() ,mediaFileHandle->audio_frame_queue->size());
+//    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,sync_audio_clock_time =%f ,diff_time =%f ,"
+//                                                                "video_frame_q size =%d ,audio_frame_q size =%d\n",
+//                                                                 video_frame_render_pts ,sync_audio_clock_time,diff_time ,
+//                                                                 mediaFileHandle->video_frame_queue->size() ,mediaFileHandle->audio_frame_queue->size());
 
     double sync_sleep_time = 0.f;
 
@@ -96,10 +96,21 @@ void YuvGLRender::render_frame()
         sync_sleep_time = diff_time * 1000;
 
     }else if( (diff_time >= -500) && (diff_time <= 0) ){
+
         sync_sleep_time = 500;
     }else if(diff_time  < -500){
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,sync_audio_clock_time =%f ,diff_time =%f ,"
+                                                                    "video_frame_q size =%d ,audio_frame_q size =%d\n",
+                                                                     video_frame_render_pts ,sync_audio_clock_time,diff_time ,
+                                                                     mediaFileHandle->video_frame_queue->size() ,mediaFileHandle->audio_frame_queue->size());
+
         sync_sleep_time = 1000;    /// video frame need to catch the audio frame clock.
     }else{
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%f ,sync_audio_clock_time =%f ,diff_time =%f ,"
+                                                                    "video_frame_q size =%d ,audio_frame_q size =%d\n",
+                                                                     video_frame_render_pts ,sync_audio_clock_time,diff_time ,
+                                                                     mediaFileHandle->video_frame_queue->size() ,mediaFileHandle->audio_frame_queue->size());
+
         sync_sleep_time = 800 * 1000;
     }
     usleep(sync_sleep_time); //in microseconds

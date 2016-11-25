@@ -225,11 +225,10 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
     {
         case EVT_DECODE_GO_ON:
         {
-            //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine recv EVT_DECODE_GO_ON event!\n");
             //
             if(mediaFileHandle->video_frame_queue->node_count >= X_MAX_FRAME_VIDEO_Q_NODE_CNT)
             {
-                XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine video_frame_queue is full!\n");
+                //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine video_frame_queue is full!\n");
                 usleep(50000);
                 this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
                 return;
