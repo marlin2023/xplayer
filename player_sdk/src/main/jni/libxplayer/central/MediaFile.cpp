@@ -63,8 +63,7 @@ MediaFile::MediaFile()
     //}
 
 
-    sync_audio_clock_time = 0.f;
-
+    sync_audio_clock_time = 0;
     duration_ms = 0;
     current_position_ms = 0;
     end_of_file = false;

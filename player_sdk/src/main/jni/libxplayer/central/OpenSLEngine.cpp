@@ -56,7 +56,7 @@ void audioPlayerCallback(SLAndroidSimpleBufferQueueItf bq,
     int outsamples = swr_convert(openSLEngine->swr_ctx,&openSLEngine->resampled_buf,needed_buf_size,(const uint8_t**)audioFrame->data, audioFrame->nb_samples);
 
     // set audio pts TODO
-    openSLEngine->mediaFileHandle->sync_audio_clock_time = (double) audioFrame->pkt_pts * av_q2d(openSLEngine->mediaFileHandle->audio_stream->time_base) * 1000;   // in millisecond , use
+    openSLEngine->mediaFileHandle->sync_audio_clock_time = audioFrame->pkt_pts * av_q2d(openSLEngine->mediaFileHandle->audio_stream->time_base) * 1000;   // in millisecond , use
     // set current position
     openSLEngine->mediaFileHandle->current_position_ms = audioFrame->pkt_pts * av_q2d(openSLEngine->mediaFileHandle->audio_stream->time_base) * 1000 - openSLEngine->mediaFileHandle->beginning_audio_pts;   // in millisecond , use
 

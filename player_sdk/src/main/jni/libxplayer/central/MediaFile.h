@@ -235,20 +235,6 @@ public:
     */
     FrameQueue *video_frame_queue;
 
-
-    //
-    /**
-    * first play ,only need to buffer start_playing_buffering_time data.
-    */
-    long long start_playing_buffering_time;
-
-    long long playing_buffering_time;
-
-    /**
-    * max buffering time.
-    */
-    long long max_buffering_time;
-
     /**
     * buffering percent.
     */
@@ -256,28 +242,30 @@ public:
 
     MediaPlayerListener*   mListener; //mediaplayer listener for java
 
-    // audio sync clock time
-    double sync_audio_clock_time;
+    /**
+    * first play ,only need to buffer start_playing_buffering_time data.
+    */
+    int64_t start_playing_buffering_time;
 
     /**
-     * duration in millisecond
-     */
-    long duration_ms;
+    * playing_buffering_time data during play.
+    */
+    int64_t playing_buffering_time;
 
     /**
-     * current position in millisecond
-     */
-    long current_position_ms;
+    * max buffering time.
+    */
+    int64_t max_buffering_time;
+
+    /**
+    * audio sync clock time (in millisecond)
+    */
+    int64_t   sync_audio_clock_time;
 
     /**
      * seek position (in millisecond)
      */
     int64_t     seekpos;
-
-    /**
-     * seeking mark
-     */
-    bool seeking_mark;
 
     /**
      * the first video packet in the video stream
@@ -290,6 +278,21 @@ public:
      * the first audio packet in the video stream
      */
     int64_t                 beginning_audio_pts;
+
+    /**
+     * duration in millisecond
+     */
+    long duration_ms;
+
+    /**
+     * current position in millisecond
+     */
+    long current_position_ms;
+
+    /**
+     * seeking mark
+     */
+    bool seeking_mark;
 
     /**
      * Whether the player is started up ,and display some frames before.

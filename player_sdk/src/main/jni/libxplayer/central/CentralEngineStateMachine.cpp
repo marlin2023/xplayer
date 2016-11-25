@@ -676,7 +676,9 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
             ffmpeg_do_seek();
 
             // do resume actions
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread SEEK_WAIT_STATE before av_read_play\n");
             av_read_play(fc);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread SEEK_WAIT_STATE after av_read_play\n");
             // send read next packet message
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             return;
