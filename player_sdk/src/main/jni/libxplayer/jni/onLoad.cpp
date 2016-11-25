@@ -151,6 +151,8 @@ void JNIMediaPlayerListener::JNIStopGlRenderMode()
     }
 
     playerInner->audioRender->pause();
+    XLog::e(TAG ,"===>stopRender ,OPENSL ES state :isPlaying :%d\n" ,   playerInner->audioRender->isPlaying());
+    XLog::e(TAG ,"===>stopRender ,OPENSL ES state :isPausing :%d\n" , playerInner->audioRender->isPausing());
 }
 
 void JNIMediaPlayerListener::JNIStartGlRenderMode()
@@ -171,6 +173,9 @@ void JNIMediaPlayerListener::JNIStartGlRenderMode()
     }
 
     playerInner->audioRender->resume();
+    XLog::e(TAG ,"===>startRender ,OPENSL ES state :isPlaying :%d\n" ,   playerInner->audioRender->isPlaying());
+    XLog::e(TAG ,"===>startRender ,OPENSL ES state :isPausing :%d\n" , playerInner->audioRender->isPausing());
+
 }
 
 void JNIMediaPlayerListener::JNI2BufferState()
@@ -180,7 +185,6 @@ void JNIMediaPlayerListener::JNI2BufferState()
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_PAUSE);
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_PAUSE);
     playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);    // push to loop ,must to perform after push msg evt to decode machine.
-
 
 }
 
@@ -307,13 +311,8 @@ static void native_play(JNIEnv *env, jobject thiz)
 
 static void native_pause(JNIEnv *env, jobject thiz)
 {
-    // playerInner->player_engine_prepare();
-    // playerInner->centralEngineStateMachineHandle->message_queue->push(EVT_START);
 
     playerInner->mediaFileHandle->stopRender();
-
-    // audio opensl es
-    playerInner->audioRender->pause();
 
     if(playerInner->mediaFileHandle->isBuffering){
 
@@ -327,8 +326,6 @@ static void native_pause(JNIEnv *env, jobject thiz)
     // process state
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_PAUSE);
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_PAUSE);
-    //playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_PAUSE); // demux thread need to read packet when network not good condition .
-
 }
 
 static void native_resume(JNIEnv *env, jobject thiz)
@@ -337,10 +334,6 @@ static void native_resume(JNIEnv *env, jobject thiz)
         XLog::e(TAG ,"======>call native_resume,but in buffering state ,and return.");
         return;
     }
-
-
-    // audio opensl es
-    playerInner->audioRender->resume();
 
     // process state
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_RESUME);

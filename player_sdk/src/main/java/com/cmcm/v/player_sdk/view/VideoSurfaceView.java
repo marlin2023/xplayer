@@ -373,7 +373,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
     @Override
     public void seekTo(int msec) {
         if (isInPlaybackState()) {
-            setRenderMode(RENDERMODE_WHEN_DIRTY);   // set render mode
             mMediaPlayer.seekTo(msec);
             mCurrentState = STATE_SEEKING;
             mSeekWhenPrepared = 0;
@@ -389,7 +388,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
                     mDuration = getDuration();
                     mLastPositionOnCompletion = getCurrentPosition();
 
-                    setRenderMode(RENDERMODE_WHEN_DIRTY); // set mode
                     isFileCompleted = true;
 
                     if (mMediaController != null) {

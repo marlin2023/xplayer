@@ -506,11 +506,13 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
     {
         public void setGLStartRenderMode()
         {
+            Log.d(TAG, "===>before RENDERMODE_CONTINUOUSLY set");
             setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
         }
 
         public void setGLStopRenderMode()
         {
+            Log.d(TAG, "===>before RENDERMODE_WHEN_DIRTY set");
             setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
         }
     };

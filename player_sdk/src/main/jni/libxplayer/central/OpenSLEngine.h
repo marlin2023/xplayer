@@ -56,6 +56,10 @@ public:
      */
     void stop();
 
+    bool isPlaying();
+
+    bool isPausing();
+
     /**
      * InitPlayout
      */

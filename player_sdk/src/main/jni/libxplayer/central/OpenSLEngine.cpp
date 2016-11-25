@@ -107,6 +107,42 @@ OpenSLEngine::~OpenSLEngine()
 
 }
 
+bool OpenSLEngine::isPlaying()
+{
+    if (bqPlayerPlay == NULL){
+        XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in isPausing function ,bqPlayerPlay == NULL===============>\n");
+        return false;
+    }
+
+    SLuint32 state;
+    SLresult result = (*bqPlayerPlay)->GetPlayState(bqPlayerPlay, &state);
+    if(result != SL_RESULT_SUCCESS)
+    {
+        return false;
+    }
+
+    return (state == SL_PLAYSTATE_PLAYING);
+}
+
+
+bool OpenSLEngine::isPausing()
+{
+    if (bqPlayerPlay == NULL){
+        XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in isPausing function ,bqPlayerPlay == NULL===============>\n");
+        return false;
+    }
+
+    SLuint32 state;
+    SLresult result = (*bqPlayerPlay)->GetPlayState(bqPlayerPlay, &state);
+    if(result != SL_RESULT_SUCCESS)
+    {
+        return false;
+    }
+
+    return (state == SL_PLAYSTATE_PAUSED);
+
+}
+
 void OpenSLEngine::play()
 {
     if (bqPlayerPlay == NULL){
@@ -128,7 +164,7 @@ void OpenSLEngine::pause()
     m_paused = true;
     SLresult result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PAUSED);   // set paused.
     assert(SL_RESULT_SUCCESS == result);
-    XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in opensl es pause ,ret =%d===============>\n" ,result);
+    XLog::e(TAG ,"==>in OpenSLEngine::pause function ,ret =%d===============>\n" ,result);
 }
 
 void OpenSLEngine::resume()
@@ -136,7 +172,8 @@ void OpenSLEngine::resume()
     if ((bqPlayerPlay == NULL )|| (isInitialized == false )){ return;}
 
     m_paused = false;
-    (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+    SLresult result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
+    XLog::e(TAG ,"==>in OpenSLEngine::resume function ,ret =%d===============>\n" ,result);
 }
 
 void OpenSLEngine::stop()

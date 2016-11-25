@@ -193,7 +193,6 @@ TODO
         Demux Thread：按照播放器播放流程梳理，获取文件信息，开始bufffer,播放 ,播放到文件末尾,播放完成；
 
 -----
-TODO
     Seek 逻辑 【播放器prepared后之后 才可以进行seek ,如果是记住历史记录的，则是在buffering 之前进行seek，就是在prepared这里做的】
     1.开始seek[prepared中的seek]
     2.播放中seek【playing 中的seek】
@@ -207,8 +206,10 @@ TODO
     --
 
 
----
-   TODO 同步逻辑
+-----
+   TODO 未来的版本迭代：
+
+   1.同步逻辑
    同步那里逻辑需要改下
    DTS（Decode timestamp 解码时间戳）
    PTS（Presentation timestamp显示时间戳）
@@ -216,6 +217,9 @@ TODO
    STC（System time clock ）
    同步有三种选择：同步音频到视频，同步视频到音频，或者音视频都同步到外部时钟。
    一般采用同步视频到音频，因为人对声音尤其的敏感。
+
+
+   2：
 
 
 

@@ -328,10 +328,11 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
             }
 
             // TODO ,here buffer data size different for the first load and the later .
-            if( mediaFileHandle->isPlayedBefore || (mediaFileHandle->seeking_mark == 1) ){
-                mediaFileHandle->playing_buffering_time = X_MAX_PKT_Q_NETWORK_BUFFERING_TS;
-            }else{
+            //if( mediaFileHandle->isPlayedBefore && (mediaFileHandle->seeking_mark == 0) ){
+            if( !mediaFileHandle->isPlayedBefore ||  mediaFileHandle->seeking_mark ){
                 mediaFileHandle->playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;    // first buffer before player start to play.
+            }else{
+                mediaFileHandle->playing_buffering_time = X_MAX_PKT_Q_NETWORK_BUFFERING_TS;
             }
 
             if(mediaFileHandle->is_pkt_q_full(mediaFileHandle->playing_buffering_time))
@@ -427,10 +428,10 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
             if(mediaFileHandle->video_queue->q_size >= X_MAX_PKT_VIDEO_Q_MEM_SPACE)
             {
                 ret = 1;
-                XLog::d(ANDROID_LOG_INFO ,TAG ,"===> pkt q full, %d,%d,%d\n",
-                mediaFileHandle->video_queue->size(),
-                mediaFileHandle->audio_queue->size(),
-                mediaFileHandle->video_queue->q_size);
+                //XLog::d(ANDROID_LOG_INFO ,TAG ,"===> pkt q full, %d,%d,%d\n",
+                //mediaFileHandle->video_queue->size(),
+                //mediaFileHandle->audio_queue->size(),
+                //mediaFileHandle->video_queue->q_size);
 
                 usleep(50000);
                 this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);

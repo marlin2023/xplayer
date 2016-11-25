@@ -252,13 +252,13 @@ void FrameQueue::notify_buffering_end()
             mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
             mediaFileHandle->isPlayedBefore = true;  // set player played mark.
         }else{ // seek or play buffering during the playing .
-            XLog::e(TAG ,"===>state_machine: buffering end.0\n");
-            // TODO
-            mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
+
             mediaFileHandle->startRender();
+            mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
+            XLog::e(TAG ,"===>state_machine: buffering end.0\n");
         }
         mediaFileHandle->isBuffering = false;
-        mediaFileHandle->seeking_mark = 0;
+        mediaFileHandle->seeking_mark = false;
     }
 
 }

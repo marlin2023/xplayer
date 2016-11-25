@@ -157,7 +157,7 @@ long PlayerInner::getCurrentPosition()
     }
     // TODO need subtract the base time
     XLog::e(TAG ,"====>current_position_ms= %ld\n",this->mediaFileHandle->current_position_ms);
-    if(this->mediaFileHandle->seeking_mark == 1){
+    if(this->mediaFileHandle->seeking_mark){
         return this->mediaFileHandle->seekpos;
     }
     return this->mediaFileHandle->current_position_ms;
@@ -186,9 +186,9 @@ void PlayerInner::seekTo(long msec)
     }
 
     XLog::e(TAG ,"====>seekTo position = %ld\n",msec);
+    this->mediaFileHandle->seeking_mark = true;
     this->mediaFileHandle->seekpos = msec;
     this->mediaFileHandle->sync_audio_clock_time = this->mediaFileHandle->beginning_audio_pts + msec;
-    this->mediaFileHandle->seeking_mark = 1;
 
     av_read_pause(this->mediaFileHandle->format_context);
     mediaFileHandle->message_queue_central_engine->push_front(EVT_SEEK);
