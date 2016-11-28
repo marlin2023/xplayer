@@ -150,7 +150,10 @@ void JNIMediaPlayerListener::JNIStopGlRenderMode()
         svm->DetachCurrentThread();
     }
 
-    playerInner->audioRender->pause();
+    if(playerInner->audioRender){
+        playerInner->audioRender->pause();
+    }
+
     XLog::e(TAG ,"===>stopRender ,OPENSL ES state :isPlaying :%d\n" ,   playerInner->audioRender->isPlaying());
     XLog::e(TAG ,"===>stopRender ,OPENSL ES state :isPausing :%d\n" , playerInner->audioRender->isPausing());
 }
@@ -172,7 +175,10 @@ void JNIMediaPlayerListener::JNIStartGlRenderMode()
         svm->DetachCurrentThread();
     }
 
-    playerInner->audioRender->resume();
+    if(playerInner->audioRender){
+        playerInner->audioRender->resume();
+    }
+
     XLog::e(TAG ,"===>startRender ,OPENSL ES state :isPlaying :%d\n" ,   playerInner->audioRender->isPlaying());
     XLog::e(TAG ,"===>startRender ,OPENSL ES state :isPausing :%d\n" , playerInner->audioRender->isPausing());
 

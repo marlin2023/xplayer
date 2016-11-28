@@ -109,8 +109,9 @@ OpenSLEngine::~OpenSLEngine()
 
 bool OpenSLEngine::isPlaying()
 {
-    if (bqPlayerPlay == NULL){
-        XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in isPausing function ,bqPlayerPlay == NULL===============>\n");
+
+    if ((bqPlayerPlay == NULL )|| (isInitialized == false )){
+        XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in isPlaying function ,bqPlayerPlay == NULL===============>\n");
         return false;
     }
 
@@ -127,7 +128,7 @@ bool OpenSLEngine::isPlaying()
 
 bool OpenSLEngine::isPausing()
 {
-    if (bqPlayerPlay == NULL){
+    if ((bqPlayerPlay == NULL )|| (isInitialized == false )){
         XLog::e(TAG ,"==>SimpleBufferQueueCallback  ,in isPausing function ,bqPlayerPlay == NULL===============>\n");
         return false;
     }
@@ -159,6 +160,7 @@ void OpenSLEngine::play()
 
 void OpenSLEngine::pause()
 {
+    XLog::e(TAG ,"==>in OpenSLEngine::pause function>\n");
     if ((bqPlayerPlay == NULL )|| (isInitialized == false )){ return;}
 
     m_paused = true;

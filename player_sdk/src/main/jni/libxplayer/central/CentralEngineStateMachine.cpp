@@ -330,8 +330,10 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
             // TODO ,here buffer data size different for the first load and the later .
             //if( mediaFileHandle->isPlayedBefore && (mediaFileHandle->seeking_mark == 0) ){
             if( !mediaFileHandle->isPlayedBefore ||  mediaFileHandle->seeking_mark ){
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"===>Buffering 01--->0.5 second\n");
                 mediaFileHandle->playing_buffering_time = X_MAX_PKT_Q_NETWORK_FIRST_BUFFERING_TS;    // first buffer before player start to play.
             }else{
+                XLog::d(ANDROID_LOG_INFO ,TAG ,"===>Buffering 02--->2 second\n");
                 mediaFileHandle->playing_buffering_time = X_MAX_PKT_Q_NETWORK_BUFFERING_TS;
             }
 
@@ -476,8 +478,6 @@ void CentralEngineStateMachine::central_engine_do_process_playing(player_event_e
         case EVT_SEEK:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAYING_STATE recv EVT_SEEK evt.\n");
-            mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
-            mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
@@ -532,8 +532,6 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
         case EVT_SEEK:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_FILE_END_STATE recv EVT_SEEK evt.\n");
-            mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
-            mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
@@ -568,8 +566,6 @@ void CentralEngineStateMachine::central_engine_do_process_play_complete(player_e
         case EVT_SEEK:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_COMPLETE_STATE recv EVT_SEEK evt.\n");
-            mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
-            mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
             return;
@@ -614,8 +610,6 @@ void CentralEngineStateMachine::central_engine_do_process_play_paused(player_eve
         case EVT_SEEK:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread PLAY_PAUSED_STATE recv EVT_SEEK evt.\n");
-            mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK);
-            mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
             this->state_machine_change_state(STATE_SEEK_WAIT);
             this->mediaFileHandle->message_queue_central_engine->push(EVT_READY_TO_SEEK);
 
@@ -668,7 +662,6 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
                 XLog::e(TAG ,"===>STATE_SEEK_WAIT receive EVT_READY_TO_SEEK ,and notify buffering_start MEDIA_INFO_BUFFERING_START.\n");
                 // Notify UI and engine to send buffering start message
                 this->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
-                mediaFileHandle->stopRender();
                 mediaFileHandle->isBuffering = true;
             }
             this->state_machine_change_state(STATE_BUFFERING);
@@ -704,7 +697,7 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
     // do seek actions
     int ret,i;
     AVPacket packet;
-    XLog::e(TAG ,"===>in ffmpeg do work function\n");
+    XLog::e(TAG ,"===>SEEK:in ffmpeg do work function\n");
     AVFormatContext *fc = this->mediaFileHandle->format_context;
 
     mediaFileHandle->stopRender();  // stop render

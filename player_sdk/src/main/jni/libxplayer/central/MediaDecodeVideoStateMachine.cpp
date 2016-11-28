@@ -172,6 +172,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_wait(player_event_e e
         }
         case EVT_SEEK:
         {
+            mediaFileHandle->message_queue_central_engine->push_front(EVT_SEEK);
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_wait state recv EVT_SEEK evt!!\n");
             this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
             return;
@@ -204,6 +205,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_start(player_event_e 
         }
         case EVT_SEEK:
         {
+            mediaFileHandle->message_queue_central_engine->push_front(EVT_SEEK);
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_start state recv EVT_SEEK evt!!\n");
             this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
             return;
@@ -229,7 +231,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
             if(mediaFileHandle->video_frame_queue->node_count >= X_MAX_FRAME_VIDEO_Q_NODE_CNT)
             {
                 //XLog::d(ANDROID_LOG_WARN ,TAG ,"== MediaDecodeVideoStateMachine video_frame_queue is full!\n");
-                usleep(50000);
+                usleep(30000);
                 this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
                 return;
             }
@@ -277,6 +279,7 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_work(player_event_e e
         }
         case EVT_SEEK:
         {
+            mediaFileHandle->message_queue_central_engine->push_front(EVT_SEEK);
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread decode_work state recv EVT_SEEK evt!!\n");
             this->state_machine_change_state(STATE_DECODE_SEEK_WAIT);  // change state.
             return;
@@ -310,7 +313,6 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_seek_wait(player_even
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread seek_wait state recv EVT_START evt!!\n");
             this->state_machine_change_state(STATE_DECODER_WORK);
             this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
-
             return;
         }
 
