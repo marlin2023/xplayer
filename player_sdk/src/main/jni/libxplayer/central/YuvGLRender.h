@@ -49,36 +49,24 @@ static const char* VERTEX_SHADER =
       "}                            \n";
 
 
-//enum {
-//    ATTRIB_VERTEX,
-//    ATTRIB_TEXTURE,
-//};
-
-static const GLfloat squareVertices[] = {
+static GLfloat squareVertices[] = {
     -1.0f, -1.0f,
      1.0f, -1.0f,
     -1.0f, 1.0f,
      1.0f, 1.0f, };
 
-static const GLfloat coordVertices[] = {
+//static GLfloat squareVertices[] = {
+//    -0.5f, -0.5f,
+//     0.5f, -0.5f,
+//    -0.5f, 0.5f,
+//     0.5f, 0.5f };
+
+
+static GLfloat coordVertices[] = {
     0.0f, 1.0f,
     1.0f, 1.0f,
      0.0f, 0.0f,
-    1.0f, 0.0f, };
-
-//static GLfloat squareVertices[] = {
-//    0.0f, 0.0f,
-//    1.0f, 0.0f,
-//    0.0f,  1.0f,
-//    1.0f,  1.0f,
-//};
-
-//static GLfloat coordVertices[] = {
-//    -1.0f, 1.0f,
-//    1.0f, 1.0f,
-//    -1.0f,  -1.0f,
-//    1.0f,  -1.0f,
-//};
+    1.0f, 0.0f };
 
 class YuvGLRender{
 
@@ -166,6 +154,8 @@ private:
     GLuint mPositionSlot;
 
     GLuint mT_texCoordInSlot;
+
+    float texture_coord_x;
 
 };
 

@@ -16,7 +16,7 @@
 YuvGLRender::YuvGLRender(MediaFile *mediaFile)
 {
     this->mediaFileHandle = mediaFile;
-
+    texture_coord_x = 1.0;
     //this->init();
 }
 
@@ -111,6 +111,8 @@ void YuvGLRender::render_frame()
     usleep(sync_sleep_time); //in microseconds
     // For synchronization end
 
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>src_frame->linesize[0] =%d\n",src_frame->linesize[0]);
+
     // src_frame->data[0]
     bindTexture(textureYId, src_frame->data[0], src_frame->linesize[0], src_frame->height); // first parameter use linesize.
     // src_frame->data[1]
@@ -128,12 +130,19 @@ void YuvGLRender::render_frame()
     GLint tex_v = glGetUniformLocation(simpleProgram, "SamplerV");
     checkGlError("glGetUniformLocation");
 
-    //GLint ATTRIB_VERTEX = glGetAttribLocation(simpleProgram, "vPosition");
-    //GLint ATTRIB_TEXTURE = glGetAttribLocation(simpleProgram, "a_texCoord");
-    //glBindAttribLocation(simpleProgram, ATTRIB_VERTEX, "vPosition");
-    //glBindAttribLocation(simpleProgram, ATTRIB_TEXTURE, "a_texCoord");
+    if(src_frame->linesize[0] != src_frame->width){
 
-    //checkGlError("glBindAttribLocation");
+        texture_coord_x = src_frame->width / (float)src_frame->linesize[0] - 0.009;  // 0.009 used to calibration .
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==> reset texture coordinate  ,padding size =%d ,amend texture_coord_x =%f\n" ,src_frame->linesize[0] - src_frame->width ,texture_coord_x);
+        // reset texture coordinate
+        coordVertices[2] = texture_coord_x;
+        coordVertices[6] = texture_coord_x;
+        //coordVertices[] = {
+        //    0.0f, 1.0f,
+        //    texture_coord_x, 1.0f,
+        //     0.0f, 0.0f,
+        //    texture_coord_x, 0.0f };
+    }
 
     glVertexAttribPointer(mPositionSlot, 2, GL_FLOAT, 0, 0, squareVertices);
     glEnableVertexAttribArray(mPositionSlot);
