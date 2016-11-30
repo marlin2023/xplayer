@@ -317,8 +317,8 @@ static void native_play(JNIEnv *env, jobject thiz)
 
 static void native_pause(JNIEnv *env, jobject thiz)
 {
-
     playerInner->mediaFileHandle->stopRender();
+    playerInner->mediaFileHandle->setPausedState(true);
 
     if(playerInner->mediaFileHandle->isBuffering){
 
@@ -330,7 +330,6 @@ static void native_pause(JNIEnv *env, jobject thiz)
         return ;
     }
     // process state
-    playerInner->mediaFileHandle->setPausedState(true);
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_PAUSE);
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_PAUSE);
 }
@@ -343,6 +342,7 @@ static void native_resume(JNIEnv *env, jobject thiz)
     }
 
     playerInner->mediaFileHandle->setPausedState(false);
+    XLog::e(TAG, "paused startrender set false");
 
     // process state
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_RESUME);

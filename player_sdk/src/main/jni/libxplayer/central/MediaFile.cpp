@@ -552,5 +552,5 @@ void MediaFile::close_file()
 
 void MediaFile::setPausedState(bool is_paused)
 {
-    isPaused = isPaused;
+    isPaused = is_paused;
 }
