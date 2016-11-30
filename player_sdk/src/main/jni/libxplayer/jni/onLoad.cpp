@@ -330,6 +330,7 @@ static void native_pause(JNIEnv *env, jobject thiz)
         return ;
     }
     // process state
+    playerInner->mediaFileHandle->setPausedState(true);
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_PAUSE);
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_PAUSE);
 }
@@ -340,6 +341,8 @@ static void native_resume(JNIEnv *env, jobject thiz)
         XLog::e(TAG ,"======>call native_resume,but in buffering state ,and return.");
         return;
     }
+
+    playerInner->mediaFileHandle->setPausedState(false);
 
     // process state
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_RESUME);

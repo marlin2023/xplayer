@@ -137,6 +137,8 @@ public:
     */
     void close_file();
 
+    void setPausedState(bool is_paused);
+
 
 private:
     /**
@@ -172,7 +174,8 @@ public:
 
     bool file_opened;
 
-    bool isBuffering ;
+    bool isBuffering;
+    bool isPaused;
     /**
      * format context for input file
      */

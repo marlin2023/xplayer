@@ -37,6 +37,7 @@ MediaFile::MediaFile()
     file_opened = false;
     stop_flag = false;  // not stop
     isBuffering = false;
+    isPaused = false;
     isPlayedBefore = false;
     seeking_mark    = false;
 
@@ -547,4 +548,9 @@ void MediaFile::close_file()
         XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource 33.");
     }
     XLog::d(ANDROID_LOG_WARN ,TAG ,"===>close_file..,free ffmpeg resource end .");
+}
+
+void MediaFile::setPausedState(bool is_paused)
+{
+    isPaused = isPaused;
 }
