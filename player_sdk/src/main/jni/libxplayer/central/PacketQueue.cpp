@@ -164,14 +164,23 @@ int64_t PacketQueue::get_first_pkt_pts()
 
     pkt1 = first_packet;
     if (pkt1) {
-        //pts = pkt1->pkt.pts;
-        //if(pts == AV_NOPTS_VALUE){
-        //    pts = pkt1->pkt.dts;
-        //}
+
         // DTS Monotonic Increase ,But PTS not.
         pts = pkt1->pkt.dts;
         if(pts == AV_NOPTS_VALUE){
             pts = pkt1->pkt.pts;
+        }
+
+        // may encounter pts and dts both be set AV_NOPTS_VALUE ,now use the next packet dts.
+        if(pts == AV_NOPTS_VALUE){
+
+            if(pkt1->next){
+                pts = pkt1->next->pkt.dts;
+                XLog::e(TAG ,"==>2 in get_first_pkt_pts after amend,pts =%lld.\n" ,pts);
+            }else{
+                pts = 0;
+                XLog::e(TAG ,"==>1 in get_first_pkt_pts after amend,pts =%lld.\n" ,pts);
+            }
         }
     }else {
       // set pts 0
@@ -192,10 +201,10 @@ int64_t PacketQueue::get_last_pkt_pts()
 
     pkt1 = last_packet;
     if (pkt1) {
-        //pts = pkt1->pkt.pts;
-        //if(pts == AV_NOPTS_VALUE){
-            pts = pkt1->pkt.dts;
-        //}
+        pts = pkt1->pkt.dts;
+        if(pts == AV_NOPTS_VALUE){
+            pts = 0;
+        }
     }else {
       // set pts 0
         pts = 0;

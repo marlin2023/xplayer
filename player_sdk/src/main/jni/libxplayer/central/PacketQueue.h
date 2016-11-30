@@ -57,7 +57,8 @@ public:
     */
     void *empty_param; //
 
-private:
+//private:
+public:
 
     /**
     * get first packet pts in packet queue.

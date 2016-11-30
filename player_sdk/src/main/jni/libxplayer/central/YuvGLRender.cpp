@@ -111,7 +111,7 @@ void YuvGLRender::render_frame()
     usleep(sync_sleep_time); //in microseconds
     // For synchronization end
 
-    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>src_frame->linesize[0] =%d\n",src_frame->linesize[0]);
+    //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>src_frame->linesize[0] =%d\n",src_frame->linesize[0]);
 
     // src_frame->data[0]
     bindTexture(textureYId, src_frame->data[0], src_frame->linesize[0], src_frame->height); // first parameter use linesize.

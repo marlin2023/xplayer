@@ -447,6 +447,8 @@ CM_BOOL MediaFile::is_pkt_q_full(int64_t max_buffer_ts)
     if(this->stream_index[AVMEDIA_TYPE_VIDEO] >= 0)
     {
         AVStream *vst = fc->streams[stream_index[AVMEDIA_TYPE_VIDEO]];
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"===>video packet video_queue->get_buffer_packet_ts() = %lld ,get_last_pkt_pts =%lld ,get_first_pkt_pts =%lld\n" ,
+                                    video_queue->get_buffer_packet_ts() ,video_queue->get_last_pkt_pts() ,video_queue->get_first_pkt_pts());
         q_v_buffer_ts = video_queue->get_buffer_packet_ts() * av_q2d(vst->time_base) * 1000;
     }
 
@@ -457,8 +459,8 @@ CM_BOOL MediaFile::is_pkt_q_full(int64_t max_buffer_ts)
         q_a_buffer_ts = audio_queue->get_buffer_packet_ts() * av_q2d(vst->time_base)*1000;
     }
 
-    //XLog::d(ANDROID_LOG_WARN ,TAG ,"PKT Q, q_v_ts = %lld, q_a_ts = %lld, v count = %d, a count = %d, base_time = %lld\n",
-    //           q_v_buffer_ts, q_a_buffer_ts, video_queue->size(), audio_queue->size(), max_buffer_ts);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"PKT Q, q_v_ts = %lld, q_a_ts = %lld, v count = %d, a count = %d, base_time = %lld\n",
+               q_v_buffer_ts, q_a_buffer_ts, video_queue->size(), audio_queue->size(), max_buffer_ts);
 
     switch(this->av_support)
     {
