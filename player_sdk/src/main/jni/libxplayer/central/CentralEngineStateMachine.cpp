@@ -727,7 +727,7 @@ void CentralEngineStateMachine::ffmpeg_do_seek(void)
     }
 
     int64_t seek_pos = av_rescale(this->mediaFileHandle->seekpos, AV_TIME_BASE, 1000); //milliseconds_to_fftime(msec);
-    if(seek_pos >= this->mediaFileHandle->format_context->duration  ){
+    if((seek_pos + 2000000)  >= this->mediaFileHandle->format_context->duration  ){    // the last 2 second and the complete
         // oncomplete
         XLog::e(TAG ,"====>state_machine: =====>ffmpeg_do_seek  onComplete.\n");
         XLog::e(TAG ,"====>state_machine: =====>ffmpeg_do_seek notify eof and should quit ...\n");
