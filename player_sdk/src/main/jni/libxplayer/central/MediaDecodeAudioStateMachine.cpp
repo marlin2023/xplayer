@@ -297,6 +297,11 @@ void MediaDecodeAudioStateMachine::do_process_audio_decode_seek_wait(player_even
 
             return;
         }
+        case EVT_SEEK:
+        {
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeAudioStateMachine thread seek_wait state recv EVT_SEEK evt!!\n");
+            return;
+        }
         default:
         {
             XLog::e(TAG ,"===>AUDIO_DECODE_SEEK_WAIT receive others EVT:%d\n" ,evt);

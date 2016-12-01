@@ -315,7 +315,12 @@ void MediaDecodeVideoStateMachine::do_process_video_decode_seek_wait(player_even
             this->mediaFileHandle->message_queue_video_decode->push(EVT_DECODE_GO_ON);
             return;
         }
-
+        case EVT_SEEK:
+        {
+            mediaFileHandle->message_queue_central_engine->push_front(EVT_SEEK);
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread seek_wait state recv EVT_SEEK evt!!\n");
+            return;
+        }
         default:
         {
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== MediaDecodeVideoStateMachine thread seek_wait state receive others EVT:%d\n" ,evt);
