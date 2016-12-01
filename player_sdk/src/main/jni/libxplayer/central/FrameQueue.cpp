@@ -254,6 +254,7 @@ void FrameQueue::notify_buffering_end()
         }else{ // seek or play buffering during the playing .
 
             if(!mediaFileHandle->isPaused) {
+                XLog::e(TAG ,"===>state_machine: isPaused is false\n");
                 mediaFileHandle->startRender();
             }
 

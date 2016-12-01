@@ -552,5 +552,6 @@ void MediaFile::close_file()
 
 void MediaFile::setPausedState(bool is_paused)
 {
+    XLog::e(TAG ,"===>state_machine: setPausedState is called ,is_paused = %d\n" ,is_paused);
     isPaused = is_paused;
 }
