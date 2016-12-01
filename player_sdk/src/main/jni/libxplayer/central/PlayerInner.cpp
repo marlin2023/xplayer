@@ -131,9 +131,8 @@ CM_BOOL PlayerInner::player_engine_prepare()
 
 CM_BOOL PlayerInner::player_start()
 {
-    audioRender->InitPlayout();
+    //audioRender->InitPlayout();
     audioRender->play();
-    //TODO
 }
 
 bool PlayerInner::isPlaying()

@@ -111,6 +111,11 @@ public:
     void jNI2BufferState();
 
     /**
+     * create audio mix object
+     */
+    void createAudioMixObj();
+
+    /**
      * set source url
      */
     void setSourceUrl(const char *source_url);

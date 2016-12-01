@@ -244,6 +244,9 @@ void CentralEngineStateMachine::central_engine_do_process_initialized(player_eve
                     return;
                 }
 
+                // create audio mix object
+                mediaFileHandle->createAudioMixObj();
+
                 // open success.
                 this->state_machine_change_state(STATE_PREPARED);
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread initialized state open file:-%s- success !!!\n" ,mediaFileHandle->getSourceUrl());

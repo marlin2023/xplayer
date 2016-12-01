@@ -78,6 +78,7 @@ public:
     void JNIStopGlRenderMode();
     void JNIStartGlRenderMode();
     void JNI2BufferState();
+    void JNICreateAudioMixObj();
 
 private:
     JNIMediaPlayerListener();
@@ -194,6 +195,15 @@ void JNIMediaPlayerListener::JNI2BufferState()
 
 }
 
+void JNIMediaPlayerListener::JNICreateAudioMixObj()
+{
+    XLog::e(TAG ,"======>in JNICreateAudioMixObj  ..");
+    if(playerInner->audioRender){
+        playerInner->audioRender->InitPlayout();
+    }
+
+}
+
 
 // ----------------------------------------------------------------------------
 
@@ -303,13 +313,9 @@ static void native_start(JNIEnv *env, jobject thiz)
 static void native_play(JNIEnv *env, jobject thiz)
 {
     // start audio decoder & video decoder thread.
-    // TODO send EVT_START to audio decode state machine & video decode state machine should be put in el_do_start_central_engine
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_START);
     playerInner->mediaFileHandle->message_queue_audio_decode->push(EVT_START);
-    // TODO
     playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_PLAY);
-    // audio render thread.
-    playerInner->player_start();
 
     playerInner->mediaFileHandle->startRender();
     XLog::e(TAG ,"======>playerInner->player_start.SimpleBufferQueueCallback");

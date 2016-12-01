@@ -149,6 +149,15 @@ void MediaFile::jNI2BufferState()
     }
 }
 
+void MediaFile::createAudioMixObj()
+{
+    if (mListener != NULL)
+    {
+        mListener->JNICreateAudioMixObj();
+    }
+
+}
+
 static int decode_interrupt_cb(void *ctx)
 {
     MediaFile *is = (MediaFile *)ctx;

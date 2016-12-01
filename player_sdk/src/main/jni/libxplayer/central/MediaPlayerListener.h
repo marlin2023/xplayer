@@ -15,6 +15,11 @@ public:
     virtual void JNIStartGlRenderMode() = 0;
 
     virtual void JNI2BufferState() = 0;
+
+    /**
+     * create opensl es object for audio mix out
+     */
+     virtual void JNICreateAudioMixObj() = 0;
 };
 
 #endif //XPLAYER_MEDIAPLAYERLISTENER_H
