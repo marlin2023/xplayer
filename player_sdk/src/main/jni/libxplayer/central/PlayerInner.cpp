@@ -193,8 +193,11 @@ void PlayerInner::seekTo(long msec)
     mediaFileHandle->message_queue_video_decode->push_front(EVT_SEEK); // start to decode video packet data .
     mediaFileHandle->message_queue_audio_decode->push_front(EVT_SEEK);
 
-    mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);   //
-    mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0); // disappear loading
+    // 第一次起播之前如果seek的话 不执行这里
+    if(mediaFileHandle->isPlayedBefore){   // first loading end
+        mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);   //
+        mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0); // disappear loading
+    }
 }
 
 //-----------*******************-------------

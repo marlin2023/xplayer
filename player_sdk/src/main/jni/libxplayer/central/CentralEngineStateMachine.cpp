@@ -132,7 +132,7 @@ void CentralEngineStateMachine::central_engine_thread(MediaFile *mediaFile)
     while(1){
 
         evt = this->mediaFileHandle->message_queue_central_engine->pop();
-        //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDemuxStateMachine msq evt = %d\n" ,evt);
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDemuxStateMachine msq evt = %d\n" ,evt);
 
         // Exit thread until receive the EXIT_THREAD EVT
         if(evt == EVT_EXIT_THREAD)
