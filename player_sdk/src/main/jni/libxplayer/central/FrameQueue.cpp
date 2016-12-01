@@ -256,10 +256,12 @@ void FrameQueue::notify_buffering_end()
             if(!mediaFileHandle->isPaused) {
                 XLog::e(TAG ,"===>state_machine: isPaused is false\n");
                 mediaFileHandle->startRender();
+                mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
+                XLog::e(TAG ,"===>state_machine: buffering end.0\n");
+            }else{
+                XLog::e(TAG ,"===>state_machine: isPaused is true\n");
             }
 
-            mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_END ,0);
-            XLog::e(TAG ,"===>state_machine: buffering end.0\n");
         }
         mediaFileHandle->isBuffering = false;
         mediaFileHandle->seeking_mark = false;

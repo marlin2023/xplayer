@@ -133,7 +133,7 @@ void YuvGLRender::render_frame()
     if(src_frame->linesize[0] != src_frame->width){
 
         texture_coord_x = src_frame->width / (float)src_frame->linesize[0] - 0.009;  // 0.009 used to calibration .
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==> reset texture coordinate  ,padding size =%d ,amend texture_coord_x =%f\n" ,src_frame->linesize[0] - src_frame->width ,texture_coord_x);
+        //XLog::d(ANDROID_LOG_WARN ,TAG ,"==> reset texture coordinate  ,padding size =%d ,amend texture_coord_x =%f\n" ,src_frame->linesize[0] - src_frame->width ,texture_coord_x);
         // reset texture coordinate
         coordVertices[2] = texture_coord_x;
         coordVertices[6] = texture_coord_x;

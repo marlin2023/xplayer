@@ -15,6 +15,7 @@
 
 #include "util/XLog.h"
 #include "util/XMessageType.h"
+#include "util/XTimeUtil.h"
 
 CentralEngineStateMachine::CentralEngineStateMachine(MediaFile *mediaFile)
 {
@@ -132,7 +133,7 @@ void CentralEngineStateMachine::central_engine_thread(MediaFile *mediaFile)
     while(1){
 
         evt = this->mediaFileHandle->message_queue_central_engine->pop();
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDemuxStateMachine msq evt = %d\n" ,evt);
+        //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>MediaDemuxStateMachine msq evt = %d\n" ,evt);
 
         // Exit thread until receive the EXIT_THREAD EVT
         if(evt == EVT_EXIT_THREAD)
@@ -321,12 +322,17 @@ void CentralEngineStateMachine::central_engine_do_process_buffering(player_event
         {
             mediaFileHandle->end_of_file = false;
             mediaFileHandle->isBuffering = true;
+            long long after_do_seek_current_time = XTimeUtil::getCurrentTime();
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== in central_engine_do_process_buffering ,time1= %lld\n" ,after_do_seek_current_time);
+
             if (demux_2_packet_queue() == AVERROR_EOF && this->read_retry_count > 5)
             {
                 XLog::d(ANDROID_LOG_INFO ,TAG ,"===>AVERROR_EOF....\n");
                 break;
             }
 
+            after_do_seek_current_time = XTimeUtil::getCurrentTime();
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== in central_engine_do_process_buffering ,time2= %lld\n" ,after_do_seek_current_time);
             // TODO ,here buffer data size different for the first load and the later .
             //if( mediaFileHandle->isPlayedBefore && (mediaFileHandle->seeking_mark == 0) ){
             if( !mediaFileHandle->isPlayedBefore ||  mediaFileHandle->seeking_mark ){
@@ -672,6 +678,8 @@ void CentralEngineStateMachine::central_engine_do_process_seek_wait(player_event
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread SEEK_WAIT_STATE before av_read_play\n");
             av_read_play(fc);
             XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread SEEK_WAIT_STATE after av_read_play\n");
+            long long after_do_seek_current_time = XTimeUtil::getCurrentTime();
+            XLog::d(ANDROID_LOG_INFO ,TAG ,"== CentralEngineStateMachine thread SEEK_WAIT_STATE after av_read_play ,time = %lld\n" ,after_do_seek_current_time);
             // send read next packet message
             this->mediaFileHandle->message_queue_central_engine->push(EVT_GO_ON);
             return;

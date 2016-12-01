@@ -16,6 +16,7 @@ LOCAL_SRC_FILES := jni/onLoad.cpp   \
                 util/XLog.cpp   \
                 util/XMessageQueue.cpp  \
                 util/XMutexlock.cpp \
+                util/XTimeUtil.cpp \
                 \
                 central/PacketQueue.cpp \
                 central/FrameQueue.cpp \

@@ -294,8 +294,9 @@ static void native_prepareAsync(JNIEnv *env, jobject thiz)
 
 static void native_start(JNIEnv *env, jobject thiz)
 {
-    //playerInner->player_engine_prepare();
     playerInner->mediaFileHandle->message_queue_central_engine->push(EVT_START);   //TODO here should be performed in upper layer
+    playerInner->mediaFileHandle->setPausedState(false);    // upper layer will call start before seek.
+    XLog::e(TAG, "====>in native_start paused  set false");
     usleep(50* 1000);   // for seek
 }
 

@@ -311,7 +311,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
     @Override
     public void start() throws IllegalStateException {
         try {
-            if(mCurrentState == STATE_SEEKING){return;} // add for soft decoder.
+            //if(mCurrentState == STATE_SEEKING){return;} // add for soft decoder.
 
             if (isInPlaybackState()) {
                 // if in the end of file
