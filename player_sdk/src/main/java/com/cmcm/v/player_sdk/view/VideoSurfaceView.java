@@ -26,7 +26,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
     public static String TAG = "VideoSurfaceView";
 
-    boolean isEGLContextInitilized;
+
 
     public int lastW = 0;
 
@@ -46,8 +46,6 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
     protected void initView(){
         Log.i(TAG, "VideoSurfaceView Construct...");
-
-        isEGLContextInitilized = false;
 
         mMediaPlayer = new XPlayer();
 
@@ -69,6 +67,7 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
         isFileCompleted = false;
         // create gl program
         if(!isEGLContextInitilized){
+            Log.i(TAG ,"========>onSurfaceCreated call initEGLCtx");
             this.mMediaPlayer.initEGLCtx();
             isEGLContextInitilized = true;
         }

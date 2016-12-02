@@ -121,7 +121,7 @@ void YuvGLRender::render_frame()
     bindTexture(textureVId, src_frame->data[2], src_frame->linesize[2], src_frame->height/2);
 
     //
-    glClearColor(1.0f, 0.0f, 0.0f, 1);
+    glClearColor(0.0f, 0.0f, 0.0f, 1);
     checkGlError("glClearColor");
     glClear(GL_COLOR_BUFFER_BIT);
 

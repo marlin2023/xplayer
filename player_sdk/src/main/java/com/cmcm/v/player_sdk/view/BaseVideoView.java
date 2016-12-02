@@ -36,6 +36,8 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
     // set VIDEO_LAYOUT_SCALE as default.
     protected int mVideoLayout = VIDEO_LAYOUT_FIT_PARENT;
 
+    boolean isEGLContextInitilized;
+
     protected SurfaceHolder mSurfaceHolder = null;
     protected IMediaPlayer mMediaPlayer = null;
     protected int mVideoWidth;
@@ -98,6 +100,7 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
         mVideoSarNum = 0;
         mVideoSarDen = 0;
         mHasFistrPic = false;
+        isEGLContextInitilized = false;
 
         getHolder().addCallback(mSHCallback);
         setFocusable(true);
@@ -230,6 +233,7 @@ public abstract class BaseVideoView extends GLSurfaceView implements CMPlayerCon
         public void surfaceDestroyed(SurfaceHolder holder) {
             Log.i("chenyg", "surfaceDestroyed()");
             mSurfaceHolder = null;
+            isEGLContextInitilized = false;
         }
 
     };
