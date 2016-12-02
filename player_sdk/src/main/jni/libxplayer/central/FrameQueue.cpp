@@ -247,8 +247,13 @@ void FrameQueue::notify_buffering_end()
 
     if(ret){
         if(!mediaFileHandle->isPlayedBefore){   // first loading end
-            XLog::e(TAG ,"===>state_machine: show first pic 0\n");
-            mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
+            if(!mediaFileHandle->isPaused) {
+                XLog::e(TAG ,"===>state_machine: show first pic 0\n");
+                mediaFileHandle->notify(MEDIA_BUFFERING_UPDATE ,100 ,100);
+            }else{
+                XLog::e(TAG ,"===>state_machine: show first pic 0 ,but is paused state.\n");
+            }
+
             mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_FIRST_SHOW_PIC ,0);    // notify first picture.
             mediaFileHandle->isPlayedBefore = true;  // set player played mark.
         }else{ // seek or play buffering during the playing .

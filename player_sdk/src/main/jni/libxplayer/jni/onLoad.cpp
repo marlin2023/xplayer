@@ -9,6 +9,7 @@
 #include "util/XLog.h"
 #include "central/PlayerInner.h"
 #include "central/YuvGLRender.h"
+#include "central/xplayer_android_def.h"
 
 static const char *TAG = "JNI_ONLOAD";
 
@@ -326,6 +327,7 @@ static void native_pause(JNIEnv *env, jobject thiz)
 {
     playerInner->mediaFileHandle->stopRender();
     playerInner->mediaFileHandle->setPausedState(true);
+    XLog::e(TAG, "====>in native_start paused  set true");
 
     if(playerInner->mediaFileHandle->isBuffering){
 
@@ -343,13 +345,16 @@ static void native_pause(JNIEnv *env, jobject thiz)
 
 static void native_resume(JNIEnv *env, jobject thiz)
 {
-    if(playerInner->centralEngineStateMachineHandle->state == STATE_BUFFERING){
-        XLog::e(TAG ,"======>call native_resume,but in buffering state ,and return.");
-        return;
-    }
 
     playerInner->mediaFileHandle->setPausedState(false);
-    XLog::e(TAG, "paused startrender set false");
+    XLog::e(TAG, "====>in native_start paused  set false");
+
+    if(playerInner->centralEngineStateMachineHandle->state == STATE_BUFFERING){
+        // notify [fix for buffering then click pause then immediate click start ,but loading is disappear ]
+        playerInner->mediaFileHandle->notify(MEDIA_INFO ,MEDIA_INFO_BUFFERING_START ,0);
+        XLog::e(TAG ,"======>call native_resume,but in buffering state ,notify buffering start and return.");
+        return;
+    }
 
     // process state
     playerInner->mediaFileHandle->message_queue_video_decode->push(EVT_RESUME);
