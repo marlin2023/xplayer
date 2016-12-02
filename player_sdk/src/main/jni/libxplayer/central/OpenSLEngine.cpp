@@ -326,17 +326,28 @@ int OpenSLEngine::createAudioPlayer()
         }
 
         swr_ctx = swr_alloc();
-        swr_ctx = swr_alloc_set_opts(NULL,
-                               audioCodecParameters->channel_layout, AV_SAMPLE_FMT_S16, audioCodecParameters->sample_rate,
-                               audioCodecParameters->channel_layout, (AVSampleFormat)audioCodecParameters->format, audioCodecParameters->sample_rate,
-                               0, NULL);
-        int ret = 0;
+        swr_ctx = swr_alloc_set_opts(swr_ctx,
+                               AV_CH_LAYOUT_STEREO /*audioCodecParameters->channel_layout*/,
+                               AV_SAMPLE_FMT_S16, audioCodecParameters->sample_rate,
 
+                               (audioCodecParameters->channel_layout == 0)?((audioCodecParameters->channels == 2)?AV_CH_LAYOUT_STEREO:AV_CH_LAYOUT_MONO):audioCodecParameters->channel_layout,
+                               (AVSampleFormat)audioCodecParameters->format, audioCodecParameters->sample_rate,
+                               0, NULL);
+
+        XLog::e(TAG ,"=====>audioCodecParameters->channel_layout = %d\n" ,audioCodecParameters->channel_layout);
+        XLog::e(TAG ,"=====>audioCodecParameters->sample_rate = %d\n" ,audioCodecParameters->sample_rate);
+        XLog::e(TAG ,"=====>audioCodecParameters->format = %d\n" ,audioCodecParameters->format);
+
+        if (!swr_ctx){
+            XLog::e(TAG ,"Failed to initialize the swr_ctx\n");
+            return -1;
+        }
+
+        int ret = 0;
         if ((ret = swr_init(swr_ctx)) < 0) {
 
-            XLog::e(TAG ,"Failed to initialize the resampling context\n");
+            XLog::e(TAG ,"Failed to initialize the resampling context ,ret = %d\n" ,ret);
             return -1;
-
         }
     }
 
