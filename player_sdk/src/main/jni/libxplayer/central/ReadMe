@@ -221,7 +221,13 @@ TODO
 
    2：
 
-
+----
+    TODO
+    视频渲染结构调整
+    -
+    视频渲染YuvGLRender 现在是在PlayerInner object 里的， 其实渲染本身与播放器没有包含关系，
+    如果把yuvglrender 单独抽取出来结构更合适，
+    直接把解码后数据送yuvrender线程就可以（同步工作在送线程之前已做好）。
 
 
 
