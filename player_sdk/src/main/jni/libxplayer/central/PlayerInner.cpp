@@ -23,7 +23,7 @@ PlayerInner::PlayerInner()
                                                                 mediaDecodeAudioStateMachineHandle ,
                                                                 mediaDecodeVideoStateMachineHandle);
     //
-    yuvGLRender = new YuvGLRender(mediaFileHandle);
+
     audioRender = new OpenSLEngine(mediaFileHandle);
 
 }
@@ -63,12 +63,6 @@ PlayerInner::~PlayerInner()
         audioRender = NULL;
     }
 
-    // yuv gl ,this should be release in GLSurfaceView Render Thread.
-    //if(yuvGLRender){
-    //    XLog::e(TAG ,"======>delete yuvGLRender.");
-    //    delete yuvGLRender;
-    //    yuvGLRender = NULL;
-    //}
     XLog::e(TAG ,"======>in ~PlayerInner end.");
 }
 
@@ -138,6 +132,11 @@ CM_BOOL PlayerInner::player_start()
 bool PlayerInner::isPlaying()
 {
     bool playerState;
+
+    if(mediaFileHandle->isPaused){ // player in paused state.
+       return false;
+    }
+
     // TODO
     if (centralEngineStateMachineHandle->state == STATE_PLAY_PLAYING ||
         centralEngineStateMachineHandle->state == STATE_PREPARED ||
@@ -145,7 +144,7 @@ bool PlayerInner::isPlaying()
         centralEngineStateMachineHandle->state == STATE_BUFFERING) {
         return true;
     }
-
+    return false;
 }
 
 long PlayerInner::getCurrentPosition()

@@ -15,7 +15,7 @@
 #include <stdint.h>
 
 #include <list>
-#include "XMutexLock.h"
+#include "XMutexlock.h"
 #include "XMessageType.h"
 
 using namespace std;

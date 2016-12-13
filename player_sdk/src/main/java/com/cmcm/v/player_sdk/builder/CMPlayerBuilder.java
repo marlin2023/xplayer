@@ -37,8 +37,8 @@ public class CMPlayerBuilder {
                 break;
             case IJKSW:
                 Log.i(TAG, "creat IjkSW player");
-                view = new VideoSurfaceView(context, libLoader);
-                ((VideoSurfaceView)view).init();    //
+                //view = new VideoSurfaceView(context, libLoader);
+                view = new VideoSurfaceView(context, null);
                 break;
             default:
         }

@@ -72,13 +72,14 @@ class YuvGLRender{
 
 public:
     YuvGLRender(MediaFile *mediaFile);
+    YuvGLRender();
     ~YuvGLRender();
 
     /**
      * render the source frame.
      */
-    //void render_frame(AVFrame *src_frame);
-    void render_frame();
+    void render_frame(AVFrame *src_frame);
+    //void render_frame();
 
 
     /**

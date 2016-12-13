@@ -166,6 +166,13 @@ echo ""
 echo "--------------------"
 echo "[*] compile ffmpeg"
 echo "--------------------"
+#
+sed -i '' "s/HAVE_LOG2 1/HAVE_LOG2 0/g" config.h
+sed -i '' "s/HAVE_LOG2F 1/HAVE_LOG2F 0/g" config.h
+sed -i '' "s/HAVE_LOG10F 1/HAVE_LOG10F 0/g" config.h
+# mac use like this
+#sed -i '' "s/HAVE_LOG2 1/HAVE_LOG2 0/g" config.h
+
 make -j4
 make install
 

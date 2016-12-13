@@ -13,6 +13,12 @@
 
 #include "util/XLog.h"
 
+YuvGLRender::YuvGLRender()
+{
+    texture_coord_x = 1.0;
+}
+
+
 YuvGLRender::YuvGLRender(MediaFile *mediaFile)
 {
     this->mediaFileHandle = mediaFile;
@@ -22,19 +28,20 @@ YuvGLRender::YuvGLRender(MediaFile *mediaFile)
 
 YuvGLRender::~YuvGLRender()
 {
-
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in ~YuvGLRender() \n");
     // delete teture
-     glDeleteTextures(1, &textureYId);
-     textureYId = -1;
-     glDeleteTextures(1, &textureUId);
-     textureUId = -1;
-     glDeleteTextures(1, &textureVId);
-     textureVId = -1;
+    glDeleteTextures(1, &textureYId);
+    textureYId = -1;
+    glDeleteTextures(1, &textureUId);
+    textureUId = -1;
+    glDeleteTextures(1, &textureVId);
+    textureVId = -1;
 
     // free opengl resource
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
     glDeleteProgram(simpleProgram);
+    XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in ~YuvGLRender() over\n");
 }
 
 void YuvGLRender::init()
@@ -61,55 +68,9 @@ void YuvGLRender::init()
 }
 
 
-//void YuvGLRender::render_frame(AVFrame *src_frame)
-void YuvGLRender::render_frame()
+void YuvGLRender::render_frame(AVFrame *src_frame)
+//void YuvGLRender::render_frame()
 {
-    AVFrame *src_frame;
-    src_frame = av_frame_alloc();
-    //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .");
-    //this->mediaFileHandle->video_frame_queue->get(src_frame);
-    int ret1 = this->mediaFileHandle->video_frame_queue->get(src_frame ,0); // no block mode
-    if(ret1 != 1){
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .no video frame ,return ,video packet size = %d ,video packet q mem size =%d" ,mediaFileHandle->video_queue->size() ,mediaFileHandle->video_queue->q_size);
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .no video frame ,return ,audio packet size = %d ,audio packet q mem size =%d" ,mediaFileHandle->audio_queue->size() ,mediaFileHandle->audio_queue->q_size);
-        //mediaFileHandle->stopRender();
-        usleep(50 * 1000); //in microseconds
-        av_frame_free(&src_frame);  // free frame memory
-        return;
-    }
-
-    //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>video frame queue size :%d\n", this->mediaFileHandle->video_frame_queue->size());
-
-    // For synchronization start
-    int64_t video_frame_render_pts = src_frame->pts * av_q2d(mediaFileHandle->video_stream->time_base) * 1000;   // in millisecond
-    int64_t sync_audio_clock_time = mediaFileHandle->sync_audio_clock_time;
-    int64_t diff_time = video_frame_render_pts - sync_audio_clock_time;
-    int64_t sync_sleep_time = 0;
-
-    // TODO filter some error diff_time.
-    if( (diff_time > 0) && (diff_time < 800) ){ // 100 millisecond
-        sync_sleep_time = diff_time * 1000;
-
-    }else if( (diff_time >= -500) && (diff_time <= 0) ){
-
-        sync_sleep_time = 500;
-    }else if(diff_time  < -500){
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%lld ,sync_audio_clock_time =%lld ,diff_time =%lld ,"
-                                                                    "video_frame_q size =%d ,audio_frame_q size =%d\n",
-                                                                     video_frame_render_pts ,sync_audio_clock_time,diff_time ,
-                                                                     mediaFileHandle->video_frame_queue->size() ,mediaFileHandle->audio_frame_queue->size());
-
-        sync_sleep_time = 1000;    /// video frame need to catch the audio frame clock.
-    }else{
-        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%lld ,sync_audio_clock_time =%lld ,diff_time =%lld ,"
-                                                                    "video_frame_q size =%d ,audio_frame_q size =%d\n",
-                                                                     video_frame_render_pts ,sync_audio_clock_time,diff_time ,
-                                                                     mediaFileHandle->video_frame_queue->size() ,mediaFileHandle->audio_frame_queue->size());
-
-        sync_sleep_time = 100 * 1000;
-    }
-    usleep(sync_sleep_time); //in microseconds
-    // For synchronization end
 
     //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>src_frame->linesize[0] =%d\n",src_frame->linesize[0]);
 
@@ -168,8 +129,7 @@ void YuvGLRender::render_frame()
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     checkGlError("glDrawArrays");
 
-    //av_frame_unref(src_frame);
-    av_frame_free(&src_frame);  // free frame memory
+    //av_frame_free(&src_frame);  // free frame memory
 }
 
 GLuint YuvGLRender::buildShader(const char* source, GLenum shaderType)

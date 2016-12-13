@@ -29,6 +29,7 @@ fields_t fields;
 static JavaVM *sVm;
 //TODO
 static PlayerInner * playerInner;
+static YuvGLRender *yuvGLRender;
 
 /*
  * Throw an exception with the specified class and an optional message.
@@ -282,7 +283,17 @@ static void native_init1(JNIEnv *env, jobject thiz)
 static void native_initEGLCtx(JNIEnv *env, jobject thiz)
 {
     XLog::e(TAG ,"======>native_initEGLCtx .");
-    playerInner->yuvGLRender->init();  // engine init
+    yuvGLRender = new YuvGLRender();
+    yuvGLRender->init();  // engine init
+}
+
+static void native_delEGLCtx(JNIEnv *env, jobject thiz)
+{
+    XLog::e(TAG ,"======>native_delEGLCtx 1.");
+    if(yuvGLRender){
+        delete yuvGLRender;
+        yuvGLRender = NULL;
+    }
 }
 
 
@@ -435,8 +446,58 @@ static void native_release(JNIEnv *env, jobject thiz)
 static void native_renderFrame(JNIEnv *env, jobject thiz)
 {
 
-    YuvGLRender *yuvGLRender = playerInner->yuvGLRender;
-    yuvGLRender->render_frame();
+    // todo
+    AVFrame *src_frame;
+    src_frame = av_frame_alloc();
+    //XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .");
+    //this->mediaFileHandle->video_frame_queue->get(src_frame);
+    int ret1 = playerInner->mediaFileHandle->video_frame_queue->get(src_frame ,0); // no block mode
+    if(ret1 != 1){
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .no video frame ,return ,video packet size = %d ,video packet q mem size =%d" ,playerInner->mediaFileHandle->video_queue->size() ,playerInner->mediaFileHandle->video_queue->q_size);
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>in render_frame thread .no video frame ,return ,audio packet size = %d ,audio packet q mem size =%d" ,playerInner->mediaFileHandle->audio_queue->size() ,playerInner->mediaFileHandle->audio_queue->q_size);
+        //mediaFileHandle->stopRender();
+        usleep(50 * 1000); //in microseconds
+        av_frame_free(&src_frame);  // free frame memory
+        return;
+    }
+
+    // For synchronization start
+    int64_t video_frame_render_pts = src_frame->pts * av_q2d(playerInner->mediaFileHandle->video_stream->time_base) * 1000;   // in millisecond
+    int64_t sync_audio_clock_time = playerInner->mediaFileHandle->sync_audio_clock_time;
+    int64_t diff_time = video_frame_render_pts - sync_audio_clock_time;
+    int64_t sync_sleep_time = 0;
+
+    // TODO filter some error diff_time.
+    if( (diff_time > 0) && (diff_time < 800) ){ // 100 millisecond
+        sync_sleep_time = diff_time * 1000;
+
+    }else if( (diff_time >= -500) && (diff_time <= 0) ){
+
+        sync_sleep_time = 500;
+    }else if(diff_time  < -500){
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%lld ,sync_audio_clock_time =%lld ,diff_time =%lld ,"
+                                                                    "video_frame_q size =%d ,audio_frame_q size =%d\n",
+                                                                     video_frame_render_pts ,sync_audio_clock_time,diff_time ,
+                                                                     playerInner->mediaFileHandle->video_frame_queue->size() ,playerInner->mediaFileHandle->audio_frame_queue->size());
+
+        sync_sleep_time = 1000;    /// video frame need to catch the audio frame clock.
+    }else{
+        XLog::d(ANDROID_LOG_WARN ,TAG ,"==>sync_video_clock_time=%lld ,sync_audio_clock_time =%lld ,diff_time =%lld ,"
+                                                                    "video_frame_q size =%d ,audio_frame_q size =%d\n",
+                                                                     video_frame_render_pts ,sync_audio_clock_time,diff_time ,
+                                                                     playerInner->mediaFileHandle->video_frame_queue->size() ,playerInner->mediaFileHandle->audio_frame_queue->size());
+
+        sync_sleep_time = 100 * 1000;
+    }
+    usleep(sync_sleep_time); //in microseconds
+    // For synchronization end
+
+    yuvGLRender->render_frame(src_frame);
+
+    if(src_frame != NULL){
+        av_frame_free(&src_frame);  // free frame memory
+    }
+
 
 }
 
@@ -486,6 +547,8 @@ static JNINativeMethod methods[] =
 
     {"_init",            "()V",                                      (void*)native_init1},
     {"_initEGLCtx",      "()V",                                      (void*)native_initEGLCtx},
+    {"_delEGLCtx",      "()V",                                      (void*)native_delEGLCtx},
+
 
     {"_setDataSource",   "(Ljava/lang/String;)V",                    (void*)native_setDataSource},
     {"_prepareAsync",    "()V",                                      (void*)native_prepareAsync},

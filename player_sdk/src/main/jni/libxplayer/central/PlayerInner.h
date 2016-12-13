@@ -17,7 +17,6 @@ extern "C" {
 #include "CentralEngineStateMachine.h"
 #include "MediaDecodeAudioStateMachine.h"
 #include "MediaDecodeVideoStateMachine.h"
-#include "YuvGLRender.h"
 #include "OpenSLEngine.h"
 
 /**
@@ -130,7 +129,7 @@ public:
     /**
      * video view Render
      */
-     YuvGLRender *yuvGLRender;
+     //YuvGLRender *yuvGLRender;
 
     /**
      * audio output use opensl es engine.

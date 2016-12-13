@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.SurfaceHolder;
 
 import com.cmcm.v.player_sdk.player.IMediaPlayer;
 import com.cmcm.v.player_sdk.player.XPlayer;
@@ -34,20 +35,23 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
     public boolean isFileCompleted;
 
+    IjkLibLoader libLoaderLocal = null;
     public VideoSurfaceView(Context context, IjkLibLoader libLoader) {
         super(context, libLoader);
-        initView();
+        initView(libLoader);
+        libLoaderLocal = libLoader;
     }
 
     public VideoSurfaceView(Context context, AttributeSet attrs, IjkLibLoader libLoader) {
         super(context, attrs, libLoader);
-        initView();
+        initView(libLoader);
+        libLoaderLocal = libLoader;
     }
 
-    protected void initView(){
+    protected void initView(IjkLibLoader libLoader){
         Log.i(TAG, "VideoSurfaceView Construct...");
 
-        mMediaPlayer = new XPlayer();
+        //mMediaPlayer = new XPlayer(libLoader);
 
         setEGLContextClientVersion(2);                  // set opengl es version
         // setEGLConfigChooser(8, 8, 8, 8, 8, 0);
@@ -61,15 +65,22 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        Log.i(TAG ,"========>onSurfaceCreated");
+        Log.i(TAG ,"========>onSurfaceCreated 1");
         lastW = 0;
         lastH = 0;
-        isFileCompleted = false;
         // create gl program
         if(!isEGLContextInitilized){
-            Log.i(TAG ,"========>onSurfaceCreated call initEGLCtx");
-            this.mMediaPlayer.initEGLCtx();
+            Log.i(TAG ,"========>onSurfaceCreated call initEGLCtx ,mCurrentState =" + mCurrentState);
+            if((mCurrentState == STATE_PLAYING) && !isFileCompleted){
+                setRenderMode(RENDERMODE_CONTINUOUSLY);
+            }
+            XPlayer.initEGLCtx2();
             isEGLContextInitilized = true;
+
+            if(isFileCompleted){
+                isFileCompleted = false;
+            }
+            Log.i(TAG ,"========>onSurfaceCreated call initEGLCtx ,isEGLContextInitilized =" + isEGLContextInitilized);
         }
         //
     }
@@ -77,13 +88,27 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
     @Override
     public void onSurfaceChanged(GL10 gl, int width, int height) {
         Log.e(TAG, "=====>on GLSurfaceView onSurfaceChanged.function..-->width=" + width + ",height=" + height);
+        // create gl program
+        if(!isEGLContextInitilized){
+            Log.i(TAG ,"========>onSurfaceChanged call initEGLCtx ,mCurrentState =" + mCurrentState);
+            if((mCurrentState == STATE_PLAYING) && !isFileCompleted){
+                setRenderMode(RENDERMODE_CONTINUOUSLY);
+            }
+            XPlayer.initEGLCtx2();
+            isEGLContextInitilized = true;
+
+            if(isFileCompleted){
+                isFileCompleted = false;
+            }
+            Log.i(TAG ,"========>onSurfaceChanged call initEGLCtx ,isEGLContextInitilized =" + isEGLContextInitilized);
+        }
+
 
         if(mMediaPlayer!= null){
             if ((lastW != width) || (lastH != width))
             {
                 Log.e(TAG, "=====>on GLSurfaceView onSurfaceChanged.set glViewport....set -->width=" + width + ",height=" + height);
                 gl.glViewport(0, 0, width , height );
-                //gl.glViewport(0, 0, 640, 360);
                 lastW = width;
                 lastH = height;
             }
@@ -93,10 +118,37 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        if(mMediaPlayer!= null){
+        if((mMediaPlayer!= null) && isEGLContextInitilized){
+
             mMediaPlayer.renderFrame();
         }
+    }
 
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+
+        setRenderMode(RENDERMODE_WHEN_DIRTY);
+
+        queueEvent(new Runnable(){
+            @Override
+            public void run() {
+                Log.i(TAG ,"========>surfaceDestroyed in VideoSurfaceView 1");
+                XPlayer.delEGLCtx2();
+                synchronized (this) {
+                    this.notify();
+                }
+            }
+        });
+        Log.i(TAG ,"========>surfaceDestroyed in VideoSurfaceView 2");
+
+        synchronized (this)
+        {
+            try { this.wait(100); }
+            catch (InterruptedException e) { }
+        }
+        super.surfaceDestroyed(holder);
+        isEGLContextInitilized = false;
+        Log.i(TAG ,"========>surfaceDestroyed in VideoSurfaceView 3");
     }
 
     @Override
@@ -139,8 +191,10 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
 
     public void play(){
-        mMediaPlayer.playInterface();
-        mCurrentState = STATE_PLAYING;
+        if(mMediaPlayer != null){
+            mMediaPlayer.playInterface();
+            mCurrentState = STATE_PLAYING;
+        }
     }
 
 
@@ -158,7 +212,10 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 //        am.requestAudioFocus(null, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
         try {
-
+            isFileCompleted = false;   // 视频流
+            mMediaPlayer = new XPlayer(libLoaderLocal);
+            //initEGLCtx();
+            mMediaPlayer.initPlayer();
             mMediaPlayer.setOnPreparedListener(mPreparedListener);
             mMediaPlayer.setOnCompletionListener(mXplayerCompletionListener);
             mMediaPlayer.setOnBufferingUpdateListener(mBufferingUpdateListener);
@@ -314,9 +371,11 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
 
             if (isInPlaybackState()) {
                 // if in the end of file
-                if(isFileCompleted){
+                if(isFileCompleted || (mTargetState == STATE_PLAYBACK_COMPLETED)){
                     mMediaPlayer.seekTo(0);
-                    isFileCompleted = false;    // reset
+                    mTargetState = STATE_PLAYING;
+                    mCurrentState = STATE_PLAYING;
+                    mMediaPlayer.resume();
                     return;
                 }
 
@@ -373,6 +432,9 @@ public class VideoSurfaceView extends BaseVideoView implements GLSurfaceView.Ren
     public void seekTo(int msec) {
         if (isInPlaybackState()) {
             mMediaPlayer.seekTo(msec);
+            if(msec != 0){
+                isFileCompleted = false;
+            }
             mCurrentState = STATE_SEEKING;
             mSeekWhenPrepared = 0;
         } else {

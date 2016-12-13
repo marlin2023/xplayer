@@ -7,6 +7,9 @@ import android.os.Message;
 import android.util.Log;
 import android.view.SurfaceHolder;
 
+import com.cmcm.v.player_sdk.view.IjkLibLoader;
+
+import java.io.File;
 import java.lang.ref.WeakReference;
 
 /**
@@ -49,20 +52,59 @@ public class XPlayer extends SimpleMediaPlayer {
 
     private static GLRenderControlerListener    mGLRenderControlerListener;
 
-    static {
-        try {
-            System.loadLibrary("ffmpeg");
-            System.loadLibrary("cmxplayer");
 
-        } catch(Exception e) {
-            e.printStackTrace(System.out);
+    /**
+     * Default library loader
+     * Load them by yourself, if your libraries are not installed at
+     * default place.
+     */
+    private static IjkLibLoader sLocalLibLoader = new IjkLibLoader() {
+        @Override
+        public void loadLibrary(String libName) throws UnsatisfiedLinkError, SecurityException {
+            System.loadLibrary(libName);
         }
+    };
 
-        //
-        _native_init();
+    private static volatile boolean mIsLibLoaded = false;
+
+    public static void loadLibrariesOnce(IjkLibLoader libLoader) {
+        synchronized (XPlayer.class) {
+            if (!mIsLibLoaded) {
+                if (libLoader == null) {  //默认使用libs下载so
+                    libLoader = sLocalLibLoader;
+                    libLoader.loadLibrary("cmffmpeg");
+                    libLoader.loadLibrary("cmxplayer");
+                } else {
+                    libLoader.loadLibrary("libcmffmpeg.so");
+                    libLoader.loadLibrary("libcmxplayer.so");
+                }
+                mIsLibLoaded = true;
+            }
+            //
+            _native_init(); //// TODO: 12/6/16  
+        }
     }
 
-    public XPlayer() {
+//    static {
+//        try {
+//            //System.loadLibrary("ffmpeg");
+//            //System.loadLibrary("cmxplayer");
+//
+//        } catch(Exception e) {
+//            e.printStackTrace(System.out);
+//        }
+//
+//    }
+
+
+    /**
+     * do not loadLibaray
+     * @param libLoader
+     *              custom library loader, can be null.
+     */
+    public XPlayer(IjkLibLoader libLoader) {
+
+        loadLibrariesOnce(libLoader);
         // new player object ,and get player handle.
         Looper looper;
         if ((looper = Looper.myLooper()) != null) {
@@ -367,7 +409,15 @@ public class XPlayer extends SimpleMediaPlayer {
 
     @Override
     public void initEGLCtx(){
+        //_initEGLCtx();
+    }
+
+    public static void initEGLCtx2(){
         _initEGLCtx();
+    }
+
+    public static void delEGLCtx2(){
+        _delEGLCtx();
     }
 
     @Override
@@ -405,7 +455,10 @@ public class XPlayer extends SimpleMediaPlayer {
     /**
      * init opengl context .
      */
-    public native void _initEGLCtx();
+    public static native void _initEGLCtx();
+
+    public static native void _delEGLCtx();
+
 
     /**
      * set DataSource

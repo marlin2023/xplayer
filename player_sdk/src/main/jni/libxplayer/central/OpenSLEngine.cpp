@@ -326,11 +326,16 @@ int OpenSLEngine::createAudioPlayer()
         }
 
         swr_ctx = swr_alloc();
+        int64_t in_out_channel_layout = audioCodecParameters->channel_layout;
+        if(in_out_channel_layout == 0){  // fix bug for mono channel file play audio dirty.
+            in_out_channel_layout = (audioCodecParameters->channels == 2)?AV_CH_LAYOUT_STEREO:AV_CH_LAYOUT_MONO;
+        }
+
         swr_ctx = swr_alloc_set_opts(swr_ctx,
-                               AV_CH_LAYOUT_STEREO /*audioCodecParameters->channel_layout*/,
+                               in_out_channel_layout,
                                AV_SAMPLE_FMT_S16, audioCodecParameters->sample_rate,
 
-                               (audioCodecParameters->channel_layout == 0)?((audioCodecParameters->channels == 2)?AV_CH_LAYOUT_STEREO:AV_CH_LAYOUT_MONO):audioCodecParameters->channel_layout,
+                               in_out_channel_layout,
                                (AVSampleFormat)audioCodecParameters->format, audioCodecParameters->sample_rate,
                                0, NULL);
 

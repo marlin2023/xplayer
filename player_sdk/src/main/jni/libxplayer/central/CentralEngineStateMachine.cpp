@@ -516,10 +516,15 @@ void CentralEngineStateMachine::central_engine_do_process_play_file_end(player_e
         case EVT_GO_ON:
         {
             // notify TODO
-            if( (mediaFileHandle->video_queue->size() == 0) &&
-                (mediaFileHandle->audio_queue->size() == 0) &&
-                ( (mediaFileHandle->video_frame_queue->size() == 0) ||
-                (mediaFileHandle->audio_frame_queue->size() == 0 ) )){
+            //if( (mediaFileHandle->video_queue->size() == 0) &&
+            //    (mediaFileHandle->audio_queue->size() == 0) &&
+            //    ( (mediaFileHandle->video_frame_queue->size() == 0) ||
+            //    (mediaFileHandle->audio_frame_queue->size() == 0 ) )){
+            if(
+                ( (mediaFileHandle->video_queue->size() == 0) && (mediaFileHandle->video_frame_queue->size() == 0) ) ||
+                ( (mediaFileHandle->audio_queue->size() == 0) && (mediaFileHandle->audio_frame_queue->size() == 0) )
+               ){
+
 
                 XLog::e(TAG ,"====>state_machine: notify eof and should quit ...\n");
                 this->state_machine_change_state(STATE_PLAY_COMPLETE);

@@ -32,7 +32,7 @@ LOCAL_SRC_FILES := jni/onLoad.cpp   \
 LOCAL_CFLAGS := -D__STDC_CONSTANT_MACROS -D__STDC_LIMIT_MACROS
 
 # linked library
-LOCAL_LDLIBS :=  -llog -lffmpeg -lGLESv2 -lOpenSLES
+LOCAL_LDLIBS :=  -llog -lcmffmpeg -lGLESv2 -lOpenSLES
 
 # linked library search path.
 LOCAL_LDFLAGS += \
